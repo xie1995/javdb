@@ -1,0 +1,833 @@
+﻿# JavDB Extension - Interactive Build Assistant (PowerShell Version)
+param()
+
+# Set console encoding to UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
+chcp 65001 | Out-Null
+
+# Flags
+$releaseOnly = $false
+$autoNotes = $false
+
+function Show-Menu {
+    Write-Host "=================================================" -ForegroundColor Cyan
+    Write-Host " JavDB Extension - Interactive Build Assistant" -ForegroundColor Cyan
+    Write-Host "=================================================" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Please choose the type of build:" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  [1] Major Release (e.g., 1.x.x -> 2.0.0, for incompatible changes)" -ForegroundColor White
+    Write-Host "      Major Release - for incompatible changes" -ForegroundColor Gray
+    Write-Host "  [2] Minor Release (e.g., x.1.x -> x.2.0, for new features)" -ForegroundColor White
+    Write-Host "      Minor Release - for new features" -ForegroundColor Gray
+    Write-Host "  [3] Patch Release (e.g., x.x.1 -> x.x.2, for bug fixes)" -ForegroundColor White
+    Write-Host "      Patch Release - for bug fixes" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "  [4] Just Build (build without changing the version number)" -ForegroundColor White
+    Write-Host "      Just Build - no version change" -ForegroundColor Gray
+    Write-Host "  [5] Generate GitHub Release (custom notes, skip build)" -ForegroundColor White
+    Write-Host "      Create release with custom notes (prev tag..current tag), use existing artifact" -ForegroundColor Gray
+    Write-Host "  [6] Exit" -ForegroundColor White
+    Write-Host ""
+}
+
+function Get-UserChoice {
+    param([string]$Prompt, [string]$Default = "")
+
+    if ($Default) {
+        $userInput = Read-Host "$Prompt [$Default]"
+        if ([string]::IsNullOrWhiteSpace($userInput)) {
+            return $Default
+        }
+    } else {
+        $userInput = Read-Host $Prompt
+    }
+    return $userInput
+}
+
+function Show-Error {
+    Write-Host ""
+    Write-Host "################################################" -ForegroundColor Red
+    Write-Host "# An error occurred. Process halted.          #" -ForegroundColor Red
+    Write-Host "################################################" -ForegroundColor Red
+    Write-Host ""
+    Read-Host "Press Enter to continue..."
+}
+
+function Show-Success {
+    Write-Host ""
+    Write-Host "Process finished." -ForegroundColor Green
+}
+
+function Set-NormalAttributes {
+    param([Parameter(Mandatory=$true)][string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return
+    }
+
+    try {
+        Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue |
+            ForEach-Object {
+                try { $_.Attributes = 'Normal' } catch {}
+            }
+        Get-ChildItem -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue |
+            ForEach-Object {
+                try { $_.Attributes = 'Normal' } catch {}
+            }
+    } catch {}
+}
+
+function Remove-DirectoryWithRetries {
+    param(
+        [Parameter(Mandatory=$true)][string]$Path,
+        [int]$Attempts = 3
+    )
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return $true
+    }
+
+    for ($attempt = 1; $attempt -le $Attempts; $attempt++) {
+        Set-NormalAttributes -Path $Path
+
+        try {
+            Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop
+        } catch {
+            Write-Host "PowerShell removal attempt $attempt failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+
+        if (-not (Test-Path -LiteralPath $Path)) {
+            return $true
+        }
+
+        Write-Host "Trying cmd rmdir fallback (attempt $attempt)..." -ForegroundColor Yellow
+        & cmd.exe /c "rmdir /s /q `"$Path`"" 2>$null | Out-Null
+        if (-not (Test-Path -LiteralPath $Path)) {
+            return $true
+        }
+
+        $robocopy = Get-Command robocopy.exe -ErrorAction SilentlyContinue
+        if ($robocopy) {
+            $emptyDir = Join-Path ([System.IO.Path]::GetTempPath()) ("javdb-empty-{0}" -f ([System.Guid]::NewGuid().ToString("N")))
+            try {
+                New-Item -ItemType Directory -Force -Path $emptyDir | Out-Null
+                & robocopy.exe "$emptyDir" "$Path" /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+                $robocopyExit = $LASTEXITCODE
+                Remove-Item -LiteralPath $emptyDir -Recurse -Force -ErrorAction SilentlyContinue
+
+                if ($robocopyExit -lt 8) {
+                    Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction SilentlyContinue
+                    & cmd.exe /c "rmdir /s /q `"$Path`"" 2>$null | Out-Null
+                    if (-not (Test-Path -LiteralPath $Path)) {
+                        return $true
+                    }
+                }
+            } catch {
+                Remove-Item -LiteralPath $emptyDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        Start-Sleep -Milliseconds (500 * $attempt)
+    }
+
+    return (-not (Test-Path -LiteralPath $Path))
+}
+
+function Clear-NodeModules {
+    $nodeModulesPath = Join-Path (Get-Location).Path "node_modules"
+    if (-not (Test-Path $nodeModulesPath)) {
+        return
+    }
+
+    Write-Host "Removing existing node_modules for this platform..." -ForegroundColor Gray
+
+    $parent = Split-Path -Parent $nodeModulesPath
+    $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $quarantinePath = Join-Path $parent ".node_modules-delete-$stamp"
+
+    try {
+        Set-NormalAttributes -Path $nodeModulesPath
+        Rename-Item -LiteralPath $nodeModulesPath -NewName (Split-Path -Leaf $quarantinePath) -ErrorAction Stop
+        Write-Host "Moved node_modules to $quarantinePath" -ForegroundColor Gray
+
+        if (-not (Remove-DirectoryWithRetries -Path $quarantinePath -Attempts 3)) {
+            Write-Host "Warning: $quarantinePath is still present. Build can continue because node_modules was moved out of the way." -ForegroundColor Yellow
+        }
+        return
+    } catch {
+        Write-Host "Could not rename node_modules: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+
+    if (-not (Remove-DirectoryWithRetries -Path $nodeModulesPath -Attempts 4)) {
+        throw "Failed to remove node_modules. Close VS Code, terminals, OneDrive sync, antivirus scanners, and any node/pnpm processes that may be locking files, then retry."
+    }
+}
+
+function Invoke-PnpmInstall {
+    param([string]$Label = "pnpm install")
+
+    Write-Host "Running $Label..." -ForegroundColor Gray
+    & pnpm install --frozen-lockfile | Out-Host
+    if ($LASTEXITCODE -eq 0) {
+        return $true
+    }
+
+    Write-Host "$Label with frozen lockfile failed. Retrying without --frozen-lockfile..." -ForegroundColor Yellow
+    & pnpm install | Out-Host
+    return ($LASTEXITCODE -eq 0)
+}
+
+function Invoke-PnpmStorePrune {
+    Write-Host "Pruning pnpm store before retry..." -ForegroundColor Gray
+    & pnpm store prune | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "pnpm store prune failed; continuing with reinstall retry." -ForegroundColor Yellow
+    }
+}
+
+function Install-Dependencies {
+    $prevCI = $env:CI
+    $prevOptional = $env:npm_config_optional
+    $env:CI = 'true'
+    $env:npm_config_optional = 'true'
+
+    if (Invoke-PnpmInstall -Label "pnpm install") {
+        if ($null -ne $prevCI) { $env:CI = $prevCI } else { Remove-Item Env:CI -ErrorAction SilentlyContinue }
+        if ($null -ne $prevOptional) { $env:npm_config_optional = $prevOptional } else { Remove-Item Env:npm_config_optional -ErrorAction SilentlyContinue }
+        return
+    }
+
+    Write-Host "pnpm install failed. Cleaning pnpm artifacts and retrying once..." -ForegroundColor Yellow
+    try {
+        Clear-NodeModules
+        Invoke-PnpmStorePrune
+
+        if (-not (Invoke-PnpmInstall -Label "pnpm install after cleanup")) {
+            throw "pnpm install failed"
+        }
+    } finally {
+        if ($null -ne $prevCI) { $env:CI = $prevCI } else { Remove-Item Env:CI -ErrorAction SilentlyContinue }
+        if ($null -ne $prevOptional) { $env:npm_config_optional = $prevOptional } else { Remove-Item Env:npm_config_optional -ErrorAction SilentlyContinue }
+    }
+}
+
+function Assert-ReleaseNotesReady {
+    param([Parameter(Mandatory=$true)][string]$Version)
+
+    Write-Host "Checking release announcement notes for $Version..." -ForegroundColor Gray
+    & node "scripts/assert-release-notes.cjs" $Version | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "Release announcement notes are not ready for $Version"
+    }
+}
+
+
+# Main loop
+while ($true) {
+    Show-Menu
+    # 交互步骤 1: 选择构建类型
+    $choice = Get-UserChoice "Enter your choice (1-6)" "4"
+
+    switch ($choice) {
+        "1" {
+            $versionType = "major"
+            break
+        }
+        "2" {
+            $versionType = "minor"
+            break
+        }
+        "3" {
+            $versionType = "patch"
+            break
+        }
+        "4" {
+            $versionType = $null
+            break
+        }
+        "5" {
+            $versionType = $null
+            $releaseOnly = $true
+            $autoNotes = $true
+            break
+        }
+        "6" {
+            exit 0
+        }
+        default {
+            Write-Host "Invalid choice." -ForegroundColor Red
+            continue
+        }
+    }
+    break
+}
+
+# Version confirmation
+if ($versionType) {
+    Write-Host ""
+    Write-Host "You have selected a $versionType release. This will create a new git commit and tag." -ForegroundColor Yellow
+    # 交互步骤 2: 确认版本更新
+    $confirm = Get-UserChoice "Are you sure? (y/n)" "Y"
+
+    if ($confirm.ToLower() -ne "y") {
+        Write-Host "Action cancelled." -ForegroundColor Yellow
+        exit 0
+    }
+
+    Write-Host ""
+    Write-Host "Updating version..." -ForegroundColor Green
+    try {
+        & pnpm tsx scripts/version.ts $versionType
+        if ($LASTEXITCODE -ne 0) {
+            throw "Version update failed"
+        }
+    } catch {
+        Show-Error
+        exit 1
+    }
+}
+
+# Install dependencies and build (skip when release-only)
+if (-not $releaseOnly) {
+    Write-Host ""
+    Write-Host "Installing dependencies and building..." -ForegroundColor Green
+
+    try {
+        # Temporarily disable ANSI colors/fancy output to avoid garbled characters in some terminals
+        $prevNoColor = $env:NO_COLOR
+        $prevForceColor = $env:FORCE_COLOR
+        $env:NO_COLOR = '1'
+        $env:FORCE_COLOR = '0'
+        
+        Install-Dependencies
+
+        Write-Host "Running pnpm run build..." -ForegroundColor Gray
+        & pnpm run build
+        if ($LASTEXITCODE -ne 0) {
+            throw "pnpm run build failed"
+        }
+
+        Write-Host ""
+        Write-Host "Build and packaging finished successfully!" -ForegroundColor Green
+        Write-Host ""
+
+    } catch {
+        Show-Error
+        exit 1
+    } finally {
+        # Restore previous color-related env vars
+        if ($null -ne $prevNoColor) { $env:NO_COLOR = $prevNoColor } else { Remove-Item Env:NO_COLOR -ErrorAction SilentlyContinue }
+        if ($null -ne $prevForceColor) { $env:FORCE_COLOR = $prevForceColor } else { Remove-Item Env:FORCE_COLOR -ErrorAction SilentlyContinue }
+    }
+} else {
+    Write-Host "Release-only mode: skip build step." -ForegroundColor Yellow
+}
+
+# Decide release for options 1-3; for Just Build (option 4), ask user
+if (-not $versionType -and -not $releaseOnly) {
+    # 交互步骤 3: 询问是否创建 GitHub Release（Just Build 模式）
+    $ans = Get-UserChoice "Create GitHub Release now? (y/n)" "N"
+    if ($ans.ToLower() -ne "y") {
+        Write-Host "" 
+        Write-Host "Build completed. Skipping GitHub Release." -ForegroundColor Yellow
+        Show-Success
+        exit 0
+    }
+    # User wants to create release after Just Build
+    $autoNotes = $true
+}
+
+# Interactive: ask whether to create release when version bumped
+$shouldRelease = $false
+if ($versionType -and -not $releaseOnly) {
+    # 交互步骤 4: 询问是否创建 GitHub Release（版本更新模式）
+    $ans = Get-UserChoice "Create GitHub Release now? (y/n)" "N"
+    if ($ans.ToLower() -eq "y") { $shouldRelease = $true }
+}
+if (-not $releaseOnly -and -not $shouldRelease -and $versionType) {
+    Write-Host "" 
+    Write-Host "Skip GitHub Release." -ForegroundColor Yellow
+    Show-Success
+    exit 0
+}
+
+# Always use auto-generated notes to align with PR-based changelogs
+if (-not $releaseOnly) {
+    $autoNotes = $true
+}
+
+# Check GitHub CLI (before creating release)
+Write-Host "Checking GitHub CLI installation..." -ForegroundColor Gray
+try {
+    & gh --version | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "GitHub CLI not found"
+    }
+    Write-Host "GitHub CLI found and working." -ForegroundColor Green
+} catch {
+    Write-Host ""
+    Write-Host "################################################" -ForegroundColor Red
+    Write-Host "# GitHub CLI not found                        #" -ForegroundColor Red
+    Write-Host "################################################" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "GitHub CLI is not installed or not working properly." -ForegroundColor Red
+    Write-Host ""
+    Write-Host "To install GitHub CLI:" -ForegroundColor Yellow
+    Write-Host "  1. Visit: https://cli.github.com/" -ForegroundColor White
+    Write-Host "  2. Download and install for Windows" -ForegroundColor White
+    Write-Host "  3. Restart your terminal after installation" -ForegroundColor White
+    Write-Host "  4. Run: gh auth login" -ForegroundColor White
+    Write-Host ""
+    Write-Host "Alternative: Create release manually" -ForegroundColor Yellow
+    Write-Host "  1. Go to your GitHub repository" -ForegroundColor White
+    Write-Host "  2. Click 'Releases' then 'Create a new release'" -ForegroundColor White
+    Write-Host "  3. Upload the zip file from dist-zip folder" -ForegroundColor White
+    Write-Host ""
+    Write-Host "Build completed successfully. Skipping GitHub Release creation." -ForegroundColor Green
+    Show-Success
+    exit 0
+}
+
+# Read version info
+Write-Host "Reading version from version.json..." -ForegroundColor Gray
+try {
+    $versionContent = Get-Content "version.json" | ConvertFrom-Json
+    $versionStr = $versionContent.version
+    $buildNum = $versionContent.build
+
+    if (-not $versionStr) {
+        throw "Could not read version from version.json"
+    }
+} catch {
+    Write-Host "ERROR: Could not read version from version.json." -ForegroundColor Red
+    Show-Error
+    exit 1
+}
+
+# Release 使用三位语义版本，构建号只进入资产文件名
+$releaseVersionStr = $versionStr
+$assetVersionStr = if ($buildNum) { "$versionStr-build-$buildNum" } else { $versionStr }
+$legacyFullVersionStr = if ($buildNum) { "$versionStr.$buildNum" } else { $versionStr }
+$tagName = "v$releaseVersionStr"
+$releaseTitle = "Release $releaseVersionStr"
+$zipName = "javdb-extension-v$assetVersionStr.zip"
+$zipPath = "dist-zip\$zipName"
+
+Write-Host "Looking for artifact: $zipName" -ForegroundColor Gray
+
+# 检查带 build 号的文件是否存在
+if (Test-Path $zipPath) {
+    Write-Host "Found artifact with build number: $zipName" -ForegroundColor Green
+} else {
+    $legacyZipName = "javdb-extension-v$legacyFullVersionStr.zip"
+    $legacyZipPath = "dist-zip\$legacyZipName"
+    # 如果找不到带 build 号的文件，尝试查找不带 build 号的文件
+    $altZipName = "javdb-extension-v$versionStr.zip"
+    $altZipPath = "dist-zip\$altZipName"
+    if (Test-Path $legacyZipPath) {
+        Write-Host "Found legacy artifact with dotted build number: $legacyZipName" -ForegroundColor Yellow
+        $zipName = $legacyZipName
+        $zipPath = $legacyZipPath
+    } elseif (Test-Path $altZipPath) {
+        Write-Host "Found alternative zip without build number: $altZipName" -ForegroundColor Yellow
+        $zipName = $altZipName
+        $zipPath = $altZipPath
+    }
+}
+
+# 如果还是找不到，尝试从 dist/ 打包
+
+if (-not (Test-Path $zipPath)) {
+    # 如果没有现成产物，尝试从 dist/ 打包一次（不进行编译）
+    $distDir = "dist"
+    if (Test-Path $distDir) {
+        Write-Host "Artifact not found. Found dist/. Packaging without compile..." -ForegroundColor Yellow
+        Write-Host "Creating: $zipName" -ForegroundColor Gray
+        try {
+            if (-not (Test-Path "dist-zip")) { New-Item -ItemType Directory -Force -Path "dist-zip" | Out-Null }
+            try { Add-Type -AssemblyName System.IO.Compression.FileSystem } catch {}
+            if (Test-Path $zipPath) { Remove-Item -Force $zipPath -ErrorAction SilentlyContinue }
+            
+            # 使用绝对路径避免路径问题
+            $absDistPath = (Resolve-Path $distDir).Path
+            $absZipPath = Join-Path (Get-Location).Path $zipPath
+            
+            [IO.Compression.ZipFile]::CreateFromDirectory($absDistPath, $absZipPath)
+            Write-Host "Packaged to $zipPath" -ForegroundColor Green
+        } catch {
+            Write-Host "ERROR: Failed to package dist to $zipName." -ForegroundColor Red
+            Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
+            Show-Error
+            exit 1
+        }
+    } else {
+        Write-Host "ERROR: Build artifact $zipName not found and dist/ is missing. Please run option [4] Just Build first." -ForegroundColor Red
+        Show-Error
+        exit 1
+    }
+}
+
+try {
+    Assert-ReleaseNotesReady -Version $releaseVersionStr
+} catch {
+    Show-Error
+    exit 1
+}
+
+# Fast path: Create release with custom notes (prev tag..current tag)
+if ($autoNotes) {
+    # 先生成 Release Notes 预览，不创建 tag
+    Write-Host ""
+    Write-Host "=================================================" -ForegroundColor Cyan
+    Write-Host " Generating Release Notes Preview..." -ForegroundColor Cyan
+    Write-Host "=================================================" -ForegroundColor Cyan
+    Write-Host ""
+    $prevTag = ""
+    try {
+        # 获取所有 tag，手动按版本号排序
+        $allTagsRaw = & git tag 2>$null
+        if ($LASTEXITCODE -eq 0 -and $allTagsRaw) {
+            # 解析并排序
+            $tagObjects = @($allTagsRaw) | ForEach-Object {
+                if ($_ -match '^v?(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?') {
+                    [PSCustomObject]@{
+                        Tag = $_
+                        Major = [int]$matches[1]
+                        Minor = [int]$matches[2]
+                        Patch = [int]$matches[3]
+                        Build = if ($matches[4]) { [int]$matches[4] } else { 0 }
+                    }
+                }
+            } | Sort-Object -Property Major,Minor,Patch,Build -Descending
+            
+            # 取第一个（最新的）作为上一个 tag
+            if ($tagObjects.Count -gt 0) {
+                $prevTag = $tagObjects[0].Tag
+                Write-Host "Found previous tag: $prevTag" -ForegroundColor Green
+            } else {
+                Write-Host "No previous tags found" -ForegroundColor Yellow
+            }
+        }
+    } catch {
+        Write-Host "Warning: Could not find previous tag - $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+    
+    if (-not $prevTag) {
+        Write-Host "No previous tag found, will show all commits from repository root" -ForegroundColor Yellow
+    }
+    $remote = ""
+    try { $remote = & git config --get remote.origin.url } catch {}
+    $repoUrl = $remote
+    if ($remote -match '^git@github.com:(.+?)(\.git)?$') {
+        $repoUrl = "https://github.com/$($Matches[1])"
+    } elseif ($remote -match '^https://github.com/(.+?)(\.git)?$') {
+        $repoUrl = "https://github.com/$($Matches[1])"
+    } else {
+        if ($repoUrl.EndsWith('.git')) { $repoUrl = $repoUrl.Substring(0, $repoUrl.Length - 4) }
+    }
+
+    $notesPath = "release-notes-$tagName.md"
+    $content = New-Object System.Collections.Generic.List[string]
+    # 标题/正文头，与 -p 预览一致
+    $content.Add("Title: $releaseTitle") | Out-Null
+    $content.Add("") | Out-Null
+    $content.Add("Body:") | Out-Null
+    $content.Add("") | Out-Null
+
+    # 基本信息
+    $releaseDate = Get-Date -Format "yyyy-MM-dd"
+    
+    # 检测版本变更类型
+    $changeType = "unknown"
+    $isMajorChange = $false
+    $isMinorChange = $false
+    $isPatchChange = $false
+    
+    # 获取上一个版本号进行比较
+    if ($prevTag) {
+        $prevVersion = $prevTag -replace '^v', ''
+        # 移除 build 号（最后一个点后面的数字）- 例如 1.18.0.67 -> 1.18.0
+        if ($prevVersion -match '^(\d+\.\d+\.\d+)') {
+            $prevVersion = $matches[1]
+        }
+        $currentVersion = $versionStr
+        
+        Write-Host "Comparing versions: $prevVersion -> $currentVersion" -ForegroundColor Gray
+        
+        # 先提取上一个版本的各部分
+        if ($prevVersion -match '^(\d+)\.(\d+)\.(\d+)') {
+            $prevMajor = [int]$matches[1]
+            $prevMinor = [int]$matches[2]
+            $prevPatch = [int]$matches[3]
+            
+            Write-Host "Previous: Major=$prevMajor, Minor=$prevMinor, Patch=$prevPatch" -ForegroundColor Gray
+            
+            # 再提取当前版本的各部分
+            if ($currentVersion -match '^(\d+)\.(\d+)\.(\d+)') {
+                $currMajor = [int]$matches[1]
+                $currMinor = [int]$matches[2]
+                $currPatch = [int]$matches[3]
+                
+                Write-Host "Current: Major=$currMajor, Minor=$currMinor, Patch=$currPatch" -ForegroundColor Gray
+                
+                # 比较版本号
+                if ($currMajor -gt $prevMajor) {
+                    $changeType = "major"
+                    $isMajorChange = $true
+                } elseif ($currMajor -eq $prevMajor -and $currMinor -gt $prevMinor) {
+                    $changeType = "minor"
+                    $isMinorChange = $true
+                } elseif ($currMajor -eq $prevMajor -and $currMinor -eq $prevMinor -and $currPatch -gt $prevPatch) {
+                    $changeType = "patch"
+                    $isPatchChange = $true
+                }
+                
+                Write-Host "Detected change type: $changeType" -ForegroundColor Gray
+            }
+        }
+    } else {
+        # 如果没有上一个版本，根据版本号格式判断
+        if ($versionStr -match "\.0\.0$") { 
+            $changeType = "major"
+            $isMajorChange = $true
+        } elseif ($versionStr -match "\.\d+\.0$") { 
+            $changeType = "minor"
+            $isMinorChange = $true
+        } else {
+            $changeType = "patch"
+            $isPatchChange = $true
+        }
+    }
+    
+    $buildType = "$changeType release"
+    $content.Add("**Build Type:** $buildType") | Out-Null
+    $content.Add("**Version:** $releaseVersionStr") | Out-Null
+    if ($buildNum) {
+        $content.Add("**Build:** $buildNum") | Out-Null
+    }
+    $content.Add("**Release Date:** $releaseDate") | Out-Null
+    $content.Add("") | Out-Null
+    
+    # 交互步骤 5: 询问是否添加重要提示（生成 Release Notes 内容时）
+    $shouldAddWarning = $false
+    if ($isMajorChange -or $isMinorChange -or $isPatchChange) {
+        Write-Host ""
+        Write-Host "检测到版本变更类型: $changeType" -ForegroundColor Cyan
+        if ($isMajorChange) {
+            Write-Host "这是一个主要版本更新 (Major)，通常包含不兼容的重大变更" -ForegroundColor Yellow
+        } elseif ($isMinorChange) {
+            Write-Host "这是一个次要版本更新 (Minor)，通常包含新功能和改进" -ForegroundColor Yellow
+        } else {
+            Write-Host "这是一个补丁版本更新 (Patch)，通常包含错误修复" -ForegroundColor Yellow
+        }
+        Write-Host ""
+        $addWarning = Get-UserChoice "是否在 Release Notes 中添加重要提示？(y/n)" "Y"
+        if ($addWarning.ToLower() -eq "y") {
+            $shouldAddWarning = $true
+        }
+    }
+    
+    # 根据用户选择和版本类型添加重要提示
+    if ($shouldAddWarning) {
+        $content.Add("### ⚠️ 重要提示") | Out-Null
+        $content.Add("") | Out-Null
+        
+        if ($isMajorChange) {
+            $content.Add("本版本为主要版本更新 (Major Release)，可能包含不兼容的重大变更。**强烈建议在更新前仔细阅读以下变更说明，并备份您的数据和配置**。") | Out-Null
+        } elseif ($isMinorChange) {
+            $content.Add("本版本为次要版本更新 (Minor Release)，包含新功能和改进，可能涉及架构调整或配置变更。**建议在更新前查看以下变更说明**。") | Out-Null
+        } elseif ($isPatchChange) {
+            $content.Add("本版本为补丁版本更新 (Patch Release)，主要包含错误修复和小幅优化。建议及时更新以获得更好的使用体验。") | Out-Null
+        }
+        
+        $content.Add("") | Out-Null
+        
+        if ($isMajorChange -or $isMinorChange) {
+            $content.Add("如果您跨多个版本更新，请特别注意：") | Out-Null
+            $content.Add("- 检查是否有不兼容的变更") | Out-Null
+            $content.Add("- 查看配置项是否需要重新设置") | Out-Null
+            $content.Add("- 备份重要数据后再进行更新") | Out-Null
+        } else {
+            $content.Add("如果您跨多个版本更新，建议查看中间版本的变更说明。") | Out-Null
+        }
+        
+        $content.Add("") | Out-Null
+    }
+
+    # 比较链接与日志范围（使用 HEAD 因为 tag 还未创建）
+    Write-Host "Previous tag: '$prevTag'" -ForegroundColor Gray
+    $range = $null
+    if ($prevTag) {
+        $content.Add("Compare: [$prevTag...$tagName]($repoUrl/compare/$prevTag...$tagName)") | Out-Null
+        $content.Add("") | Out-Null
+        $range = "$prevTag..HEAD"
+        Write-Host "Using range with previous tag: $range" -ForegroundColor Green
+    } else {
+        Write-Host "No previous tag, using full history" -ForegroundColor Yellow
+        $root = ""
+        try { $root = & git rev-list --max-parents=0 HEAD 2>$null } catch {}
+        if ($root) { $range = "$root..HEAD" } else { $range = "HEAD" }
+    }
+
+    Write-Host "Final commit range: $range" -ForegroundColor Cyan
+    # 使用字符串拼接避免 PowerShell 变量解析问题
+    $fmt = "- %s - by %an on %ad ([%h]($repoUrl/commit/%H))"
+
+    # 分类日志
+    $features = @(& git log --no-merges --date=short --grep="^feat" --pretty="format:$fmt" $range 2>$null)
+    $fixes = @(& git log --no-merges --date=short --grep="^fix" --pretty="format:$fmt" $range 2>$null)
+    # 使用两次 --grep 来排除 feat 和 fix
+    $others = @(& git log --no-merges --date=short --grep="^feat" --grep="^fix" --invert-grep --pretty="format:$fmt" $range 2>$null)
+    
+    Write-Host "Found $($features.Count) features, $($fixes.Count) fixes, $($others.Count) other changes" -ForegroundColor Gray
+
+    if ($features.Count -gt 0) {
+        $content.Add("### Features") | Out-Null
+        foreach ($l in $features) { 
+            if ($l -and $l.Trim()) {
+                $content.Add($l) | Out-Null 
+            }
+        }
+        $content.Add("") | Out-Null
+    }
+    if ($fixes.Count -gt 0) {
+        $content.Add("### Fixes") | Out-Null
+        foreach ($l in $fixes) { 
+            if ($l -and $l.Trim()) {
+                $content.Add($l) | Out-Null 
+            }
+        }
+        $content.Add("") | Out-Null
+    }
+    if ($others.Count -gt 0) {
+        $content.Add("### Other Changes") | Out-Null
+        foreach ($l in $others) { 
+            if ($l -and $l.Trim()) {
+                $content.Add($l) | Out-Null 
+            }
+        }
+        $content.Add("") | Out-Null
+    }
+
+    # 制品信息
+    $sha256 = ""
+    try { $sha256 = (Get-FileHash -Algorithm SHA256 $zipPath).Hash } catch { $sha256 = "[文件未生成]" }
+    $content.Add("### Artifacts") | Out-Null
+    $content.Add("- $zipName") | Out-Null
+    $content.Add("  - SHA256: $sha256") | Out-Null
+
+    try { Set-Content -Path $notesPath -Value $content -Encoding UTF8 } catch {}
+
+    # 显示预览
+    Write-Host ""
+    Write-Host "=================================================" -ForegroundColor Cyan
+    Write-Host " Release Notes Preview" -ForegroundColor Cyan
+    Write-Host "=================================================" -ForegroundColor Cyan
+    Write-Host ""
+    Get-Content -Path $notesPath | ForEach-Object {
+        if ($_ -match '^Title:') {
+            Write-Host $_ -ForegroundColor Yellow
+        } elseif ($_ -match '^Body:') {
+            Write-Host $_ -ForegroundColor Yellow
+        } elseif ($_ -match '^###') {
+            Write-Host $_ -ForegroundColor Cyan
+        } elseif ($_ -match '^Compare:') {
+            Write-Host $_ -ForegroundColor Green
+        } else {
+            Write-Host $_
+        }
+    }
+    Write-Host ""
+    Write-Host "=================================================" -ForegroundColor Cyan
+    Write-Host ""
+    
+    # 交互步骤 6: 确认生成的 Release Notes 并决定是否继续发布
+    $confirm = Get-UserChoice "Release Notes generated. Continue to create tag and publish to GitHub? (y/n)" "Y"
+    if ($confirm.ToLower() -ne "y") {
+        Write-Host ""
+        Write-Host "Release cancelled. Release Notes saved to: $notesPath" -ForegroundColor Yellow
+        Show-Success
+        exit 0
+    }
+
+    # 用户确认后，先将 version.json 和 .env.local 的变更追加到最近的 commit
+    Write-Host ""
+    Write-Host "Amending version files to last commit..." -ForegroundColor Green
+    $didAmend = $false
+    try {
+        # 检查是否有 version.json 或 .env.local 的变更
+        $status = & git status --porcelain version.json .env.local 2>$null
+        if ($status) {
+            Write-Host "Found version file changes, amending to last commit..." -ForegroundColor Gray
+            & git add version.json .env.local 2>$null
+            & git commit --amend --no-edit
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "Version files amended successfully" -ForegroundColor Green
+                $didAmend = $true
+            } else {
+                Write-Host "Warning: Failed to amend version files" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "No version file changes to amend" -ForegroundColor Gray
+        }
+    } catch {
+        Write-Host "Warning: Could not amend version files - $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+
+    # 创建 tag
+    Write-Host ""
+    Write-Host "Creating tag and pushing to GitHub..." -ForegroundColor Green
+    try {
+        & git rev-parse -q --verify "refs/tags/$tagName" | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Creating annotated tag: $tagName" -ForegroundColor Gray
+            & git tag -a $tagName -m $releaseTitle
+        } else {
+            Write-Host "Tag $tagName already exists" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "Warning: Could not verify/create tag" -ForegroundColor Yellow
+    }
+
+    # Push commits and tags (如果修改了 commit 则使用 force push)
+    Write-Host "Pushing git commits and tags..." -ForegroundColor Gray
+    try {
+        if ($didAmend) {
+            Write-Host "Commit was amended, using force push..." -ForegroundColor Yellow
+            & git push --force-with-lease
+        } else {
+            & git push
+        }
+        if ($LASTEXITCODE -ne 0) { throw "git push failed" }
+        & git push --tags
+        if ($LASTEXITCODE -ne 0) { throw "git push --tags failed" }
+    } catch {
+        Show-Error
+        exit 1
+    }
+
+    # 发布时去掉预览专用的 Title/Body 行
+    Write-Host "Creating GitHub Release..." -ForegroundColor Gray
+    $notesRelease = "release-notes-$tagName.release.md"
+    try {
+        Get-Content -Path $notesPath | Where-Object { $_ -notmatch '^(Title:|Body:)$' -and $_ -notmatch '^Title:' -and $_ -ne 'Body:' } | Set-Content -Path $notesRelease -Encoding UTF8
+    } catch {}
+
+    try {
+        & gh release create $tagName $zipPath --title $releaseTitle -F $notesRelease
+        if ($LASTEXITCODE -ne 0) { throw "GitHub release creation failed" }
+        Write-Host "GitHub Release created successfully!" -ForegroundColor Green
+        Show-Success
+        Remove-Item -Force $notesPath,$notesRelease -ErrorAction SilentlyContinue
+        exit 0
+    } catch {
+        Remove-Item -Force $notesPath,$notesRelease -ErrorAction SilentlyContinue
+        Show-Error
+        exit 1
+    }
+}
+
+ 

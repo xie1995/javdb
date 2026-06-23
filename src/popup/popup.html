@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Jav 助手</title>
+    <link rel="stylesheet" href="./popup.css">
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.min.css">
+</head>
+<body>
+    <div id="panel">
+        <div id="title" class="panel-title">
+            <div class="title-left">
+                <img id="titleLogo" alt="Jav 助手 logo">
+                <span>Jav 助手</span>
+                <span id="versionTag" class="version-tag"></span>
+                <!-- 网站可用状态标签 -->
+                <span id="site-status-tag" class="site-status-tag" style="display: none;">
+                    <span class="status-text">检测中...</span>
+                </span>
+
+            </div>
+            <div class="title-right">
+                <!-- 主题切换按钮 -->
+                <button id="theme-switcher-btn" class="theme-switcher" title="切换主题">
+                    <i class="fas fa-sun theme-icon"></i>
+                </button>
+                <button id="helpBtn" title="功能说明">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="filters-left main-controls">
+                <div class="section-title" style="font-weight:600;">番号过滤</div>
+                <div id="toggleWatchedContainer"></div>
+                <div id="toggleViewedContainer"></div>
+                <div id="toggleVRContainer"></div>
+                <div id="toggleWantContainer"></div>
+            </div>
+
+            <div class="filters-right main-controls">
+                <div class="section-title" style="font-weight:600;">演员过滤（列表）</div>
+                <div id="toggleHideBlacklistedActorsContainer"></div>
+                <div id="toggleHideNonFavoritedActorsContainer"></div>
+                <div id="toggleHideUnrecognizedActorsContainer"></div>
+                <div id="toggleTreatSubscribedContainer"></div>
+            </div>
+
+            <div class="full-row">
+                <!-- 音量控制 -->
+                <div class="volume-control-section">
+                    <div class="volume-control-header">
+                        <span class="volume-icon">🔊</span>
+                        <span class="volume-label">预览视频音量</span>
+                        <button class="help-icon-btn" title="设置详情页预览视频的默认音量">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                        <span id="volumeValue" class="volume-value">50%</span>
+                    </div>
+                    <div class="volume-slider-container">
+                        <button id="muteBtn" class="mute-btn" title="静音">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <input type="range" id="volumeSlider" class="volume-slider"
+                               min="0" max="100" value="50" step="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="full-row">
+                <!-- 列表显示控制 -->
+                <div class="list-display-control-section">
+                    <div class="control-header">
+                        <span class="control-icon">📐</span>
+                        <span class="control-label">列表显示控制</span>
+                        <button class="help-icon-btn" title="列数：1-8列，列数越多，每列越窄&#10;宽度：影片列表容器的宽度百分比&#10;注意：列数越多，最大宽度会自动限制，以保证列数准确显示">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                        <button id="resetListDisplayBtn" class="reset-btn" title="恢复默认设置">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="control-items-container">
+                        <div class="control-item control-item-input-only">
+                            <label class="control-item-label">列数</label>
+                            <input type="number" id="columnCountInput" class="control-input"
+                                   min="1" max="8" value="4" step="1">
+                        </div>
+
+                        <div class="control-item">
+                            <label class="control-item-label">宽度</label>
+                            <input type="range" id="containerWidthSlider" class="control-slider"
+                                   min="50" max="150" value="100" step="1">
+                            <span id="containerWidthValue" class="control-value">100%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="full-row">
+                <div class="dashboard-link">
+                    <button id="dashboard-button" class="button">
+                        高级设置 & 数据管理
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./popup.ts" type="module"></script>
+</body>
+</html> 

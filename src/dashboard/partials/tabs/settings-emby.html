@@ -1,0 +1,192 @@
+<div class="settings-page" id="emby-settings">
+    <div class="settings-page-header">
+        <button class="settings-back-btn" data-action="back-to-settings">
+            <i class="fas fa-arrow-left"></i> 返回设置
+        </button>
+        <h2>Emby联动</h2>
+        <p class="settings-description">连接 Emby/Jellyfin 媒体库服务器，在浏览 JavDB 时为已入库影片添加标记。</p>
+    </div>
+    <div class="settings-page-body">
+
+        <!-- 主开关 -->
+        <div class="settings-card settings-section">
+            <div class="form-group-checkbox">
+                <input type="checkbox" id="embyEnabled" data-settings-search-target data-settings-search-keywords="emby 启用 媒体库 联动">
+                <label for="embyEnabled">
+                    <i class="fas fa-power-off"></i>
+                    启用 Emby 联动
+                </label>
+                <p class="input-description">开启后可以在视频封面显示已入库标记，并在本地维护一个媒体库索引。</p>
+            </div>
+        </div>
+
+        <!-- 服务器配置 -->
+        <div class="settings-card settings-section" id="embyConfigSection">
+            <h4><i class="fas fa-server"></i> 服务器配置</h4>
+            <p class="section-description">配置 Emby 或 Jellyfin 服务器的连接信息。</p>
+
+            <div class="form-group">
+                <label for="embyServerType">
+                    <i class="fas fa-layer-group"></i>
+                    服务器类型:
+                </label>
+                <div class="form-group-inline">
+                    <select id="embyServerType" class="select-input" data-settings-search-target data-settings-search-keywords="emby jellyfin 服务器 类型">
+                        <option value="emby">Emby</option>
+                        <option value="jellyfin">Jellyfin</option>
+                    </select>
+                </div>
+                <p class="input-description">选择您正在使用的媒体服务器软件。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="embyServerUrl">
+                    <i class="fas fa-link"></i>
+                    服务器地址:
+                </label>
+                <input type="url" id="embyServerUrl" class="text-input" data-settings-search-target data-settings-search-keywords="服务器 地址 url 配置"
+                       placeholder="http://192.168.1.100:8096 或 https://emby.example.com">
+                <p class="input-description">输入您的 Emby/Jellyfin 服务器访问地址，包含协议和端口号。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="embyApiKey">
+                    <i class="fas fa-key"></i>
+                    API 密钥:
+                </label>
+                <div class="form-group-inline">
+                    <input type="password" id="embyApiKey" class="text-input" data-settings-search-target data-settings-search-keywords="api key 密钥 认证"
+                           placeholder="在 Emby 管理面板中创建的 API Key">
+                    <button type="button" id="testEmbyConnection" class="btn btn-info" data-settings-search-target data-settings-search-keywords="测试 连接 连通性">
+                        <i class="fas fa-plug"></i>
+                        测试连接
+                    </button>
+                </div>
+                <p class="input-description">在服务器管理面板 → API 密钥中创建新的 API 密钥。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="embyLibraryName">
+                    <i class="fas fa-folder"></i>
+                    媒体库名称:
+                </label>
+                <div class="form-group-inline">
+                    <input type="text" id="embyLibraryName" class="text-input" data-settings-search-target data-settings-search-keywords="媒体库 名称 文件夹 扫描 范围"
+                           placeholder="例如：日本AV（留空则扫描全部库）">
+                    <button type="button" id="refreshEmbyFolders" class="btn btn-info" data-settings-search-target data-settings-search-keywords="获取 库 列表 刷新">
+                        <i class="fas fa-sync"></i>
+                        获取库列表
+                    </button>
+                </div>
+                <p class="input-description">可选。填写媒体库名称可只扫描该库，大幅加快同步速度。点击"获取库列表"可查看服务器上的所有媒体库。</p>
+            </div>
+
+            <div id="embyFolderList" class="connection-status" style="display:none;"></div>
+
+            <div id="embyConnectionStatus" class="connection-status" style="display:none;"></div>
+        </div>
+
+        <!-- 库同步 -->
+        <div class="settings-card settings-section">
+            <h4><i class="fas fa-database"></i> 库同步</h4>
+            <p class="section-description">选择媒体库数据的同步方式，定期更新本地影片索引。</p>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-sync-alt"></i>
+                    同步模式:
+                </label>
+                <div class="form-group-inline">
+                    <label style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;">
+                        <input type="radio" name="embySyncMode" value="manual" checked data-settings-search-target data-settings-search-keywords="同步 模式 手动">
+                        手动同步
+                    </label>
+                    <label style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;">
+                        <input type="radio" name="embySyncMode" value="scheduled" data-settings-search-target data-settings-search-keywords="同步 模式 定时 自动">
+                        定时同步
+                    </label>
+                    <label style="display:inline-flex;align-items:center;gap:6px;">
+                        <input type="radio" name="embySyncMode" value="realtime" data-settings-search-target data-settings-search-keywords="同步 模式 实时 查询">
+                        实时查询
+                    </label>
+                </div>
+                <p class="input-description">手动同步需手动点击按钮更新；定时同步按设定间隔自动更新；实时查询每次浏览时在线查询。</p>
+            </div>
+
+            <div class="form-group" id="embySyncIntervalField" style="display:none;">
+                <label for="embySyncInterval">
+                    <i class="fas fa-clock"></i>
+                    同步间隔 (分钟):
+                </label>
+                <input type="number" id="embySyncInterval" class="number-input" min="10" max="10080" value="1440" data-settings-search-target data-settings-search-keywords="同步 间隔 频率 时间">
+                <p class="input-description">定时同步的时间间隔，建议设置为 24 小时(1440 分钟)或更长。</p>
+            </div>
+
+            <div class="form-group">
+                <div class="form-group-inline">
+                    <button type="button" id="syncEmbyLibrary" class="btn btn-primary" data-settings-search-target data-settings-search-keywords="立即 同步 刷新">
+                        <i class="fas fa-sync"></i>
+                        立即同步
+                    </button>
+                </div>
+                <p class="input-description">手动从服务器拉取当前所有影片的番号索引，用于标记已入库状态。</p>
+            </div>
+
+            <div id="embySyncStatus" class="connection-status" style="display:none;"></div>
+            <p class="input-description" id="embyLastSyncText" style="margin-top:8px;font-style:italic;color:var(--text-secondary);"></p>
+
+            <div class="form-group" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-color);">
+                <div class="form-group-inline">
+                    <button type="button" id="syncEmbyWatched" class="btn btn-warning" data-settings-search-target data-settings-search-keywords="已观看 同步 emby 记录">
+                        <i class="fas fa-eye"></i>
+                        同步已观看记录
+                    </button>
+                </div>
+                <p class="input-description">独立同步 Emby 中的已观看记录（已观看番号会永久保留，即使删除原文件也不丢失）。</p>
+            </div>
+            <div id="embyWatchedSyncStatus" class="connection-status" style="display:none;"></div>
+        </div>
+
+        <!-- 显示设置 -->
+        <div class="settings-card settings-section">
+            <h4><i class="fas fa-eye"></i> 显示设置</h4>
+            <p class="section-description">控制在 JavDB 页面上的入库标记显示位置。</p>
+
+            <div class="form-group-checkbox">
+                <input type="checkbox" id="embyShowOnList" checked data-settings-search-target data-settings-search-keywords="列表 封面 显示 标识 入库">
+                <label for="embyShowOnList">
+                    <i class="fas fa-list"></i>
+                    在影片列表封面显示"已入库"标记
+                </label>
+                <p class="input-description">在搜索结果、想看列表、已看列表等页面的封面右上角显示已入库标记。</p>
+            </div>
+
+            <div class="form-group-checkbox">
+                <input type="checkbox" id="embyShowOnDetail" checked data-settings-search-target data-settings-search-keywords="详情 页面 封面 显示 标记">
+                <label for="embyShowOnDetail">
+                    <i class="fas fa-image"></i>
+                    在影片详情页封面显示"已入库"标记
+                </label>
+                <p class="input-description">在单片详情页的封面右上角显示已入库标记。</p>
+            </div>
+        </div>
+
+        <!-- 保存设置 -->
+        <div class="settings-card settings-section">
+            <h4><i class="fas fa-save"></i> 保存设置</h4>
+            <p class="section-description">将当前的配置保存到本地存储中。</p>
+
+            <div class="form-group">
+                <div class="form-group-inline">
+                    <button type="button" id="saveEmbySettings" class="btn btn-success" data-settings-search-target data-settings-search-keywords="保存 设置 持久化">
+                        <i class="fas fa-save"></i>
+                        保存 Emby 联动设置
+                    </button>
+                </div>
+                <p class="input-description">将服务器地址、API 密钥和同步模式等配置持久化保存。</p>
+            </div>
+
+            <div id="embySaveStatus" class="connection-status" style="display:none;"></div>
+        </div>
+    </div>
+</div>

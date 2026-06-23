@@ -1,0 +1,677 @@
+/**
+ * 更新检查设置面板样式
+ */
+
+/* CSS变量定义 */
+:root {
+    --update-primary: #06b6d4;
+    --update-secondary: #67e8f9;
+    --update-bg: #ecfeff;
+    --update-card-bg: #ffffff;
+    --update-border: #a5f3fc;
+    --update-text: #1e293b;
+    --update-text-muted: #64748b;
+    --update-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --update-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 深色主题下的更新设置变量 */
+[data-theme="dark"] {
+    --update-bg: #1e293b;
+    --update-card-bg: #334155;
+    --update-border: #475569;
+    --update-text: #f1f5f9;
+    --update-text-muted: #94a3b8;
+    --update-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --update-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* 更新设置面板特有样式 */
+#update-settings {
+    position: relative;
+}
+
+#update-settings .settings-page-header {
+    position: relative;
+    padding: 0 0 24px 0;
+    text-align: center;
+}
+
+#update-settings .settings-page-header h3 {
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+#update-settings .settings-page-header h3::before {
+    content: '🔄';
+    font-size: 1.2em;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+#update-settings .settings-description {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 0;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* 状态总览卡片 */
+#update-settings .update-status-section {
+    margin-bottom: 24px;
+}
+
+#update-settings .update-status-card {
+    position: relative;
+    overflow: hidden;
+    padding: 24px;
+    border: 1px solid rgba(6, 182, 212, 0.22);
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.18), transparent 34%),
+        linear-gradient(135deg, var(--update-card-bg) 0%, var(--update-bg) 100%);
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+}
+
+#update-settings .update-status-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+#update-settings .update-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 8px;
+    color: var(--update-primary);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#update-settings .update-status-main h4 {
+    margin: 0 0 8px;
+    color: var(--update-text);
+    font-size: 24px;
+    font-weight: 800;
+}
+
+#update-settings .update-status-copy {
+    max-width: 620px;
+    margin: 0;
+    color: var(--update-text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* 版本信息区域 - 统一卡片风格 */
+#update-settings .version-info {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.56);
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--update-border);
+    transition: all 0.3s ease;
+}
+
+#update-settings .version-info:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+#update-settings .version-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 16px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    gap: 10px;
+    min-height: 108px;
+}
+
+#update-settings .version-item:last-child {
+    border-bottom: none;
+}
+
+#update-settings .version-item:hover {
+    background: var(--bg-hover);
+}
+
+#update-settings .version-item:not(:last-child) {
+    border-bottom: none;
+    border-right: 1px solid var(--update-border);
+}
+
+#update-settings .version-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: none;
+    min-width: 0;
+}
+
+#update-settings .version-label::before {
+    content: "📋";
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+#update-settings .version-item:nth-child(2) .version-label::before {
+    content: "🚀";
+}
+
+#update-settings .version-item:nth-child(3) .version-label::before {
+    content: "⏰";
+}
+
+#update-settings .version-value {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--update-text);
+    background: var(--update-bg);
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--update-border);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+    min-width: 140px;
+    text-align: center;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+#update-settings .version-value:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 8px var(--shadow-primary);
+}
+
+/* 当前版本特殊样式 */
+#update-settings .version-item:first-child .version-value {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-color: #3b82f6;
+    color: #1e40af;
+}
+
+/* 最新版本特殊样式 */
+#update-settings .version-item:nth-child(2) .version-value {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-color: #10b981;
+    color: #065f46;
+}
+
+/* 检查中状态 */
+#update-settings .version-value.checking {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-color: #f59e0b;
+    color: #92400e;
+    animation: pulse 1.5s infinite;
+}
+
+/* 检查失败状态 */
+#update-settings .version-value.error {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+}
+
+/* 更新通知区域 - 统一卡片风格 */
+#update-settings .update-notification {
+    background: rgba(255, 255, 255, 0.66);
+    border: 1px solid var(--update-border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#update-settings .notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 500;
+    color: var(--update-text);
+}
+
+#update-settings .notification-content i {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-3px);
+    }
+    60% {
+        transform: translateY(-2px);
+    }
+}
+
+/* 按钮样式增强 - 统一现代化风格 */
+#update-settings .action-buttons-top {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+    justify-content: flex-end;
+    align-items: center;
+    max-width: 360px;
+}
+
+/* 立即检查按钮 */
+#checkUpdateNow {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+}
+
+#checkUpdateNow::before {
+    content: "🔍";
+    font-size: 16px;
+}
+
+#checkUpdateNow:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+#checkUpdateNow:disabled {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 6px rgba(156, 163, 175, 0.2);
+}
+
+/* 查看更新日志按钮 */
+#viewChangelog {
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--update-text);
+    border: 1px solid var(--update-border);
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+}
+
+#viewChangelog::before {
+    content: "📋";
+    font-size: 16px;
+}
+
+#viewChangelog:hover {
+    background: var(--update-card-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
+}
+
+/* 下载更新按钮 */
+#downloadUpdate {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+}
+
+#downloadUpdate::before {
+    content: "⬇️";
+    font-size: 16px;
+}
+
+#downloadUpdate:hover {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
+}
+
+.action-buttons-top .btn {
+    min-width: 120px;
+    transition: all 0.2s ease;
+}
+
+.action-buttons-top .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-buttons-top .btn.primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+}
+
+.action-buttons-top .btn.primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.action-buttons-top .btn.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+}
+
+.action-buttons-top .btn.success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.action-buttons-top .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 表单控件样式 */
+#update-settings .form-group {
+    margin-bottom: 16px;
+}
+
+#update-settings .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--update-text);
+}
+
+#update-settings .input-description {
+    margin-top: 12px;
+    color: var(--update-text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+#update-settings .input-description strong {
+    color: var(--update-text);
+    font-weight: 600;
+}
+
+/* 设置区域分隔 - 统一风格 */
+#update-settings .settings-section {
+    margin-bottom: 24px;
+}
+
+#update-settings .settings-section:last-child {
+    margin-bottom: 0;
+}
+
+#update-settings .settings-section > h4 {
+    margin-bottom: 16px;
+    color: var(--update-text);
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 自动检查设置区域美化 */
+#update-settings .auto-check-section {
+    background: var(--update-bg);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--update-border);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.08);
+    transition: all 0.3s ease;
+}
+
+#update-settings .auto-check-section:hover {
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.12);
+    transform: translateY(-2px);
+}
+
+#update-settings .section-header {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+#update-settings .section-header h4 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #4f46e5;
+    margin-bottom: 8px;
+}
+
+#update-settings .section-icon {
+    font-size: 24px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+#update-settings .section-description {
+    color: var(--update-text-muted);
+    font-size: 14px;
+    margin: 0;
+    font-weight: 400;
+}
+
+#update-settings .auto-check-card {
+    background: var(--update-card-bg);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+#update-settings .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    gap: 20px;
+}
+
+#update-settings .setting-item:hover {
+    background: var(--bg-hover);
+}
+
+#update-settings .setting-item:not(:last-child) {
+    border-bottom: 1px solid var(--update-border);
+}
+
+#update-settings .setting-info {
+    flex: 1;
+    min-width: 0;
+}
+
+#update-settings .setting-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--update-text);
+    margin-bottom: 4px;
+}
+
+#update-settings .setting-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+#update-settings .setting-desc {
+    font-size: 13px;
+    color: var(--update-text-muted);
+    line-height: 1.5;
+}
+
+#update-settings .setting-control {
+    flex-shrink: 0;
+}
+
+/* 现代化下拉选择框 */
+#update-settings .modern-select {
+    appearance: none;
+    background: var(--update-card-bg);
+    border: 2px solid var(--update-border);
+    border-radius: 10px;
+    padding: 10px 36px 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--update-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+#update-settings .modern-select:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+}
+
+#update-settings .modern-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+#update-settings .modern-select option {
+    padding: 10px;
+    background: var(--update-card-bg);
+    color: var(--update-text);
+}
+
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    #update-settings .update-status-card {
+        padding: 18px;
+    }
+
+    #update-settings .update-status-main {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    #update-settings .action-buttons-top {
+        flex-direction: column;
+        align-items: stretch;
+        max-width: none;
+    }
+
+    #update-settings #checkUpdateNow,
+    #update-settings #viewChangelog,
+    #update-settings #downloadUpdate {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #update-settings .version-item {
+        min-height: auto;
+    }
+
+    #update-settings .version-info {
+        grid-template-columns: 1fr;
+    }
+
+    #update-settings .version-item:not(:last-child) {
+        border-right: none;
+        border-bottom: 1px solid var(--update-border);
+    }
+
+    #update-settings .version-value {
+        align-self: stretch;
+        text-align: left;
+    }
+
+    #update-settings .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    #update-settings .setting-control {
+        align-self: flex-start;
+    }
+
+    #update-settings .modern-select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    #update-settings .auto-check-section {
+        padding: 16px;
+    }
+}
