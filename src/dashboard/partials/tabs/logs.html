@@ -1,0 +1,126 @@
+<div class="card">
+  <div class="settings-section">
+    <h4>日志记录</h4>
+    <p class="settings-description">在此查看扩展运行日志，可按等级、来源、关键词与时间范围进行筛选，并支持仅显示包含详细数据的日志。</p>
+    
+    <div class="logs-toolbar">
+      <div class="log-view-switch">
+        <button id="log-view-ext" class="switch-btn active" title="显示扩展持久化日志">扩展日志</button>
+        <button id="log-view-magnet" class="switch-btn" title="显示 115 磁力推送记录（成功/失败）">磁力推送</button>
+      </div>
+      <div class="log-actions">
+        <button id="refresh-logs-button" class="primary">刷新</button>
+        <button id="clear-logs-button" class="danger">清空日志</button>
+        <button id="export-logs-button" class="button is-light">导出</button>
+      </div>
+    </div>
+
+    <div class="log-filters" id="log-filters-ext">
+      <div class="filter-group log-search-filter">
+        <label for="log-search-input">关键词搜索</label>
+        <div class="linked-filter-control" data-linked-control="log-search-input">
+          <input id="log-search-input" type="search" placeholder="搜索消息或详细数据..." />
+        </div>
+      </div>
+      <div class="filter-group">
+        <label for="log-level-filter">日志级别</label>
+        <select id="log-level-filter">
+          <option value="ALL">全部</option>
+          <option value="INFO">信息</option>
+          <option value="WARN">警告</option>
+          <option value="ERROR">错误</option>
+          <option value="DEBUG">调试</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="log-category-filter">日志类别</label>
+        <select id="log-category-filter">
+          <option value="ALL">全部类别</option>
+          <option value="CORE">核心</option>
+          <option value="ORCHESTRATOR">编排器</option>
+          <option value="STORAGE">存储</option>
+          <option value="ACTOR">演员</option>
+          <option value="MAGNET">磁力</option>
+          <option value="SYNC">同步</option>
+          <option value="NEWWORKS">新作品</option>
+          <option value="DRIVE115">115网盘</option>
+          <option value="AI">AI</option>
+          <option value="UPDATE">更新</option>
+          <option value="HELP">帮助</option>
+          <option value="SETTINGS">设置</option>
+          <option value="GENERAL">常规</option>
+          <option value="DEBUG">调试</option>
+          <option value="DB">数据库</option>
+          <option value="BG">后台</option>
+          <option value="CONTENT">内容脚本</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>日期范围（起）</label>
+        <div class="linked-filter-control" data-linked-control="log-start-date">
+          <input id="log-start-date" type="date" />
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>日期范围（止）</label>
+        <div class="linked-filter-control" data-linked-control="log-end-date">
+          <input id="log-end-date" type="date" />
+        </div>
+      </div>
+      <div class="filter-group log-data-toggle-filter">
+        <label for="log-has-data-only">仅含详细数据</label>
+        <input id="log-has-data-only" type="checkbox" />
+      </div>
+    </div>
+
+    <div class="log-filters is-hidden" id="log-filters-magnet">
+      <div class="filter-group log-search-filter">
+        <label for="log-search-input">关键词搜索</label>
+        <div class="linked-filter-control" data-linked-control="log-search-input"></div>
+      </div>
+      <div class="filter-group">
+        <label for="magnet-status-filter">推送结果</label>
+        <select id="magnet-status-filter">
+          <option value="ALL">全部</option>
+          <option value="SUCCESS">只看成功</option>
+          <option value="FAILED">只看失败</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>日期范围（起）</label>
+        <div class="linked-filter-control" data-linked-control="log-start-date"></div>
+      </div>
+      <div class="filter-group">
+        <label>日期范围（止）</label>
+        <div class="linked-filter-control" data-linked-control="log-end-date"></div>
+      </div>
+    </div>
+
+    <div class="log-container">
+      <div id="log-body">
+        <!-- Log entries will be inserted here -->
+      </div>
+      <div id="magnet-log-body" hidden>
+        <!-- Magnet cache entries will be inserted here -->
+      </div>
+    </div>
+
+    <!-- 日志条数信息 -->
+    <div id="logsCountInfo" class="pagination-info"></div>
+
+    <div class="pagination-controls">
+      <div class="pagination" id="logsPagination">
+        <!-- 分页控件将由 JS 动态填充 -->
+      </div>
+      <div class="records-per-page-selector">
+        <label for="logsPerPageSelect">每页显示:</label>
+        <select id="logsPerPageSelect">
+          <option value="10">10</option>
+          <option value="20" selected>20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

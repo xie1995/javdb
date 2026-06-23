@@ -1,0 +1,2188 @@
+/* ===================================================================
+   Data Sync Section - 精致现代化设计
+   ================================================================ */
+
+/* 同步页面的 card 容器内边距 */
+#tab-sync .card {
+    padding: 24px;
+}
+
+#tab-sync .card.sync-page {
+    padding: 14px !important;
+}
+
+/* 数据同步标题样式 */
+.data-sync-section .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 16px 0;
+    letter-spacing: -0.025em;
+}
+
+/* 功能说明提示样式 */
+.sync-info-notice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin: 0 0 20px 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(37, 99, 235, 0.05) 100%);
+    border-left: 3px solid #3b82f6;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.sync-info-notice i {
+    color: #3b82f6;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.sync-info-notice span {
+    flex: 1;
+}
+
+/* 深色主题适配 */
+[data-theme="dark"] .sync-info-notice {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(37, 99, 235, 0.08) 100%);
+    border-left-color: #60a5fa;
+}
+
+[data-theme="dark"] .sync-info-notice i {
+    color: #60a5fa;
+}
+
+/* 使用提示框样式 */
+.sync-usage-notice {
+    background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.sync-usage-notice::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #ffc107 0%, #ff9800 100%);
+}
+
+.sync-usage-notice .notice-content {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.sync-usage-notice .notice-icon {
+    font-size: 18px;
+    color: #ff9800;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.sync-usage-notice .notice-text {
+    flex: 1;
+}
+
+.sync-usage-notice .notice-text h5 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #e65100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sync-usage-notice .notice-list {
+    margin: 0;
+    padding-left: 16px;
+    list-style: none;
+}
+
+.sync-usage-notice .notice-list li {
+    position: relative;
+    margin-bottom: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #5d4037;
+    padding-left: 6px;
+}
+
+.sync-usage-notice .notice-list li::before {
+    content: '•';
+    position: absolute;
+    left: -10px;
+    color: #ff9800;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.sync-usage-notice .notice-list li:last-child {
+    margin-bottom: 0;
+}
+
+.sync-usage-notice .notice-list li strong {
+    color: #e65100;
+    font-weight: 600;
+}
+
+/* 深色主题适配 */
+[data-theme="dark"] .sync-usage-notice {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 152, 0, 0.1) 100%);
+    border-color: rgba(255, 193, 7, 0.4);
+}
+
+[data-theme="dark"] .sync-usage-notice .notice-text h5 {
+    color: #ffb74d;
+}
+
+[data-theme="dark"] .sync-usage-notice .notice-list li {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .sync-usage-notice .notice-list li strong {
+    color: #ffa726;
+}
+
+.data-sync-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: var(--surface-primary);
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.data-sync-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1e40af 0%, #059669 25%, #ea580c 50%, #7c3aed 75%, #1e40af 100%);
+    background-size: 200% 100%;
+    animation: gradientFlow 8s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes gradientFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.sync-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+}
+
+/* 按钮组布局 */
+.sync-button-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: nowrap;
+}
+
+.sync-button-group .sync-btn {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* 双按钮布局：图标+主文案+副文案纵向排布（还原旧版体验） */
+.sync-button-group .sync-option-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 12px;
+    min-height: 80px;
+    height: auto;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.sync-button-group .sync-option-btn i {
+    font-size: 20px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.sync-button-group .btn-text {
+    font-weight: 600;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.sync-button-group .btn-desc {
+    font-size: 11px;
+    opacity: 0.9;
+    display: block;
+    line-height: 1.2;
+    font-weight: 400;
+}
+
+/* 恢复按钮悬浮动效（缩放+投影） */
+.sync-button-group .sync-option-btn:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+}
+
+/* 确保 group 场景下高光动画可见（防止被旧样式禁用） */
+.sync-option-actions .sync-option-btn::before,
+.sync-button-group .sync-option-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+    transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sync-option-actions .sync-option-btn:hover::before,
+.sync-button-group .sync-option-btn:hover::before {
+    left: 100%;
+}
+
+/* 确保单个按钮占满宽度 */
+.sync-option-actions .sync-btn:only-child {
+    width: 100%;
+}
+
+/* 同步选项卡片 - 精致主题化设计 */
+.sync-option-card {
+    position: relative;
+    background: var(--surface-primary);
+    border-radius: 24px;
+    padding: 32px;
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-md);
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    cursor: pointer;
+    backdrop-filter: blur(20px);
+}
+
+.sync-option-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, transparent);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sync-option-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.sync-option-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--border-hover);
+}
+
+.sync-option-card:hover::after {
+    opacity: 1;
+}
+
+/* 为每个卡片添加微妙的主题背景 */
+.sync-option-card:nth-child(1) {
+    background: var(--surface-primary);
+}
+
+.sync-option-card:nth-child(1):hover::before {
+    background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+}
+
+.sync-option-card:nth-child(2) {
+    background: var(--surface-primary);
+}
+
+.sync-option-card:nth-child(2):hover::before {
+    background: linear-gradient(90deg, var(--success), var(--success-hover));
+}
+
+.sync-option-card:nth-child(3) {
+    background: var(--surface-primary);
+}
+
+.sync-option-card:nth-child(3):hover::before {
+    background: linear-gradient(90deg, var(--warning), var(--error));
+}
+
+.sync-option-card:nth-child(4) {
+    background: var(--surface-primary);
+}
+
+.sync-option-card:nth-child(4):hover::before {
+    background: linear-gradient(90deg, #7c3aed, #6d28d9);
+}
+
+.sync-option-btn {
+    background: var(--surface-primary);
+    border: 2px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 50px;
+    width: 100%;
+    box-shadow: var(--shadow-md);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+/* 同步选项头部 */
+.sync-option-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.sync-option-header h5 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+}
+
+/* 图标样式 - 适配实际HTML结构 */
+.sync-option-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+}
+
+/* 确保Font Awesome图标正确显示 */
+.sync-option-icon.fas {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+}
+
+.sync-option-icon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.sync-option-card:hover .sync-option-icon {
+    transform: scale(1.08) rotate(-2deg);
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35);
+}
+
+.sync-option-card:hover .sync-option-icon::after {
+    opacity: 1;
+}
+
+/* 同步选项描述 */
+.sync-option-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
+/* 同步选项统计 */
+.sync-option-stats {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-secondary);
+}
+
+/* 限定在同步选项统计区域，避免影响全局 stat-item */
+.sync-option-stats .stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sync-option-stats .stat-item::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.sync-option-stats .stat-nav-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.15s;
+}
+
+.sync-option-stats .stat-nav-link:hover {
+    opacity: 0.75;
+    text-decoration: underline;
+}
+
+/* 现代化按钮样式 */
+.sync-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 28px;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    min-height: 52px;
+    letter-spacing: 0.025em;
+    text-transform: none;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(10px);
+    color: var(--text-primary);
+}
+
+.sync-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1;
+}
+
+.sync-btn:hover::before {
+    left: 100%;
+}
+
+.sync-btn i {
+    font-size: 17px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 2;
+    position: relative;
+}
+
+.sync-btn span {
+    z-index: 2;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.sync-btn:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.sync-btn:hover:not(:disabled) i {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.sync-btn:hover:not(:disabled) span {
+    transform: translateX(1px);
+}
+
+.sync-btn:active:not(:disabled) {
+    transform: translateY(-1px) scale(0.98);
+    transition: transform 0.1s ease;
+}
+
+.sync-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    filter: grayscale(0.3);
+}
+
+.sync-option-btn#syncWantData {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+    border-color: #ffc107;
+}
+
+.sync-option-btn#syncWantData:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e0a800, #d39e00);
+    border-color: #e0a800;
+    box-shadow: 0 8px 30px rgba(255, 193, 7, 0.3);
+}
+
+.sync-option-btn#syncWantData i {
+    color: #212529;
+}
+
+.sync-option-btn#syncActorsData {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    color: white;
+    border-color: #6f42c1;
+}
+
+.sync-option-btn#syncActorsData:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5a32a3, #4c2a85);
+    border-color: #5a32a3;
+    box-shadow: 0 8px 30px rgba(111, 66, 193, 0.3);
+}
+
+.sync-option-btn#syncActorsData i {
+    color: white;
+}
+
+/* 主要按钮样式 - 全部同步 - 柔和蓝绿色 */
+.sync-btn-primary {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: #ffffff !important;
+    border-color: #0ea5e9;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+}
+
+.sync-btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border-color: #0284c7;
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.35);
+    transform: translateY(-3px);
+    color: #ffffff !important;
+}
+
+.sync-btn-primary i {
+    color: #ffffff !important;
+}
+
+.sync-btn-primary .btn-text {
+    color: #ffffff !important;
+}
+
+.sync-btn-primary .btn-desc,
+.sync-btn-primary small {
+    color: #ffffff !important;
+    opacity: 0.9;
+}
+
+/* 次要按钮样式 - 优雅的半透明设计 */
+.sync-btn-secondary {
+    background: var(--surface-secondary);
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-primary);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.sync-btn-secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.3) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.sync-btn-secondary:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--border-hover);
+    color: var(--text-primary) !important;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px) scale(1.02);
+}
+
+.sync-btn-secondary:hover:not(:disabled)::before {
+    opacity: 1;
+}
+
+.sync-btn-secondary i {
+    color: var(--text-secondary) !important;
+    z-index: 2;
+    position: relative;
+}
+
+.sync-btn-secondary span,
+.sync-btn-secondary .btn-text {
+    color: var(--text-primary) !important;
+    z-index: 2;
+    position: relative;
+}
+
+.sync-btn-secondary .btn-desc,
+.sync-btn-secondary small {
+    color: var(--text-secondary) !important;
+    z-index: 2;
+    position: relative;
+}
+
+.sync-btn-secondary:hover:not(:disabled) i {
+    color: var(--text-primary) !important;
+    transform: scale(1.1) rotate(8deg);
+}
+
+.sync-btn-secondary:hover:not(:disabled) span,
+.sync-btn-secondary:hover:not(:disabled) .btn-text {
+    color: var(--text-primary) !important;
+}
+
+.sync-btn-secondary:hover:not(:disabled) .btn-desc,
+.sync-btn-secondary:hover:not(:disabled) small {
+    color: var(--text-primary) !important;
+}
+
+/* 为不同卡片的次要按钮添加主题色调 - 修正版 */
+.sync-option-card:nth-child(1) .sync-btn-secondary,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-secondary {
+    border-color: rgba(30, 64, 175, 0.3) !important;
+    color: #1e40af !important;
+    background: rgba(30, 64, 175, 0.05) !important;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-secondary .btn-text,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-secondary .btn-text {
+    color: #1e40af !important;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-secondary .btn-desc,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-secondary .btn-desc,
+.sync-option-card:nth-child(1) .sync-btn-secondary small,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-secondary small {
+    color: #3b82f6 !important;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-secondary i,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-secondary i {
+    color: #1e40af !important;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-secondary:hover,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-secondary:hover {
+    border-color: rgba(30, 64, 175, 0.5) !important;
+    background: rgba(30, 64, 175, 0.1) !important;
+    color: #1d4ed8 !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-secondary,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-secondary {
+    border-color: rgba(5, 150, 105, 0.3) !important;
+    color: #059669 !important;
+    background: rgba(5, 150, 105, 0.05) !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-secondary .btn-text,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-secondary .btn-text {
+    color: #059669 !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-secondary .btn-desc,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-secondary .btn-desc,
+.sync-option-card:nth-child(2) .sync-btn-secondary small,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-secondary small {
+    color: #10b981 !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-secondary i,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-secondary i {
+    color: #059669 !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-secondary:hover,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-secondary:hover {
+    border-color: rgba(5, 150, 105, 0.5) !important;
+    background: rgba(5, 150, 105, 0.1) !important;
+    color: #047857 !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-secondary,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-secondary {
+    border-color: rgba(234, 88, 12, 0.3) !important;
+    color: #ea580c !important;
+    background: rgba(234, 88, 12, 0.05) !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-secondary .btn-text,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-secondary .btn-text {
+    color: #ea580c !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-secondary .btn-desc,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-secondary .btn-desc,
+.sync-option-card:nth-child(3) .sync-btn-secondary small,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-secondary small {
+    color: #f97316 !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-secondary i,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-secondary i {
+    color: #ea580c !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-secondary:hover,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-secondary:hover {
+    border-color: rgba(234, 88, 12, 0.5) !important;
+    background: rgba(234, 88, 12, 0.1) !important;
+    color: #dc2626 !important;
+}
+
+/* 基于实际HTML结构的美观配色方案 - 修正版 */
+
+/* 同步全部 - 深邃蓝色主题 (第1个卡片) */
+.sync-option-card:nth-child(1) .sync-option-icon {
+    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.3) !important;
+}
+
+.sync-option-card:nth-child(1):hover .sync-option-icon {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+    box-shadow: 0 8px 24px rgba(30, 64, 175, 0.4) !important;
+    transform: scale(1.08) rotate(-2deg) !important;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-primary,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-primary {
+    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+    border-color: #1e40af !important;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25) !important;
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-primary .btn-text,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-primary .btn-text {
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-primary .btn-desc,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-primary .btn-desc,
+.sync-option-card:nth-child(1) .sync-btn-primary small,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-primary small {
+    color: #ffffff !important;
+    opacity: 0.9;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-primary i,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-primary i {
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(1) .sync-btn-primary:hover,
+.sync-option-card:nth-child(1) .sync-option-btn.sync-btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+    box-shadow: 0 8px 20px rgba(30, 64, 175, 0.35) !important;
+    color: #ffffff !important;
+}
+
+/* 同步已观看 - 翠绿色主题 (第2个卡片) */
+.sync-option-card:nth-child(2) .sync-option-icon {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3) !important;
+}
+
+.sync-option-card:nth-child(2):hover .sync-option-icon {
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.4) !important;
+    transform: scale(1.08) rotate(2deg) !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-primary,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-primary {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    border-color: #059669 !important;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-primary .btn-text,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-primary .btn-text {
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-primary .btn-desc,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-primary .btn-desc,
+.sync-option-card:nth-child(2) .sync-btn-primary small,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-primary small {
+    color: #ffffff !important;
+    opacity: 0.9;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-primary i,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-primary i {
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(2) .sync-btn-primary:hover,
+.sync-option-card:nth-child(2) .sync-option-btn.sync-btn-primary:hover {
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.35) !important;
+    color: #ffffff !important;
+}
+
+/* 同步想看 - 温暖橙色主题 (第3个卡片) */
+.sync-option-card:nth-child(3) .sync-option-icon {
+    background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%) !important;
+    box-shadow: 0 4px 16px rgba(234, 88, 12, 0.3) !important;
+}
+
+.sync-option-card:nth-child(3):hover .sync-option-icon {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 8px 24px rgba(234, 88, 12, 0.4) !important;
+    transform: scale(1.08) rotate(-3deg) !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-primary,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-primary {
+    background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%) !important;
+    border-color: #ea580c !important;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25) !important;
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-primary .btn-text,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-primary .btn-text {
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-primary .btn-desc,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-primary .btn-desc,
+.sync-option-card:nth-child(3) .sync-btn-primary small,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-primary small {
+    color: #ffffff !important;
+    opacity: 0.9;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-primary i,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-primary i {
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(3) .sync-btn-primary:hover,
+.sync-option-card:nth-child(3) .sync-option-btn.sync-btn-primary:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.35) !important;
+    color: #ffffff !important;
+}
+
+/* 同步收藏演员 - 优雅紫色主题 (第4个卡片) */
+.sync-option-card:nth-child(4) .sync-option-icon {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3) !important;
+}
+
+.sync-option-card:nth-child(4):hover .sync-option-icon {
+    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%) !important;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4) !important;
+    transform: scale(1.08) rotate(3deg) !important;
+}
+
+.sync-option-card:nth-child(4) .sync-btn-secondary,
+.sync-option-card:nth-child(4) .sync-option-btn.sync-btn-secondary,
+.sync-option-card:nth-child(4) #syncActorsData {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+    color: #ffffff !important;
+    border-color: #7c3aed !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25) !important;
+}
+
+.sync-option-card:nth-child(4) .sync-btn-secondary .btn-text,
+.sync-option-card:nth-child(4) .sync-option-btn.sync-btn-secondary .btn-text,
+.sync-option-card:nth-child(4) #syncActorsData .btn-text {
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(4) .sync-btn-secondary .btn-desc,
+.sync-option-card:nth-child(4) .sync-option-btn.sync-btn-secondary .btn-desc,
+.sync-option-card:nth-child(4) #syncActorsData .btn-desc,
+.sync-option-card:nth-child(4) .sync-btn-secondary small,
+.sync-option-card:nth-child(4) .sync-option-btn.sync-btn-secondary small,
+.sync-option-card:nth-child(4) #syncActorsData small {
+    color: #ffffff !important;
+    opacity: 0.9;
+}
+
+.sync-option-card:nth-child(4) .sync-btn-secondary i,
+.sync-option-card:nth-child(4) .sync-option-btn.sync-btn-secondary i,
+.sync-option-card:nth-child(4) #syncActorsData i {
+    color: #ffffff !important;
+}
+
+.sync-option-card:nth-child(4) .sync-btn-secondary:hover,
+.sync-option-card:nth-child(4) .sync-option-btn.sync-btn-secondary:hover,
+.sync-option-card:nth-child(4) #syncActorsData:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%) !important;
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35) !important;
+    color: #ffffff !important;
+}
+
+/* 覆盖 sync.css 中的冲突样式 - 使用更高优先级 */
+.data-sync-section .sync-option-icon,
+.sync-options-grid .sync-option-icon {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 16px !important;
+    font-size: 22px !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.25) !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.data-sync-section .sync-option-icon i,
+.sync-options-grid .sync-option-icon i {
+    color: #ffffff !important;
+    z-index: 2 !important;
+    position: relative !important;
+}
+
+/* 确保所有按钮类组合都被覆盖 */
+.sync-option-btn.sync-btn.sync-btn-primary,
+.sync-option-btn.sync-btn.sync-btn-secondary,
+.sync-btn.sync-btn-primary,
+.sync-btn.sync-btn-secondary {
+    font-family: inherit !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.025em !important;
+}
+
+/* 确保图标和文字的层级正确 */
+.sync-option-btn i,
+.sync-btn i {
+    z-index: 2 !important;
+    position: relative !important;
+}
+
+.sync-option-btn span,
+.sync-btn span,
+.sync-option-btn .btn-text {
+    z-index: 2 !important;
+    position: relative !important;
+}
+
+/* 按钮加载状态 */
+.sync-btn.loading {
+    pointer-events: none;
+    position: relative;
+    color: transparent !important;
+}
+
+.sync-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    color: inherit;
+}
+
+.sync-btn-primary.loading::after {
+    border-top-color: #ffffff;
+}
+
+.sync-btn-secondary.loading::after {
+    border-top-color: #374151;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 按钮成功状态 */
+.sync-btn.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    border-color: #10b981 !important;
+}
+
+.sync-btn.success i {
+    color: #ffffff !important;
+}
+
+/* 按钮错误状态 */
+.sync-btn.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: #ffffff !important;
+    border-color: #ef4444 !important;
+    animation: shake 0.5s ease-in-out;
+}
+
+.sync-btn.error i {
+    color: #ffffff !important;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* 移除动画，使用纯CSS过渡 */
+
+/* 响应式调整 - 小屏幕时的处理 */
+@media (max-width: 768px) {
+    .sync-mode-options {
+        left: 0;
+        right: 0;
+        transform: translateY(-10px);
+        min-width: auto;
+        width: 100%;
+        max-width: none;
+    }
+
+    .sync-mode-options.show,
+    .sync-mode-options[style*="display: block"],
+    .sync-mode-options[style*="display:block"] {
+        transform: translateY(0);
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* 防止悬浮菜单超出容器边界 */
+.sync-option-group {
+    overflow: visible;
+    position: relative; /* 确保相对定位 */
+}
+
+.sync-option-actions {
+    overflow: visible; /* 允许悬浮菜单溢出 */
+    position: relative;
+}
+
+.data-sync-container {
+    overflow: visible;
+}
+
+/* 扩大悬浮区域，防止鼠标移动时闪烁 */
+.sync-option-group::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: -10px; /* 扩展到菜单区域 */
+    background: transparent;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* 添加小箭头指示器 */
+.sync-mode-options::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #ffffff;
+    filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.1));
+    z-index: 2;
+}
+
+@media (max-width: 768px) {
+    .sync-mode-options::before {
+        left: 0;
+        right: 0;
+        transform: none;
+    }
+
+    .sync-mode-options::after {
+        left: 20px;
+        transform: none;
+    }
+}
+
+.sync-mode-btn {
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-secondary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    white-space: nowrap;
+}
+
+.sync-mode-btn:last-child {
+    border-bottom: none;
+}
+
+.sync-mode-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    transform: translateX(3px);
+    box-shadow: inset 3px 0 0 var(--primary);
+}
+
+.sync-mode-btn i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sync-mode-btn:hover i {
+    color: var(--primary);
+}
+
+.sync-mode-btn span {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex-shrink: 0;
+    min-width: 80px;
+}
+
+.sync-mode-btn small {
+    color: var(--text-secondary);
+    font-size: 12px;
+    opacity: 0.9;
+    line-height: 1.3;
+    flex-shrink: 0;
+}
+
+.sync-mode-btn:hover span {
+    color: var(--primary);
+}
+
+.sync-mode-btn:hover small {
+    color: #495057;
+}
+
+/* 同步状态信息 */
+.sync-status-info {
+    margin-top: 10px;
+}
+
+.sync-progress {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-active));
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* 进度阶段容器 */
+.progress-stage {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--surface-secondary);
+    border-radius: 6px;
+    border-left: 4px solid var(--primary);
+}
+
+.progress-stage:last-of-type {
+    margin-bottom: 0;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.progress-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.progress-percentage {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 2px 8px;
+    border-radius: 12px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.progress-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    display: block;
+}
+
+/* 进度控制按钮 */
+.progress-controls {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.cancel-sync-btn {
+    background: var(--error);
+    border: none;
+    border-radius: 6px;
+    color: var(--text-inverse);
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    gap: 6px;
+}
+
+.cancel-sync-btn:hover {
+    background: var(--error-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.cancel-sync-btn:active {
+    transform: translateY(0);
+}
+
+.sync-result {
+    background: var(--success-light);
+    border: 1px solid var(--success);
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.sync-result i {
+    color: var(--success);
+    font-size: 14px;
+}
+
+.sync-result span {
+    font-size: 12px;
+    color: var(--success);
+    font-weight: 500;
+}
+
+/* 错误状态 */
+.sync-result.error {
+    background: var(--error-light);
+    border-color: var(--error);
+}
+
+.sync-result.error i,
+.sync-result.error span {
+    color: var(--error);
+}
+
+/* 微交互效果 - 更精致 */
+.sync-option-card:active {
+    transform: translateY(-4px) scale(0.97);
+    transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 按钮点击波纹效果 - 优化 */
+.sync-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 70%, transparent 100%);
+    transform: translate(-50%, -50%);
+    transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), height 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+}
+
+.sync-btn:active::after {
+    width: 300px;
+    height: 300px;
+    opacity: 1;
+}
+
+/* 图标动画 - 更流畅 */
+.sync-option-card:hover .sync-option-icon i {
+    animation: iconFloat 2s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% {
+        transform: scale(1) translateY(0px);
+    }
+    50% {
+        transform: scale(1.05) translateY(-2px);
+    }
+}
+
+/* 统计项动画 - 更柔和 */
+.stat-item {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sync-option-card:hover .stat-item {
+    transform: translateX(6px);
+    color: var(--primary);
+}
+
+.sync-option-card:hover .stat-item::before {
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    transform: scale(1.3);
+    box-shadow: 0 0 8px var(--primary-light);
+}
+
+/* 卡片内容动画 */
+.sync-option-header h5 {
+    transition: all 0.3s ease;
+}
+
+.sync-option-card:hover .sync-option-header h5 {
+    transform: translateX(2px);
+    color: var(--text-primary);
+}
+
+.sync-option-description {
+    transition: all 0.3s ease;
+}
+
+.sync-option-card:hover .sync-option-description {
+    transform: translateX(1px);
+    color: var(--text-secondary);
+}
+
+/* 即将推出标签样式 - 现代化 */
+.coming-soon-label {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+    }
+}
+
+/* 数据同步区域的整体动画 */
+.data-sync-container {
+    animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 卡片进入动画 - 更现代化 */
+.sync-option-card {
+    animation: cardSlideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: calc(var(--card-index, 0) * 0.15s);
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+}
+
+@keyframes cardSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9) rotateX(10deg);
+        filter: blur(4px);
+    }
+    60% {
+        opacity: 0.8;
+        transform: translateY(-5px) scale(1.02) rotateX(0deg);
+        filter: blur(0px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotateX(0deg);
+        filter: blur(0px);
+    }
+}
+
+/* 数据同步容器的整体动画优化 */
+.data-sync-container {
+    animation: containerSlideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes containerSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+        filter: blur(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+    }
+}
+
+/* 成功同步的脉冲效果 */
+.sync-result.success {
+    animation: successPulse 0.6s ease-out;
+}
+
+@keyframes successPulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 演员同步统计样式 */
+.actor-sync-stats {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 16px 0 20px 0;
+    box-shadow: var(--shadow-md);
+    animation: slideInDown 0.4s ease-out;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 同步进度容器 */
+.sync-progress-container {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.sync-progress-container .progress-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sync-progress-container .progress-section > h5 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* 进度阶段容器 */
+.progress-stage {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.progress-stage:last-of-type {
+    margin-bottom: 0;
+}
+
+.actor-stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.actor-stats-header h5 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.actor-stats-status {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+}
+
+.actor-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-hover);
+}
+
+.stat-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.stat-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+/* 当前页面详情卡片特殊样式 */
+.stat-card.current-page-detail {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-color: #bfdbfe;
+}
+
+.stat-card.current-page-detail .stat-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.stat-card.current-page-detail .stat-value {
+    color: #1d4ed8;
+}
+
+/* 不同统计类型的图标颜色 */
+.stat-card:nth-child(1) .stat-icon { /* 当前页面 */
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.stat-card:nth-child(2) .stat-icon { /* 已处理 */
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+}
+
+.stat-card:nth-child(3) .stat-icon { /* 新增 */
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+}
+
+.stat-card:nth-child(4) .stat-icon { /* 更新 */
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.stat-card:nth-child(5) .stat-icon { /* 跳过 */
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+}
+
+/* 动画效果 */
+.stat-value {
+    transition: all 0.3s ease;
+}
+
+.stat-card.updated .stat-value {
+    animation: statUpdate 0.6s ease-out;
+}
+
+@keyframes statUpdate {
+    0% {
+        transform: scale(1);
+        color: var(--text-primary);
+    }
+    50% {
+        transform: scale(1.1);
+        color: var(--success);
+    }
+    100% {
+        transform: scale(1);
+        color: var(--text-primary);
+    }
+}
+
+/* 响应式设计优化 */
+@media (max-width: 768px) {
+    .sync-options-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .sync-option-card {
+        padding: 20px;
+    }
+
+    .sync-option-header h5 {
+        font-size: 16px;
+    }
+
+    .sync-option-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .actor-stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+    }
+
+    .actor-stats-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .stat-card.current-page-detail {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .data-sync-container {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .sync-btn {
+        padding: 12px 20px;
+        font-size: 13px;
+    }
+
+    .sync-option-description {
+        font-size: 13px;
+    }
+}
+
+/* 已获取影片列表容器 */
+.fetched-videos-container {
+    margin-top: 12px;
+    border-top: 1px solid var(--border-primary);
+    padding-top: 12px;
+}
+
+.fetched-videos-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fetched-videos-header::before {
+    content: '📋';
+    font-size: 14px;
+}
+
+.fetched-videos-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.fetched-videos-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.fetched-videos-list::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+}
+
+.fetched-videos-list::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 3px;
+}
+
+.fetched-videos-list::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+.fetched-video-item {
+    font-size: 12px;
+    color: var(--text-primary);
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--border-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+    animation: slideIn 0.3s ease;
+}
+
+.fetched-video-item:last-child {
+    border-bottom: none;
+}
+
+.fetched-video-item .video-number {
+    font-weight: 600;
+    color: var(--primary);
+    min-width: 30px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.fetched-video-item .video-title {
+    flex: 1;
+    word-break: break-word;
+    color: var(--text-primary);
+}
+
+.fetched-video-item.success {
+    background: var(--success-light);
+}
+
+.fetched-video-item.error {
+    background: var(--error-light);
+}
+
+.fetched-video-item.error .video-title {
+    color: var(--error);
+    text-decoration: line-through;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 空状态 */
+.fetched-videos-list:empty::before {
+    content: '暂无数据';
+    display: block;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 20px;
+}
+
+/* Sync page modern shell */
+.sync-page {
+    --sync-primary: #2563eb;
+    --sync-info: #0891b2;
+    --sync-success: #059669;
+    --sync-warning: #d97706;
+    --sync-danger: #dc2626;
+    --sync-card: color-mix(in srgb, var(--surface-primary) 92%, #ffffff 8%);
+    --sync-soft: color-mix(in srgb, var(--surface-secondary) 88%, #ffffff 12%);
+    --sync-border: color-mix(in srgb, var(--border-primary) 78%, transparent);
+    --sync-muted: var(--text-secondary);
+    --sync-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+    --sync-shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.06);
+    position: relative;
+    overflow: visible;
+    padding: 14px !important;
+    border: 1px solid var(--sync-border);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(37, 99, 235, 0.10), transparent 34%),
+        radial-gradient(circle at 90% 8%, rgba(5, 150, 105, 0.10), transparent 30%),
+        var(--surface-primary);
+}
+
+[data-theme="dark"] .sync-page {
+    --sync-card: color-mix(in srgb, var(--surface-primary) 92%, #0f172a 8%);
+    --sync-soft: color-mix(in srgb, var(--surface-secondary) 88%, #0f172a 12%);
+    --sync-border: color-mix(in srgb, var(--border-primary) 84%, rgba(148, 163, 184, 0.18));
+    --sync-shadow: 0 20px 56px rgba(0, 0, 0, 0.30);
+    --sync-shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.22);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(96, 165, 250, 0.14), transparent 34%),
+        radial-gradient(circle at 90% 8%, rgba(45, 212, 191, 0.10), transparent 30%),
+        var(--surface-primary);
+}
+
+.sync-page-hero {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.sync-page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--sync-primary) 13%, transparent);
+    color: var(--sync-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.sync-page-hero h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.sync-page-hero p {
+    margin: 3px 0 0;
+    color: var(--sync-muted);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.sync-page-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--sync-primary) 18%, transparent), color-mix(in srgb, var(--sync-success) 14%, transparent));
+    color: var(--sync-primary);
+    border: 1px solid var(--sync-border);
+    box-shadow: var(--sync-shadow-soft);
+}
+
+.sync-page .sync-info-notice,
+.sync-page .sync-usage-notice,
+.sync-page .sync-login-notice {
+    padding: 12px;
+    border: 1px solid var(--sync-border);
+    border-radius: 16px;
+    background: var(--sync-card);
+    box-shadow: var(--sync-shadow-soft);
+}
+
+.sync-page .sync-info-notice {
+    border-left: 0;
+    color: var(--sync-muted);
+    margin-bottom: 16px;
+}
+
+.sync-page .sync-info-notice i {
+    color: var(--sync-primary);
+}
+
+.sync-page .sync-usage-notice {
+    margin-bottom: 20px;
+    border-color: color-mix(in srgb, var(--sync-warning) 35%, var(--sync-border));
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--sync-warning) 11%, transparent), transparent 58%),
+        var(--sync-card);
+}
+
+.sync-page .sync-usage-notice::before {
+    display: none;
+}
+
+.sync-page .sync-usage-notice .notice-content,
+.sync-page .sync-login-notice .notice-content {
+    gap: 10px;
+}
+
+.sync-page .sync-usage-notice .notice-icon {
+    color: var(--sync-warning);
+}
+
+.sync-page .sync-usage-notice .notice-text h5,
+.sync-page .sync-login-notice .notice-text h5 {
+    margin: 0 0 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.sync-page .sync-usage-notice .notice-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 12px;
+    padding-left: 0;
+}
+
+.sync-page .sync-usage-notice .notice-list li {
+    margin-bottom: 0;
+    padding-left: 14px;
+    color: var(--sync-muted);
+}
+
+.sync-page .sync-usage-notice .notice-list li::before {
+    left: 0;
+    color: var(--sync-warning);
+}
+
+.sync-page .sync-usage-notice .notice-list li strong {
+    color: var(--text-primary);
+}
+
+.sync-page .sync-progress-container,
+.sync-page .sync-result {
+    margin-top: 0;
+    border: 1px solid var(--sync-border);
+    border-radius: 18px;
+    background: var(--sync-card);
+    box-shadow: var(--sync-shadow-soft);
+}
+
+.sync-page .sync-progress-container .progress-section {
+    padding: 16px;
+    background: transparent;
+}
+
+.sync-page .sync-progress-container .progress-section > h5 {
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.sync-page .progress-stage {
+    border-radius: 14px;
+    background: var(--sync-soft);
+    border: 1px solid var(--sync-border);
+}
+
+.sync-page .progress-bar {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--sync-soft);
+}
+
+.sync-page .progress-fill {
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--sync-primary), var(--sync-success));
+}
+
+.sync-page .cancel-sync-btn {
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--sync-danger), #b91c1c);
+}
+
+@media (max-width: 900px) {
+    .sync-page .sync-usage-notice .notice-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sync-page {
+        padding: 16px !important;
+    }
+
+    .sync-page-hero {
+        flex-direction: column;
+    }
+
+    .sync-page-mark {
+        display: none;
+    }
+
+}

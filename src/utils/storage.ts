@@ -1,0 +1,256 @@
+// storage.ts
+// 封装 chrome.storage，兼容 GM_setValue/GM_getValue
+
+import { STORAGE_KEYS, DEFAULT_SETTINGS } from './config';
+import type { ExtensionSettings } from '../types';
+import { log } from './logController';
+import { dedupeSearchEngines, migrateSearchEngineTemplateIcon } from './searchEngines';
+import { createChromeStorage } from '../platform/storage/chromeStorage';
+
+const VIEWED_RECORDS_STORAGE_KEY = 'viewed';
+const IDB_MIGRATED_STORAGE_KEY = 'idb_migrated';
+
+const chromeStorage = createChromeStorage({
+  largeKeys: [VIEWED_RECORDS_STORAGE_KEY],
+  migratedLargeObjectLoaders: {
+    [VIEWED_RECORDS_STORAGE_KEY]: {
+      migratedFlagKey: IDB_MIGRATED_STORAGE_KEY,
+      messageType: 'DB:VIEWED_GET_ALL',
+      mapResponseToObject(response) {
+        const records = Array.isArray(response?.records) ? response.records : [];
+        const byId: Record<string, any> = Object.create(null);
+        for (const record of records) {
+          if (record?.id) {
+            byId[record.id] = record;
+          }
+        }
+        return byId;
+      },
+    },
+  },
+  logger(message, context) {
+    log.storage?.(message, context);
+  },
+});
+
+export function setValue<T>(key: string, value: T): Promise<void> {
+  return chromeStorage.setValue(key, value);
+}
+
+export function getValue<T>(key: string, defaultValue: T): Promise<T> {
+  return chromeStorage.getValue(key, defaultValue);
+}
+
+function migrateLegacyDrive115Settings(raw: any): { drive115: Record<string, any>; changed: boolean } {
+  const source = raw && typeof raw === 'object' ? raw : {};
+  const next = { ...source } as Record<string, any>;
+  let changed = false;
+
+  if (!Object.prototype.hasOwnProperty.call(next, 'enabled') && typeof next.enableV2 === 'boolean') {
+    next.enabled = next.enableV2;
+    changed = true;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(next, 'enableV2')) {
+    delete next.enableV2;
+    changed = true;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(next, 'lastSelectedVersion')) {
+    delete next.lastSelectedVersion;
+    changed = true;
+  }
+
+  return { drive115: next, changed };
+}
+
+function normalizeSettingsForSave<T extends Partial<ExtensionSettings>>(settings: T): T {
+  if (!settings || typeof settings !== 'object') return settings;
+  if (!('drive115' in settings)) return settings;
+
+  const migrated = migrateLegacyDrive115Settings((settings as any).drive115);
+  return {
+    ...settings,
+    drive115: migrated.drive115,
+  } as T;
+}
+
+function mergeTelemetrySettings(storedTelemetry: any): Record<string, any> {
+  const defaults = ((DEFAULT_SETTINGS as any).telemetry || {}) as Record<string, any>;
+  const stored = storedTelemetry && typeof storedTelemetry === 'object' ? storedTelemetry : {};
+  const merged = {
+    ...defaults,
+    ...stored,
+  };
+
+  if (!String(merged.endpoint || '').trim()) {
+    merged.endpoint = defaults.endpoint;
+  }
+
+  return merged;
+}
+
+export function mergeSearchEngineTemplates(searchEngines: any[] | undefined | null): any[] {
+  const defaultEngines = Array.isArray((DEFAULT_SETTINGS as any).searchEngines)
+    ? (DEFAULT_SETTINGS as any).searchEngines
+    : [];
+  const userEngines = Array.isArray(searchEngines) ? searchEngines : [];
+  const merged: any[] = [];
+  const bundledOverrides = new Map<string, { enabled?: boolean }>();
+
+  userEngines.forEach((engine) => {
+    if (!engine || typeof engine !== 'object') return;
+    const id = String(engine.id || '').trim().toLowerCase();
+    if (!id || typeof engine.enabled !== 'boolean') return;
+    if (defaultEngines.some((defaultEngine: any) => String(defaultEngine.id || '').trim().toLowerCase() === id)) {
+      bundledOverrides.set(id, { enabled: engine.enabled });
+    }
+  });
+
+  defaultEngines.forEach((engine: any) => {
+    const id = String(engine.id || '').trim().toLowerCase();
+    merged.push(migrateSearchEngineTemplateIcon({
+      ...engine,
+      ...bundledOverrides.get(id),
+    }));
+  });
+
+  userEngines.forEach((engine) => {
+    if (!engine || typeof engine !== 'object') return;
+    merged.push(migrateSearchEngineTemplateIcon(engine));
+  });
+
+  return dedupeSearchEngines(merged).engines;
+}
+
+export async function getSettings(): Promise<ExtensionSettings> {
+  const storedSettings = await getValue<Partial<ExtensionSettings>>(STORAGE_KEYS.SETTINGS, {});
+  const { drive115: migratedDrive115, changed: drive115Migrated } = migrateLegacyDrive115Settings((storedSettings as any).drive115);
+
+  log.storage('Loading settings from storage', {
+    key: STORAGE_KEYS.SETTINGS,
+    hasStoredSettings: !!storedSettings,
+    drive115Migrated,
+  });
+
+  const mergedSettings: ExtensionSettings = {
+    ...DEFAULT_SETTINGS,
+    ...storedSettings,
+    actorLibrary: {
+      ...DEFAULT_SETTINGS.actorLibrary,
+      ...(storedSettings.actorLibrary || {}),
+      blacklist: {
+        ...DEFAULT_SETTINGS.actorLibrary.blacklist,
+        ...(storedSettings.actorLibrary?.blacklist || {}),
+      },
+    },
+    display: {
+      ...DEFAULT_SETTINGS.display,
+      ...(storedSettings.display || {}),
+    },
+    webdav: {
+      ...DEFAULT_SETTINGS.webdav,
+      ...(storedSettings.webdav || {}),
+    },
+    dataSync: {
+      ...DEFAULT_SETTINGS.dataSync,
+      ...(storedSettings.dataSync || {}),
+      urls: {
+        ...DEFAULT_SETTINGS.dataSync.urls,
+        ...(storedSettings.dataSync?.urls || {}),
+      },
+    },
+    dataEnhancement: {
+      ...DEFAULT_SETTINGS.dataEnhancement,
+      ...(storedSettings.dataEnhancement || {}),
+    },
+    translation: {
+      ...DEFAULT_SETTINGS.translation,
+      ...(storedSettings.translation || {}),
+      targets: {
+        ...((DEFAULT_SETTINGS.translation as any).targets || {}),
+        ...((storedSettings.translation as any)?.targets || {}),
+      },
+      traditional: {
+        ...DEFAULT_SETTINGS.translation.traditional,
+        ...(storedSettings.translation?.traditional || {}),
+      },
+      ai: {
+        ...DEFAULT_SETTINGS.translation.ai,
+        ...(storedSettings.translation?.ai || {}),
+      },
+    },
+    videoEnhancement: {
+      ...DEFAULT_SETTINGS.videoEnhancement,
+      ...((storedSettings as any).videoEnhancement || {}),
+    },
+    userExperience: {
+      ...DEFAULT_SETTINGS.userExperience,
+      ...(storedSettings.userExperience || {}),
+    },
+    contentFilter: {
+      ...DEFAULT_SETTINGS.contentFilter,
+      ...(storedSettings.contentFilter || {}),
+    },
+    listEnhancement: {
+      ...DEFAULT_SETTINGS.listEnhancement,
+      ...(storedSettings.listEnhancement || {}),
+      listDisplayControl: {
+        ...((DEFAULT_SETTINGS.listEnhancement as any).listDisplayControl || {}),
+        ...((storedSettings.listEnhancement as any)?.listDisplayControl || {}),
+        enabled: true,
+      },
+    },
+    drive115: {
+      ...DEFAULT_SETTINGS.drive115,
+      ...migratedDrive115,
+    },
+    actorSync: {
+      ...DEFAULT_SETTINGS.actorSync,
+      ...(storedSettings.actorSync || {}),
+      urls: {
+        ...DEFAULT_SETTINGS.actorSync.urls,
+        ...(storedSettings.actorSync?.urls || {}),
+      },
+    },
+    ai: {
+      ...DEFAULT_SETTINGS.ai,
+      ...(storedSettings.ai || {}),
+    },
+    telemetry: {
+      ...mergeTelemetrySettings((storedSettings as any).telemetry),
+    },
+    insights: {
+      ...DEFAULT_SETTINGS.insights,
+      ...((storedSettings as any).insights || {}),
+    },
+
+    embyLibrary: {
+      ...DEFAULT_SETTINGS.embyLibrary,
+      ...((storedSettings as any).embyLibrary || {}),
+      server: {
+        ...DEFAULT_SETTINGS.embyLibrary.server,
+        ...((storedSettings as any).embyLibrary?.server || {}),
+      },
+      sync: {
+        ...DEFAULT_SETTINGS.embyLibrary.sync,
+        ...((storedSettings as any).embyLibrary?.sync || {}),
+      },
+      libraryStatus: {
+        ...DEFAULT_SETTINGS.embyLibrary.libraryStatus,
+        ...((storedSettings as any).embyLibrary?.libraryStatus || {}),
+      },
+    },
+
+  };
+  mergedSettings.searchEngines = mergeSearchEngineTemplates((storedSettings as any).searchEngines);
+
+  return mergedSettings;
+}
+
+export function saveSettings(settings: ExtensionSettings): Promise<void> {
+  log.storage('Saving settings to storage', {
+    key: STORAGE_KEYS.SETTINGS,
+  });
+  return setValue(STORAGE_KEYS.SETTINGS, settings);
+}

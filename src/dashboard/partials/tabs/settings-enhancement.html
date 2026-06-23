@@ -1,0 +1,1373 @@
+<div class="settings-page" id="enhancement-settings">
+    <div class="settings-page-header">
+        <button class="settings-back-btn" data-action="back-to-settings">
+            <i class="fas fa-arrow-left"></i> 返回设置
+        </button>
+        <h3>功能增强设置</h3>
+        <p class="settings-description">解锁强大的增强功能，让您的 JavDB 体验更加丰富和高效！这些功能将显著提升浏览效率、数据完整性和操作便捷性。</p>
+
+        <!-- 功能提示 -->
+        <div class="enhancement-notice">
+            <i class="fas fa-info-circle"></i>
+            <span>增强功能可能存在细微问题，如遇到任何异常请在 <a href="https://github.com/xie1995/javdb/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a> 反馈。</span>
+        </div>
+
+        <div id="enhancementSubTabs" class="subtabs">
+            <button type="button" class="subtab-link" data-subtab="list">列表页增强</button>
+            <button type="button" class="subtab-link" data-subtab="video">影片页增强</button>
+            <button type="button" class="subtab-link" data-subtab="actor">演员页增强</button>
+            <button type="button" class="subtab-link" data-subtab="other">其他增强</button>
+            <span style="flex:1"></span>
+            <button type="button" id="showOrchestratorBtn" class="button-like" title="查看当前页面功能编排">编排可视化</button>
+        </div>
+    </div>
+    
+    <div class="settings-page-body">
+                                <!-- 隐藏的checkbox元素，用于JavaScript逻辑 -->
+                                <div style="display: none;">
+                                    <input type="checkbox" id="enableTranslation">
+                                    <input type="checkbox" id="enableContentFilter">
+                                    <input type="checkbox" id="enableMagnetSearch">
+                                    <input type="checkbox" id="enableAnchorOptimization">
+                                    <input type="checkbox" id="enableListEnhancement">
+                                    <input type="checkbox" id="enableVideoPreview">
+                                    <input type="checkbox" id="enableHighQualityCover">
+                                    <input type="checkbox" id="enableClickEnhancement">
+                                    <input type="checkbox" id="enableClickEnhancementList">
+                                    <input type="checkbox" id="enableClickEnhancementDetail">
+                                    <input type="checkbox" id="enableScrollPaging">
+                                    <input type="checkbox" id="enableActorWatermark">
+                                    <input type="checkbox" id="enableActorEnhancement">
+                                    <input type="checkbox" id="enableVideoEnhancement">
+                                    <input type="checkbox" id="enablePasswordHelper">
+                                    <input type="checkbox" id="enableSuperRanking">
+                                    <input type="checkbox" id="enableVideoFavoriteRating">
+                                    <input type="checkbox" id="enableActorQuickActions">
+                                    <input type="checkbox" id="enableListDisplayControl">
+                                    <input type="checkbox" id="enableContainerExpansion">
+                                    <input type="checkbox" id="showStatusBadge">
+                                    <input type="checkbox" id="enableStatusQuickAction">
+                                    <!-- 影片页增强子项（右侧通用开关的状态源） -->
+                                    <input type="checkbox" id="veShowLoadingIndicator">
+                                    <input type="checkbox" id="veEnableReviewEnhancement">
+                                    <input type="checkbox" id="veEnableReviewBreaker">
+                                    <input type="checkbox" id="veEnableFC2Breaker">
+                                    <input type="checkbox" id="veEnableReviewMagnetLinkify">
+                                    <input type="checkbox" id="veEnableReviewPush115">
+                                    <input type="checkbox" id="veEnableActorRemarks">
+                                    <input type="checkbox" id="veEnableActorNameMarks">
+                                    <input type="checkbox" id="veEnableRelatedLists">
+                                    <input type="checkbox" id="veEnableExternalEntryPanel">
+                                    <input type="checkbox" id="veEnableExternalSearch">
+                                    <input type="checkbox" id="veEnableOnlineAvailability">
+                                    <input type="checkbox" id="veShowOnlineAvailabilityFailures">
+                                    <input type="checkbox" id="veEnableSubtitleSearch">
+                                    <!-- 新增：影片页增强 - 本地同步类子项（隐藏 checkbox 作为状态源） -->
+                                    <input type="checkbox" id="veEnableWantSync">
+                                    <input type="checkbox" id="veAutoMarkWatchedAfter115">
+                                    <!-- 新增：演员页增强 - 影片分段显示（隐藏 checkbox 作为状态源） -->
+                                    <input type="checkbox" id="aeEnableActionButtons">
+                                    <input type="checkbox" id="aeEnableTimeSegmentationDivider">
+                                    <!-- 磁力搜索子项 -->
+                                    <input type="checkbox" id="magnetBlockMojContent" checked>
+                                    <input type="checkbox" id="magnetAutoSearch">
+                                </div>
+
+                                <!-- 数据增强 -->
+                                <div class="settings-section">
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🎭 演员名称标识</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="veEnableActorNameMarks"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在影片页为演员名称显示收藏、订阅、黑名单状态<br>
+                                            <strong>使用：</strong>已收藏显示绿色，黑名单显示红色删除线，已订阅显示提醒标记
+                                        </p>
+                                    </div>
+
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🈳 智能标题翻译</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableTranslation"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>自动将日文标题翻译为中文，支持 Google 翻译与 AI 翻译<br>
+                                            <strong>使用：</strong>在视频详情页会在原标题下方显示中文翻译，帮助理解内容
+                                        </p>
+
+                                        <!-- 翻译服务配置（作为子设置，悬浮展开） -->
+                                        <div id="translationConfig" class="translation-config sub-settings" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
+                                            <div class="translation-status">
+                                                <h5 style="margin: 0 0 10px 0; color: #495057;">
+                                                    <i class="fas fa-language"></i> 翻译服务配置
+                                                </h5>
+                                                <div class="current-service" style="margin-bottom: 15px;">
+                                                    <span style="font-weight: 500;">当前使用：</span>
+                                                    <span id="currentTranslationService" style="color: #007bff; font-weight: 600;">Google 翻译</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" style="margin-bottom: 15px;">
+                                                <label for="translationProvider" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                                    <i class="fas fa-cogs"></i> 翻译服务类型：
+                                                </label>
+                                                <select id="translationProvider" class="select-input" style="width: 100%;">
+                                                    <option value="traditional">Google 翻译</option>
+                                                    <option value="ai">AI 翻译</option>
+                                                </select>
+                                                <p class="input-description" style="margin-top: 5px; font-size: 12px;">
+                                                    Google 服务稳定快速；AI 服务更智能但需要先在 AI 设置中配置
+                                                </p>
+                                            </div>
+
+                                            <!-- 传统翻译服务配置 -->
+                                            <div id="traditionalTranslationConfig" class="translation-provider-config">
+                                                <div class="form-group" style="margin-bottom: 10px;">
+                                                    <label for="traditionalTranslationService" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                                        翻译服务：
+                                                    </label>
+                                                    <select id="traditionalTranslationService" class="select-input" style="width: 100%;">
+                                                        <option value="google">Google 翻译 (免费)</option>
+                                                    </select>
+                                                </div>
+
+                                                <div id="traditionalApiKeyGroup" class="form-group" style="display: none; margin-bottom: 10px;">
+                                                    <label for="traditionalApiKey" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                                        API密钥：
+                                                    </label>
+                                                    <input type="password" id="traditionalApiKey" class="text-input"
+                                                           placeholder="输入API密钥" style="width: 100%;">
+                                                    <p class="input-description" style="margin-top: 5px; font-size: 12px;">
+                                                        Google 翻译无需密钥
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <!-- AI翻译服务配置 -->
+                                            <div id="aiTranslationConfig" class="translation-provider-config" style="display: none;">
+                                                <div class="ai-translation-status" style="padding: 10px; background: #e3f2fd; border-radius: 4px; margin-top: 10px;">
+                                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                                        <i class="fas fa-info-circle" style="color: #1976d2;"></i>
+                                                        <span style="font-size: 12px; color: #1976d2;">
+                                                            AI 翻译将直接使用“AI 设置”中的当前模型。如未设置，请先前往配置
+                                                        </span>
+                                                    </div>
+                                                    <div style="margin-top:8px; font-size: 12px; color:#333;">
+                                                        当前模型：<span id="aiCurrentModel" style="font-weight:600; color:#007bff;">未设置</span>
+                                                        <button id="goAiSettingsBtn" class="btn-secondary btn-sm" style="margin-left:8px;">前往 AI 设置</button>
+                                                    </div>
+                                                    <div id="aiModelEmptyTip" style="display:none; margin-top:8px; font-size:12px; color:#d9534f;">
+                                                        未检测到当前模型，请点击“前往 AI 设置”进行配置
+                                                    </div>
+                                                </div>
+                                                <!-- 翻译目标与显示方式配置已移动到通用区域（适用于所有提供商） -->
+                                            </div>
+                                        
+                                            <!-- 翻译目标与显示方式配置（适用于所有提供商） -->
+                                            <div class="form-group" style="margin-top: 12px;">
+                                                <label style="display:block; margin-bottom:6px; font-weight:600;">翻译目标位置</label>
+                                                <label class="checkbox-label" style="display:flex; align-items:center; gap:8px;">
+                                                    <input type="checkbox" id="translateCurrentTitle">
+                                                    <span class="checkmark"></span>
+                                                    影片页标题（current-title）
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group" style="margin-top: 8px;">
+                                                <label for="translationDisplayMode" style="display:block; margin-bottom:6px; font-weight:600;">显示方式</label>
+                                                <select id="translationDisplayMode" class="select-input" style="width: 100%;">
+                                                    <option value="append">保留原始（追加显示）</option>
+                                                    <option value="replace">替换原始标题</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 状态标记增强 主开关与子设置（显示在“影片页增强”子标签内） -->
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🎬 状态标记增强</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <!-- 主开关：控制子设置区块显隐 -->
+                                                <button class="enhancement-toggle" data-target="enableVideoEnhancement"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>功能：</strong>在影片详情页注入增强区块，支持“想看”点击同步到本地番号库，以及 115 推送后自动标记“已看”。<br>
+                                            <strong>说明：</strong>此主开关仅控制设置区块显示与核心增强；具体子功能可单独开关。
+                                        </p>
+
+                                        <!-- 子设置容器：由 data-target=enableVideoEnhancement 控制显隐 -->
+                                        <div id="videoEnhancementConfig" class="sub-settings" style="display: none;">
+                                            <!-- 子项：点击“想看”时同步到番号库 -->
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">✅ 点击“想看”时同步到番号库</h6>
+                                                            <span class="enhancement-feature-status available">可用</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="veEnableWantSync"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">
+                                                    开启后，在 JavDB 影片页点击“想看”按钮，将自动把该影片以“想看”状态写入本地番号库（若不存在则自动创建）。
+                                                </p>
+                                            </div>
+
+                                            <!-- 子项：115 推送成功后自动标记“已看” -->
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">☑️ 115 推送成功后自动标记“已看”</h6>
+                                                            <span class="enhancement-feature-status available">可用</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="veAutoMarkWatchedAfter115"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">
+                                                    开启后，当从影片页触发 115 推送成功，将自动将本片标记为“已看”。
+                                                </p>
+                                                <!-- 115 自动标记星级配置 -->
+                                                <div class="sub-settings" id="autoMarkWatchedConfig" style="display: none;">
+                                                    <div class="sub-settings-header">
+                                                        <h5> 星级配置</h5>
+                                                        <p class="sub-description">设置自动标记"已看"时使用的星级评分</p>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="veAutoMarkWatchedStars">默认星级：</label>
+                                                        <select id="veAutoMarkWatchedStars" class="select-input">
+                                                            <option value="0">不评分</option>
+                                                            <option value="1"> 1星</option>
+                                                            <option value="2"> 2星</option>
+                                                            <option value="3"> 3星</option>
+                                                            <option value="4" selected> 4星</option>
+                                                            <option value="5"> 5星</option>
+                                                        </select>
+                                                        <p class="input-description">115 推送成功后自动标记为"已看"时使用的星级，默认 4 星。</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 状态标记增强 结束 -->
+
+                                    <!-- 影片页收藏与评分 -->
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">⭐ 影片页收藏与评分</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableVideoFavoriteRating"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>功能：</strong>在影片详情页显示番号库中的收藏状态和用户评分，支持直接修改。<br>
+                                            <strong>说明：</strong>如果该影片已在番号库中，会在页面顶部显示收藏按钮和星级评分，可快速编辑。
+                                        </p>
+                                    </div>
+                                    <!-- 影片页收藏与评分 结束 -->
+
+                                    <!-- 影片页外部入口 -->
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🧭 影片页外部入口</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="veEnableExternalEntryPanel"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>功能：</strong>统一管理影片详情页的在线可看、外部搜索和字幕搜索入口。<br>
+                                            <strong>说明：</strong>外部搜索和字幕搜索入口来源于搜索引擎设置中的分类，可在搜索引擎设置页调整自定义项分类。
+                                        </p>
+                                        <div class="sub-settings" id="externalEntryConfig" style="display: none;">
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">在线可看</h6>
+                                                            <span class="enhancement-feature-status available">可用</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="veEnableOnlineAvailability"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">
+                                                    检测 FANZA、Jable、MISSAV、Supjav、JavBus、123AV、NETFLAV 等站点是否有在线资源，命中后显示可点击站点标签。
+                                                </p>
+                                                <div class="sub-settings" id="onlineAvailabilityConfig" style="display: none;">
+                                                    <div class="form-group">
+                                                        <label class="checkbox-label">
+                                                            <div class="enhancement-feature-info">
+                                                                <div class="enhancement-feature-title">
+                                                                    <h6 class="enhancement-feature-name">显示失败站点</h6>
+                                                                    <span class="enhancement-feature-status available">可选</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="enhancement-toggle-wrapper">
+                                                                <button class="enhancement-toggle" data-target="veShowOnlineAvailabilityFailures"></button>
+                                                            </div>
+                                                        </label>
+                                                        <p class="input-description">
+                                                            开启后，检测失败或未命中的站点会以红色标签显示；默认只显示命中的可看站点。
+                                                        </p>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="sub-settings-header compact">
+                                                            <h5>站点列表</h5>
+                                                            <p class="sub-description">选择在线可看检测使用的站点。</p>
+                                                        </div>
+                                                        <div id="onlineAvailabilitySiteList" class="online-availability-site-grid"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">外部搜索</h6>
+                                                            <span class="enhancement-feature-status available">可选</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="veEnableExternalSearch"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">
+                                                    在影片详情页显示 JavDB、JavBus、98堂、BTSOW、JAVLib、Jable、MISSAV、123AV、Google、FANZA/DMM、Sukebei 等搜索入口。
+                                                </p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">字幕搜索</h6>
+                                                            <span class="enhancement-feature-status available">可选</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="veEnableSubtitleSearch"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">
+                                                    在影片详情页单独显示 SubTitleCat、迅雷字幕等字幕入口。
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 影片页外部入口 结束 -->
+
+                                    <!-- 相关清单解锁 -->
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🔓 相关清单解锁</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="veEnableRelatedLists"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>功能：</strong>在影片详情页解锁“相关清单”标签内容，显示清单名称、影片数、收藏数、浏览数和创建时间。<br>
+                                            <strong>说明：</strong>点击“相关清单”标签后自动加载，底部支持继续加载更多清单。
+                                        </p>
+                                    </div>
+                                    <!-- 相关清单解锁 结束 -->
+
+                                    <!-- 演员标记增强 -->
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🎭 演员标记增强</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableActorQuickActions"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>功能：</strong>在影片页悬浮演员名字时显示快速操作面板，支持一键收藏、拉黑、订阅演员。<br>
+                                            <strong>使用：</strong>鼠标悬停在演员名字上，会弹出操作面板，无需跳转到演员页即可快速操作。
+                                        </p>
+                                    </div>
+                                    <!-- 演员标记增强 结束 -->
+
+                                    <!-- 用户体验 -->
+                                <div class="settings-section">
+                                    <div class="form-group" data-subtab="list">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🎯 智能内容过滤</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableContentFilter"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在列表页过滤关键字，支持正则表达式，可隐藏、高亮或标记匹配内容<br>
+                                            <strong>使用：</strong>在下方设置过滤规则，保存后在列表页自动生效
+                                        </p>
+
+                                        <!-- 内容过滤详细配置 -->
+                                        <div class="sub-settings" id="contentFilterConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>🎯 过滤规则配置</h5>
+                                                <p class="sub-description">配置关键字过滤规则，支持正则表达式，可隐藏、高亮或标记匹配的内容。</p>
+                                            </div>
+
+                                            <div class="filter-rules-container">
+                                                <div class="filter-rules-header">
+                                                    <span>过滤规则列表</span>
+                                                    <button type="button" id="addFilterRule" class="btn-secondary btn-sm">
+                                                        <i class="fas fa-plus"></i> 添加规则
+                                                    </button>
+                                                </div>
+
+                                                <div id="filterRulesList" class="filter-rules-list">
+                                                    <!-- 过滤规则将由 JS 动态填充 -->
+                                                    <div class="empty-state">
+                                                        <p>暂无过滤规则，点击"添加规则"开始配置</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 新：🖱️ 启用点击增强（独立区块，右侧通用开关） -->
+                                    <div class="form-group" data-subtab="list">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🖱️ 启用点击增强</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableClickEnhancement"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>左键直接在当前标签打开，右键在后台新标签打开（不中断当前浏览）。<br>
+                                            <strong>说明：</strong>该增强会统一卡片/标题的点击行为，减少多余的页面跳转。<br>
+                                            <strong>适用：</strong>影片列表页和详情页的相关作品区域。
+                                        </p>
+                                        
+                                        <!-- 点击增强独立子设置 -->
+                                        <div class="sub-settings" id="clickEnhancementConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>🖱️ 点击增强细化设置</h5>
+                                                <p class="sub-description">分别控制列表页和详情页的点击增强功能。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <span>列表页点击增强</span>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="enableClickEnhancementList"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">
+                                                    适用于首页、搜索、分类、演员页等所有影片列表页
+                                                </p>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <span>详情页相关作品点击增强</span>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="enableClickEnhancementDetail"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">
+                                                    适用于影片详情页的"TA(們)還出演過"和"你可能也喜歡"区域
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 新：🎬 视频预览增强（独立区块） -->
+                                    <div class="form-group" data-subtab="list">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🎬 视频预览增强</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableVideoPreview"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在列表页鼠标悬停时显示视频预览片段（需要预览源支持）<br>
+                                            <strong>使用：</strong>鼠标悬停在视频封面上即可预览，无需点击进入详情页<br>
+                                            <strong>延迟：</strong><span id="currentPreviewDelay">—</span> ms（可在本块子设置中调整“预览延迟时间”）
+                                        </p>
+
+                                        <!-- 视频预览增强独立子设置 -->
+                                        <div class="sub-settings" id="listVideoPreviewConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>🎬 预览设置</h5>
+                                                <p class="sub-description">控制悬停预览的延迟、音量和来源。</p>
+                                            </div>
+
+                                            <!-- 🆕 启用范围选项 -->
+                                            <div class="form-group">
+                                                <label>启用范围</label>
+                                                <div class="checkbox-group">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" id="enableVideoPreviewList" checked>
+                                                        <span class="checkmark"></span>
+                                                        列表页启用预览
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" id="enableVideoPreviewDetail" checked>
+                                                        <span class="checkmark"></span>
+                                                        详情页封面预览
+                                                    </label>
+                                                </div>
+                                                <p class="input-description">选择在哪些页面启用视频预览功能。详情页预览会在封面图片上悬停时触发。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="previewDelay">预览延迟时间 (毫秒):</label>
+                                                <input type="number" id="previewDelay" class="number-input" min="100" max="5000" value="1000">
+                                                <p class="input-description">鼠标悬浮多久后开始播放预览，建议1000毫秒。</p>
+                                            </div>
+
+                                            <div class="form-group volume-control-group">
+                                                <div class="volume-header">
+                                                    <label for="previewVolume">🔊 预览音量</label>
+                                                    <span id="previewVolumeValue" class="volume-percentage">20%</span>
+                                                </div>
+                                                <div class="volume-slider-wrapper">
+                                                    <input type="range" id="previewVolume" class="modern-range" min="0" max="1" step="0.01" value="0.2">
+                                                    <div class="range-track-fill"></div>
+                                                </div>
+                                                <p class="input-description">预览视频的音量大小，建议保持较低音量。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>预览来源</label>
+                                                <div class="radio-group" id="previewSourceGroup">
+                                                    <label class="radio-item"><input type="radio" name="previewSource" id="previewSourceAuto" value="auto" checked> 自动（推荐）</label>
+                                                    <label class="radio-item"><input type="radio" name="previewSource" id="previewSourceJavDB" value="javdb"> JavDB</label>
+                                                    <label class="radio-item"><input type="radio" name="previewSource" id="previewSourceJavSpyl" value="javspyl"> JavSpyl</label>
+                                                    <label class="radio-item"><input type="radio" name="previewSource" id="previewSourceAVPreview" value="avpreview"> AVPreview</label>
+                                                    <label class="radio-item"><input type="radio" name="previewSource" id="previewSourceVBGFL" value="vbgfl"> 厂牌规则（VBGFL）</label>
+                                                </div>
+                                                <p class="input-description">选择悬停预览的首选来源。自动会按 JavDB → JavSpyl → AVPreview → 厂牌规则 的顺序尝试。</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 新：🖼️ 高质量封面 -->
+                                    <div class="form-group" data-subtab="list">
+                                        <label class="checkbox-label" style="opacity: 0.6;">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🖼️ 高质量封面</h6>
+                                                    <span class="enhancement-feature-status deprecated">已弃用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableHighQualityCover" disabled></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在列表页自动将缩略图URL替换为高质量封面URL<br>
+                                            <strong>说明：</strong>JavDB 现已默认使用高质量封面，此功能无需启用
+                                        </p>
+                                    </div>
+
+                                    <!-- 新：🖍️ 演员水印（订阅/黑名单） -->
+                                    <div class="form-group" data-subtab="list">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🖍️ 演员水印（订阅/黑名单）</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableActorWatermark"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在影片封面角落显示演员状态水印，小圆点颜色区分订阅（绿色）与黑名单（红色）。<br>
+                                            <strong>识别：</strong>根据标题末尾的演员名匹配本地演员库（含别名）。未匹配到则不显示水印。
+                                        </p>
+
+                                        <!-- 演员水印子设置 -->
+                                        <div class="sub-settings" id="actorWatermarkConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>🖍️ 水印设置</h5>
+                                                <p class="sub-description">自定义水印位置与透明度，以减少视觉干扰。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="actorWatermarkPosition">水印位置</label>
+                                                <select id="actorWatermarkPosition" class="select-input">
+                                                    <option value="top-left">左上</option>
+                                                    <option value="top-right">右上</option>
+                                                    <option value="bottom-left">左下</option>
+                                                    <option value="bottom-right">右下</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group volume-control-group">
+                                                <div class="volume-header">
+                                                    <label for="actorWatermarkOpacity">透明度</label>
+                                                    <span id="actorWatermarkOpacityValue" class="volume-percentage">40%</span>
+                                                </div>
+                                                <div class="volume-slider-wrapper">
+                                                    <input type="range" id="actorWatermarkOpacity" class="modern-range" min="0" max="1" step="0.05" value="0.4">
+                                                    <div class="range-track-fill"></div>
+                                                </div>
+                                                <p class="input-description">降低透明度以减少干扰，0为全透明，1为不透明。</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 🆕 列表页显示控制 -->
+                                    <div class="form-group" data-subtab="list">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">📐 列表页显示控制</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableListDisplayControl" data-always-on="true"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>自定义列表页的列数和容器宽度，优化浏览体验。<br>
+                                            <strong>说明：</strong>可以根据屏幕大小和个人喜好调整列表显示效果。<br>
+                                            <strong>适用：</strong>所有影片列表页面。
+                                        </p>
+
+                                        <!-- 列表显示控制子设置 -->
+                                        <div class="sub-settings" id="listDisplayControlConfig" style="display: block;">
+                                            <div class="sub-settings-header">
+                                                <h5>📐 显示设置</h5>
+                                                <p class="sub-description">调整列表页的列数和影片卡片的宽度。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <div class="volume-header">
+                                                    <label for="listColumnCount">列数</label>
+                                                    <span id="listColumnCountValue" class="volume-percentage">4 列</span>
+                                                </div>
+                                                <div class="volume-slider-wrapper">
+                                                    <input type="range" id="listColumnCount" class="modern-range" min="1" max="8" step="1" value="4">
+                                                    <div class="range-track-fill"></div>
+                                                </div>
+                                                <p class="input-description">设置列表页每行显示的影片数量（1-8列）。</p>
+                                            </div>
+
+                                            <div class="form-group volume-control-group">
+                                                <div class="volume-header">
+                                                    <label for="listContainerWidth">容器宽度</label>
+                                                    <span id="listContainerWidthValue" class="volume-percentage">100%</span>
+                                                </div>
+                                                <div class="volume-slider-wrapper">
+                                                    <input type="range" id="listContainerWidth" class="modern-range" min="50" max="150" step="5" value="100">
+                                                    <div class="range-track-fill"></div>
+                                                </div>
+                                                <p class="input-description">设置列表容器的宽度百分比（50%-150%），超过100%时会居中显示。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <span>启用搜索框和容器扩展</span>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="enableContainerExpansion"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">
+                                                    开启后，搜索框和内容容器将扩展到100%宽度（接近浏览器窗口边缘），覆盖 Bulma 框架的默认宽度限制。<br>
+                                                    <strong>注意：</strong>关闭此选项后，搜索框和容器将保持原始宽度，只有影片列表容器受上方"容器宽度"滑块控制。
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 列表页显示控制 结束 -->
+
+                                    <!-- 🆕 状态标签显示 -->
+                                    <div class="form-group" data-subtab="list">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🏷️ 状态标签显示</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="showStatusBadge"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在列表页卡片上显示状态标签（已观看/想看/已浏览），方便快速识别观看状态。<br>
+                                            <strong>说明：</strong>标签会显示在影片卡片的标签区域，使用不同颜色区分状态。<br>
+                                            <strong>适用：</strong>所有影片列表页面。
+                                        </p>
+                                    </div>
+                                    <!-- 状态标签显示 结束 -->
+
+                                    <!-- 🆕 列表页状态快捷标识 -->
+                                    <div class="form-group" data-subtab="list">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">⚡ 状态快捷标识</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableStatusQuickAction"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在列表页卡片左下角显示状态快捷标识，可直接标记已浏览、想看、已观看。<br>
+                                            <strong>说明：</strong>点击标识只更新本地番号库状态，并刷新当前卡片状态显示。
+                                        </p>
+                                    </div>
+                                    <!-- 状态快捷标识 结束 -->
+
+                                    <div class="form-group" data-subtab="other">
+                                        <input type="checkbox" id="enablePopularityEffects" hidden>
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🔥 影片热度特效</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enablePopularityEffects"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>根据评分和评价人数综合判断，为番号卡片添加热度脉冲边框效果（说实话这个效果与“高亮”效果有重叠，有更好的建议可以提issue）。<br>
+                                            <strong>规则：</strong>默认评分 4 分且评价人数 350 以上显示热度脉冲，两个阈值都可自行调整。<br>
+                                            <strong>适用：</strong>列表页与演员页的影片卡片。
+                                        </p>
+                                        <div class="sub-settings" id="popularityEffectsConfig" style="display: block;">
+                                            <div class="sub-settings-header">
+                                                <h5>热度参数</h5>
+                                                <p class="sub-description">默认评分 4 分、评价人数 350 以上显示热度脉冲。</p>
+                                            </div>
+                                            <div class="form-row popularity-threshold-row">
+                                                <div class="form-group-inline">
+                                                    <label for="popularityMinRating">最低评分</label>
+                                                    <input type="number" id="popularityMinRating" class="number-input" min="0" max="5" step="0.1" value="4">
+                                                    <p class="input-description">评分达到该值才会参与热度判定。</p>
+                                                </div>
+                                                <div class="form-group-inline">
+                                                    <label for="popularityMinRatingCount">最低评价人数</label>
+                                                    <input type="number" id="popularityMinRatingCount" class="number-input" min="0" max="9999" step="1" value="350">
+                                                    <p class="input-description">评价人数达到该值后，且评分也达标，显示热度脉冲。</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- 新：📝 演员备注（Wiki/xslist）（独立区块） -->
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">📝 演员备注（Wiki / xslist）</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="veEnableActorRemarks"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>显示演员基础备注（年龄/身高/罩杯/引退）与 Wiki 外链。<br>
+                                            <strong>数据源：</strong>Wikipedia → xslist（与原脚本一致）。<br>
+                                            <strong style="color: var(--warning);">性能提示：</strong><span style="color: var(--warning); font-weight: 600;">开启后会显著增加页面增强阶段的请求与处理耗时。</span>
+                                        </p>
+
+                                        <div class="sub-settings" id="actorRemarksConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>📝 演员备注配置</h5>
+                                                <p class="sub-description">控制展示样式与缓存策略</p>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group-inline">
+                                                    <label for="veActorRemarksMode">展示模式：</label>
+                                                    <select id="veActorRemarksMode" class="select-input">
+                                                        <option value="panel">面板</option>
+                                                        <option value="inline">内嵌胶囊</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group-inline">
+                                                    <label for="veActorRemarksTTL">缓存TTL（天）：</label>
+                                                    <input type="number" id="veActorRemarksTTL" class="number-input" min="0" max="30" value="0">
+                                                    <span class="input-suffix">天</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="form-group-inline">
+                                                    <label for="veActorRemarksTaskTimeout">任务超时：</label>
+                                                    <input type="number" id="veActorRemarksTaskTimeout" class="number-input" min="10" max="1800" step="5" value="10">
+                                                    <span class="input-suffix">秒</span>
+                                                </div>
+                                            </div>
+                                            <p class="input-description">
+                                                超过该时长后，会结束当前网页的演员备注任务；演员页和影片页分别独立计时。
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 评论区增强 -->
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">💬 评论区增强</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="veEnableReviewEnhancement"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>增强影片页评论区，支持完整评论、链接识别和磁链快捷操作<br>
+                                            <strong>使用：</strong>主开关控制整组功能，子开关控制评论解锁、链接识别和 115 推送按钮<br>
+                                            <strong>数据源：</strong>评论解锁使用 JAV-JHS 代理 API
+                                        </p>
+
+                                        <div class="sub-settings" id="reviewEnhancementConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>评论区增强子设置</h5>
+                                                <p class="sub-description">控制评论区里的链接识别和磁链推送行为</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">🔓 破解评论区</h6>
+                                                            <span class="enhancement-feature-status available">可用</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="veEnableReviewBreaker"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">使用 JAV-JHS 的 API 解锁影片评论区，显示完整评论内容并支持分页浏览。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">🔗 自动识别番号与磁链</h6>
+                                                            <span class="enhancement-feature-status available">可用</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="veEnableReviewMagnetLinkify"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">自动把评论中的番号转成搜索链接，把纯文本磁链转成可点击磁链。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">🧲 磁链后显示推送115按钮</h6>
+                                                            <span class="enhancement-feature-status available">可用</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="veEnableReviewPush115"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">在评论区磁链后显示推送115按钮，支持翻页后重新注入。</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 新：🚫 破解FC2拦截功能（独立区块） -->
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🚫 破解FC2拦截</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="veEnableFC2Breaker"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>整合123av和fc2ppvdb数据源，绕过FC2视频访问限制<br>
+                                            <strong>使用：</strong>在FC2影片页显示增强信息，包括视频预览、演员信息和销售者详情<br>
+                                            <strong>数据源：</strong>从123av.com和fc2ppvdb.com获取FC2视频的详细信息
+                                        </p>
+                                    </div>
+
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">⚓ 锚点优化</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableAnchorOptimization"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在视频详情页优化快捷按钮位置，添加预览图和磁链快捷跳转<br>
+                                            <strong>使用：</strong>仅在详情页生效，在页面右侧显示优化的快捷按钮<br>
+                                            <strong>适用：</strong>视频详情页（/v/xxx），不适用于列表页和搜索页
+                                        </p>
+
+                                        <!-- 锚点优化详细配置 -->
+                                        <div class="sub-settings" id="anchorOptimizationConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>⚓ 锚点优化配置</h5>
+                                                <p class="sub-description">自定义详情页快捷按钮的位置和功能。仅在视频详情页生效。</p>
+                                            </div>
+
+                                            <!-- 锚点配置并排选项 -->
+                                            <div class="anchor-config-container">
+                                                <div class="anchor-config-option">
+                                                    <div class="config-header">
+                                                        <span class="config-title">📍 按钮位置</span>
+                                                        <div class="modern-select-wrapper">
+                                                            <select id="anchorButtonPosition" class="modern-select">
+                                                                <option value="right-center">右侧中央</option>
+                                                                <option value="right-bottom">右下角</option>
+                                                            </select>
+                                                            <span class="select-arrow">▼</span>
+                                                        </div>
+                                                    </div>
+                                                    <p class="config-description">选择优化后按钮的显示位置</p>
+                                                </div>
+
+                                                <div class="anchor-config-option">
+                                                    <div class="config-header">
+                                                        <span class="config-title">🖼️ 显示预览图按钮</span>
+                                                        <label class="modern-toggle">
+                                                            <input type="checkbox" id="showPreviewButton" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                    <p class="config-description">在快捷按钮中显示"预览图"按钮，点击可快速跳转到预览图区域。</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-box">
+                                                <p><strong>按钮顺序（从上到下）：</strong></p>
+                                                <ol>
+                                                    <li>🖼️ 预览图 - 跳转到预览图区域</li>
+                                                    <li>🧲 磁链下载 - 跳转到磁链下载区域</li>
+                                                    <li>⬆️ TOP - 返回页面顶部</li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" data-subtab="actor">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🎛️ 演员操作按钮增强</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="aeEnableActionButtons"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在演员页注入拉黑、订阅、扫描新作品等快捷操作按钮<br>
+                                            <strong>使用：</strong>将常用演员操作集中到页面顶部，减少跳转和手动查找
+                                        </p>
+                                    </div>
+
+                                    <div class="form-group" data-subtab="actor">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🎯 影片类别过滤</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableActorEnhancement"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在演员页按影片类别/标签进行过滤，并自动保存过滤条件，跨演员页智能应用<br>
+                                            <strong>使用：</strong>在演员页选择类别/标签后自动保存；切换到其他演员页时自动应用兼容的过滤条件<br>
+                                            <strong>适用：</strong>演员页面（/actors/xxx），支持影片类别/标签过滤条件的自动保存与智能应用
+                                        </p>
+
+                                        <!-- 影片类别过滤详细配置 -->
+                                        <div class="sub-settings" id="actorEnhancementConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>🎯 影片类别过滤配置</h5>
+                                                <p class="sub-description">自定义演员页的类别/标签过滤器行为，提升浏览效率。</p>
+                                            </div>
+
+                                            <!-- 演员页配置选项 -->
+                                            <div class="dual-toggle-container">
+                                                <div class="toggle-option">
+                                                    <div class="toggle-header">
+                                                        <span class="toggle-title">🔄 自动应用过滤器</span>
+                                                        <label class="modern-toggle">
+                                                            <input type="checkbox" id="enableAutoApplyTags" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                    <p class="toggle-description">自动将上次使用的过滤条件应用到新的演员页</p>
+                                                    
+                                                    <!-- 上次应用的标签显示 -->
+                                                    <div class="last-applied-tags" id="lastAppliedTagsDisplay" style="margin-top: 10px;">
+                                                        <div class="tag-display-header">
+                                                            <span class="tag-display-title">📋 上次应用的过滤条件：</span>
+                                                            <div class="tag-actions">
+                                                                <button class="btn-small btn-outline" id="clearLastAppliedTags" title="清除记录">🗑️</button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="applied-tags-container" id="appliedTagsContainer">
+                                                            <span class="no-tags-message">暂无记录</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="toggle-option">
+                                                    <div class="toggle-header">
+                                                        <span class="toggle-title">🏷️ 默认过滤条件</span>
+                                                        <!-- 动态生成的复选框组 -->
+                                                        <div id="actorDefaultTagsGroup" class="checkbox-group">
+                                                            <!-- 由 JavaScript 动态生成 -->
+                                                        </div>
+                                                    </div>
+                                                    <p class="toggle-description">当没有保存记录或兼容性检查失败时使用的默认过滤条件</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-box">
+                                                <p><strong>功能说明：</strong></p>
+                                                <ul>
+                                                    <li>🔄 <strong>自动同步：</strong>在演员页选择类别/标签后自动保存，切换演员时智能应用</li>
+                                                    <li>🧠 <strong>智能兼容：</strong>只应用当前演员页支持的过滤条件，避免无效过滤</li>
+                                                    <li>📝 <strong>默认回退：</strong>当无保存记录或兼容性检查失败时，使用默认过滤条件</li>
+                                                    <li>💾 <strong>存储限制：</strong>最多保存10个演员的过滤器记录，自动清理旧记录</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" data-subtab="actor">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🧭 影片分段显示</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="aeEnableTimeSegmentationDivider"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在演员页的作品列表中，按时间阈值（默认6个月）在“近N个月”和“更早”之间插入一条高亮分隔线，增强时间分段的可读性。
+                                        </p>
+
+                                        <!-- 子设置：时间阈值（月） -->
+                                        <div class="sub-settings" id="actorTimeSegmentationConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>🧭 分段配置</h5>
+                                                <p class="sub-description">设置“近N个月”的时间阈值。</p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="aeTimeSegmentationMonths">时间阈值（月）:</label>
+                                                <input type="number" id="aeTimeSegmentationMonths" class="number-input" min="1" max="24" value="6">
+                                                <p class="input-description">用于区分“近N个月”和“更早”的临界值，默认 6 个月。</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" data-subtab="video">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🧲 磁力资源搜索</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableMagnetSearch"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在视频详情页自动搜索多个站点的磁力资源，自动识别画质和字幕<br>
+                                            <strong>使用：</strong>进入视频详情页自动开始搜索，结果显示在磁力链接区域
+                                        </p>
+
+                                        <!-- 磁力搜索详细配置 -->
+                                        <div class="sub-settings" id="magnetSourcesConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>🔍 搜索源配置</h5>
+                                                <p class="sub-description">选择要搜索的磁力资源站点，建议保持默认选择以获得最佳搜索效果。</p>
+                                            </div>
+
+                                            <div class="sources-grid">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="magnetSourceSukebei" checked>
+                                                    <span class="checkmark"></span>
+                                                    Sukebei (SUK)
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="magnetSourceBtdig" checked>
+                                                    <span class="checkmark"></span>
+                                                    BTdig (BTD)
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="magnetSourceBtsow" checked>
+                                                    <span class="checkmark"></span>
+                                                    BTSOW (BTS)
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="magnetSourceTorrentz2">
+                                                    <span class="checkmark"></span>
+                                                    Torrentz2 (TZ2)
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="magnetSourceJavbus">
+                                                    <span class="checkmark"></span>
+                                                    JAVBUS (JVB)
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group" style="margin-top: 10px;">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">🚫 屏蔽磁力区域广告</h6>
+                                                            <span class="enhancement-feature-status available">可用</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="magnetBlockMojContent"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">隐藏磁力链接区域内的广告横幅（<code>.moj-content</code>）。</p>
+                                            </div>
+
+                                            <div class="form-group" style="margin-top: 10px;">
+                                                <label class="checkbox-label">
+                                                    <div class="enhancement-feature-info">
+                                                        <div class="enhancement-feature-title">
+                                                            <h6 class="enhancement-feature-name">⚡ 自动加载磁力资源</h6>
+                                                            <span class="enhancement-feature-status available">可用</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="enhancement-toggle-wrapper">
+                                                        <button class="enhancement-toggle" data-target="magnetAutoSearch"></button>
+                                                    </div>
+                                                </label>
+                                                <p class="input-description">开启后，进入<strong>未看</strong>影片页自动搜索磁力资源；已看影片仍需手动点击加载。关闭后无论是否已看均需手动加载。</p>
+                                            </div>
+
+                                            <div class="info-box">
+                                                <p><strong>搜索源说明：</strong></p>
+                                                <ul>
+                                                    <li><strong>Sukebei</strong> - 专业的成人内容磁力搜索引擎</li>
+                                                    <li><strong>BTdig</strong> - 通用磁力搜索引擎</li>
+                                                    <li><strong>BTSOW</strong> - 高质量磁力资源搜索</li>
+                                                    <li><strong>Torrentz2</strong> - 综合磁力搜索聚合器</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    
+                                </div>
+
+                                <!-- 其他增强 -->
+                                <div class="settings-section">
+                                    <!-- 新：📜 启用滚动翻页（独立区块，右侧通用开关） -->
+                                    <div class="form-group" data-subtab="other">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">📜 启用滚动翻页</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableScrollPaging"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>当滚动到页面底部时自动加载下一页列表，实现连续浏览。<br>
+                                            <strong>提示：</strong>如遇到站点限速或触发反爬，请适当停顿或关闭此项。<br>
+                                            <strong>适用：</strong>支持分页的影片列表页与演员页。
+                                        </p>
+                                    </div>
+
+                                    <div class="form-group" data-subtab="other">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🏆 超级排行榜</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enableSuperRanking"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>把 JavDB 顶部“排行榜”改为“超级排行榜”，热播和 TOP250 使用免 VIP 的增强页面渲染，其他分类保留 JavDB 原生入口。<br>
+                                            <strong>适用：</strong>JavDB 全站任意路由的顶部导航栏，支持鼠标悬停和移动端点击展开。
+                                        </p>
+                                    </div>
+
+                                    <div class="form-group" data-subtab="other">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">⌛ 显示加载指示器</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="veShowLoadingIndicator"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在演员页和影片页的增强任务执行时显示加载提示与处理中状态<br>
+                                            <strong>使用：</strong>帮助您判断页面增强仍在运行，减少等待时的疑惑
+                                        </p>
+                                    </div>
+
+                                    <!-- 密码显示助手 -->
+                                    <div class="form-group" data-subtab="other">
+                                        <label class="checkbox-label">
+                                            <div class="enhancement-feature-info">
+                                                <div class="enhancement-feature-title">
+                                                    <h6 class="enhancement-feature-name">🔑 密码显示助手</h6>
+                                                    <span class="enhancement-feature-status available">可用</span>
+                                                </div>
+                                            </div>
+                                            <div class="enhancement-toggle-wrapper">
+                                                <button class="enhancement-toggle" data-target="enablePasswordHelper"></button>
+                                            </div>
+                                        </label>
+                                        <p class="input-description">
+                                            <strong>效果：</strong>在所有网站的密码框上显示星号密码，避免忘记或输错密码<br>
+                                            <strong>使用：</strong>根据设置的显示方式（悬浮/单击/双击/Ctrl+单击）查看密码框中的内容
+                                        </p>
+
+                                        <!-- 密码显示助手详细配置 -->
+                                        <div class="sub-settings" id="passwordHelperConfig" style="display: none;">
+                                            <div class="sub-settings-header">
+                                                <h5>🔑 密码显示配置</h5>
+                                                <p class="sub-description">自定义密码显示的触发方式和等待时间。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="passwordShowMethod">显示密码方式：</label>
+                                                <select id="passwordShowMethod" class="select-input">
+                                                    <option value="0">鼠标悬浮在密码框上时</option>
+                                                    <option value="1">双击密码框时</option>
+                                                    <option value="2">单击密码框时</option>
+                                                    <option value="3">按下Ctrl并单击密码框时</option>
+                                                </select>
+                                                <p class="input-description">选择触发密码显示的方式，默认为鼠标悬浮。</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="passwordWaitTime">等待时间 (毫秒)：</label>
+                                                <input type="number" id="passwordWaitTime" class="number-input" min="0" max="2000" step="50" value="300">
+                                                <p class="input-description">鼠标悬浮模式下，悬停多久后显示密码（仅悬浮模式有效）。</p>
+                                            </div>
+
+                                            <div class="info-box">
+                                                <p><strong>功能说明：</strong></p>
+                                                <ul>
+                                                    <li>🔒 <strong>安全提示：</strong>此功能会在页面上显示密码明文，请注意使用环境</li>
+                                                    <li>⌨️ <strong>快捷键：</strong>在密码框中按 Enter 键可快速隐藏密码</li>
+                                                    <li>🌐 <strong>全局生效：</strong>此功能在所有网站的密码输入框上生效</li>
+                                                    <li>🔄 <strong>自动隐藏：</strong>失去焦点或鼠标移开时自动隐藏密码</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 开发中 -->
+                                <div class="settings-section">
+                                </div>
+
+
+                            </div>
+                        </div>
+
+</div>

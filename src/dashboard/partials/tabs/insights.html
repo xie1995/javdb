@@ -1,0 +1,56 @@
+<section class="tab-section" data-tab-id="insights">
+  <div class="card container insights-page">
+    <div class="insights-hero">
+      <div>
+        <span class="insights-eyebrow">Insights</span>
+        <h3>观影报告</h3>
+        <p>按时间范围生成观影统计报告，管理历史报告并预览导出结果。</p>
+      </div>
+      <div class="insights-hero-mark">
+        <i class="fas fa-chart-line"></i>
+      </div>
+    </div>
+    
+    <!-- 顶部工具栏：主动作清晰、分组排列 -->
+    <div class="insights-toolbar">
+      <!-- 第二行：时间范围 + 生成 + 查看生成过程 -->
+      <div class="toolbar-row row-2">
+        <div class="toolbar-left">
+          <div class="field-inline">
+            <label for="insights-month-start">时间范围：</label>
+            <input type="month" id="insights-month-start" />
+            <span style="margin: 0 6px; color: #64748b;">—</span>
+            <input type="month" id="insights-month-end" />
+            <span style="margin-left: 16px; color: var(--text-secondary); font-size: 13px;">
+              <i class="fas fa-user-circle"></i>&nbsp;当前人设：<span id="insights-current-persona" style="color: var(--text-primary); font-weight: 500;">友好解说员</span>
+            </span>
+          </div>
+          <button id="insights-generate" class="btn-primary"><i class="fas fa-magic" aria-hidden="true"></i>&nbsp;生成报告</button>
+        </div>
+        <div class="toolbar-right" id="insights-toolbar-row2-actions">
+          <!-- 这里将插入“查看生成过程”按钮（由脚本动态注入） -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 内容区：左右双栏布局（左：历史；右：预览） -->
+    <div class="insights-grid">
+      <div class="col-left">
+        <div class="section-title">
+          <div class="title-left"><i class="fas fa-history"></i>&nbsp;历史月报（保留 24 个月）</div>
+        </div>
+        <div class="history-actions">
+          <button id="insights-export" class="btn-secondary"><i class="fas fa-file-export"></i>&nbsp;导出</button>
+          <button id="insights-delete-selected" class="btn-danger" disabled><i class="fas fa-trash-alt"></i>&nbsp;删除所选</button>
+          <button id="insights-refresh-history" class="btn-ghost"><i class="fas fa-sync-alt"></i>&nbsp;刷新历史</button>
+        </div>
+        <div id="insights-history-list" class="history-list"></div>
+      </div>
+      <div class="col-right">
+        <div class="section-title"><div class="title-left"><i class="fas fa-eye"></i>&nbsp;预览</div></div>
+        <iframe id="insights-preview" style="width:100%;min-height:520px;border:1px solid var(--border-primary);border-radius:8px;background:var(--surface-primary);"></iframe>
+      </div>
+    </div>
+  </div>
+  
+</section>

@@ -1,0 +1,2038 @@
+/* 网络测试样式 - 适配日夜主题 */
+
+/* 确保 settings-page-body 使用 gap 来创建间距 */
+#network-test-settings .settings-page-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+}
+
+/* 移除 settings-card 的 margin-bottom，使用 gap 代替 */
+#network-test-settings .settings-card {
+    margin-bottom: 0 !important;
+}
+
+#network-test-settings .settings-section {
+    margin-bottom: 0 !important;
+}
+
+/* ===== 网络加速配置区域样式 ===== */
+#network-test-settings .settings-section h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+#network-test-settings .settings-section h4 i {
+    font-size: 18px;
+    color: var(--primary);
+}
+
+#network-test-settings .section-description {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* 表单组样式 */
+#network-test-settings .form-group {
+    margin-bottom: 20px;
+}
+
+#network-test-settings .form-group:last-child {
+    margin-bottom: 0;
+}
+
+#network-test-settings .form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+#network-test-settings .form-label i {
+    font-size: 14px;
+    color: var(--primary);
+}
+
+/* 复选框组样式 */
+#network-test-settings .checkbox-group {
+    margin-bottom: 8px;
+}
+
+#network-test-settings .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+#network-test-settings .checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+#network-test-settings .checkbox-label span {
+    user-select: none;
+}
+
+/* 提示文字样式 */
+#network-test-settings .form-hint {
+    margin: 8px 0 0 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* 选择框样式 */
+#network-test-settings .select-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#network-test-settings .select-input:hover {
+    border-color: var(--primary);
+}
+
+#network-test-settings .select-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 59, 130, 246), 0.1);
+}
+
+/* 输入框样式 */
+#network-test-settings .text-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#network-test-settings .text-input:hover {
+    border-color: var(--primary);
+}
+
+#network-test-settings .text-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 59, 130, 246), 0.1);
+}
+
+#network-test-settings .text-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* 按钮样式 */
+#network-test-settings .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+#network-test-settings .btn i {
+    font-size: 14px;
+}
+
+#network-test-settings .btn-primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+#network-test-settings .btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb, 59, 130, 246), 0.3);
+}
+
+#network-test-settings .btn-secondary {
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+#network-test-settings .btn-secondary:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-primary);
+}
+
+#network-test-settings .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* 加载动画 */
+#network-test-settings .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+#network-test-settings .spinner.hidden {
+    display: none;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 测试结果框 */
+.test-results-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+}
+
+/* 线路管理区域 - 移除不必要的样式 */
+.route-group {
+    margin-top: 15px;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+}
+
+.routes-list {
+    margin-bottom: 10px;
+}
+
+.routes-empty-hint {
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 10px 0;
+    margin: 0;
+}
+
+/* 线路项样式 */
+.route-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.route-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px var(--shadow-primary);
+}
+
+.route-item-preferred {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(76, 175, 80, 0.08) 100%);
+    border: 2px solid var(--success);
+    border-left-width: 5px;
+    box-shadow: 0 2px 12px rgba(76, 175, 80, 0.2);
+    position: relative;
+    animation: preferredPulse 2s ease-in-out infinite;
+    overflow: hidden; /* 防止光效溢出 */
+}
+
+.route-item-preferred::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.1), transparent);
+    animation: shimmer 3s infinite;
+    pointer-events: none;
+    border-radius: 6px;
+}
+
+@keyframes preferredPulse {
+    0%, 100% {
+        box-shadow: 0 2px 12px rgba(76, 175, 80, 0.2);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(76, 175, 80, 0.35);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.route-item-preferred:hover {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.12) 100%);
+    border-color: var(--success);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(76, 175, 80, 0.3);
+}
+
+.route-checkbox {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.route-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.route-url {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-primary);
+    word-break: break-all;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.route-preferred-badge {
+    color: white;
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+.route-preferred-badge i {
+    animation: starRotate 4s linear infinite;
+}
+
+/* 延迟徽章样式 */
+.route-latency-badge {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+.route-latency-badge.latency-excellent {
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+}
+
+.route-latency-badge.latency-good {
+    background: linear-gradient(135deg, #8bc34a 0%, #9ccc65 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(139, 195, 74, 0.3);
+}
+
+.route-latency-badge.latency-medium {
+    background: linear-gradient(135deg, #ff9800 0%, #ffa726 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(255, 152, 0, 0.3);
+}
+
+.route-latency-badge.latency-poor {
+    background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
+}
+
+.route-latency-badge.latency-error {
+    background: linear-gradient(135deg, #9e9e9e 0%, #bdbdbd 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(158, 158, 158, 0.3);
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes starRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.route-description {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.route-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.route-actions .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    min-height: 32px;
+}
+
+.route-actions .btn-secondary {
+    background: var(--surface-secondary);
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-primary);
+}
+
+.route-actions .btn-secondary:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-hover);
+    color: var(--text-primary) !important;
+}
+
+.route-actions .btn-warning {
+    background: var(--warning-light);
+    color: var(--warning) !important;
+    border: 1px solid var(--warning);
+}
+
+.route-actions .btn-warning:hover {
+    background: var(--warning);
+    color: #fff !important;
+}
+
+.route-actions .btn-success {
+    background: var(--success-light);
+    color: var(--success) !important;
+    border: 1px solid var(--success);
+}
+
+.route-actions .btn-success:hover {
+    background: var(--success);
+    color: #fff !important;
+}
+
+.route-disabled-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--error-light);
+    color: var(--error);
+    margin-left: 6px;
+}
+
+.route-actions .btn-danger {
+    background: transparent;
+    color: var(--error);
+    border-color: var(--border-primary);
+}
+
+.route-actions .btn-danger:hover {
+    background: var(--error-light);
+    border-color: var(--error);
+    color: var(--error);
+}
+
+.route-add-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.route-url-input {
+    flex: 1;
+    min-width: 250px;
+}
+
+.route-desc-input {
+    width: 180px;
+    min-width: 150px;
+}
+
+/* 域名配置面板 */
+.domain-config-panel {
+    margin-top: 15px;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+}
+
+.domain-config-panel .config-header {
+    margin-bottom: 15px;
+}
+
+.domain-config-panel .config-header h5 {
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.domain-config-panel .config-header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.domain-config-panel .config-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+/* 批量测试结果容器 */
+.batch-results-container {
+    margin-top: 20px;
+}
+
+.batch-results-placeholder {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+.batch-results-placeholder i {
+    font-size: 48px;
+    margin-bottom: 10px;
+    display: block;
+    opacity: 0.5;
+}
+
+.batch-results-placeholder p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .route-primary-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .route-primary-row .btn {
+        width: 100%;
+    }
+    
+    .route-add-row {
+        flex-direction: column;
+    }
+    
+    .route-url-input,
+    .route-desc-input {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .route-item {
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+    }
+    
+    .route-checkbox {
+        grid-row: 1;
+    }
+    
+    .route-info {
+        grid-row: 1;
+    }
+    
+    .route-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+    }
+    
+    .route-actions .btn {
+        flex: 1;
+    }
+    
+    .domain-config-panel .config-actions {
+        flex-direction: column;
+    }
+    
+    .domain-config-panel .config-actions button {
+        width: 100%;
+    }
+    
+    .form-group-inline {
+        flex-direction: column;
+    }
+    
+    .form-group-inline .input-with-icon {
+        width: 100% !important;
+    }
+}
+
+/* 手动测试区域样式 */
+.form-group-inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-icon .icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.input-with-icon .text-input {
+    width: 100%;
+}
+
+/* 网络测试设置面板特有样式 */
+#network-test-settings {
+    position: relative;
+    overflow: hidden;
+}
+
+#network-test-settings::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(135deg,
+        rgba(59, 130, 246, 0.05) 0%,
+        rgba(96, 165, 250, 0.05) 50%,
+        rgba(147, 197, 253, 0.05) 100%);
+    z-index: -1;
+    border-radius: 20px;
+}
+
+#network-test-settings .settings-page-header {
+    position: relative;
+    padding: 20px 0;
+    text-align: center;
+}
+
+#network-test-settings .settings-page-header h3 {
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#network-test-settings .settings-page-header h3::before {
+    content: '🌐';
+    font-size: 1.3em;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+#network-test-settings .settings-description {
+    color: var(--text-muted);
+    font-size: 16px;
+    margin-bottom: 0;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* 网络测试区域 */
+.network-test-section {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.network-test-section:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px var(--shadow-primary);
+    transition: all 0.3s ease;
+}
+
+/* 区域标题 */
+.section-header {
+    margin-bottom: 15px;
+}
+
+.section-header h4 {
+    color: var(--text-primary);
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h4 i {
+    color: var(--primary);
+    font-size: 14px;
+}
+
+.section-description {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* 域名统计信息 */
+.domain-stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.stat-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    background: var(--bg-tertiary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    min-width: 30px;
+    text-align: center;
+}
+
+/* 网络测试设置面板按钮样式 */
+#network-test-settings .button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+#network-test-settings .button-group .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    min-height: 40px;
+    border: 1px solid transparent;
+}
+
+#network-test-settings .button-group .btn-primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+#network-test-settings .button-group .btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb, 59, 130, 246), 0.3);
+}
+
+#network-test-settings .button-group .btn-secondary {
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+#network-test-settings .button-group .btn-secondary:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-primary);
+}
+
+/* 批量测试结果容器 */
+.batch-results-container {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    min-height: 200px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.batch-results-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 170px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.batch-results-placeholder i {
+    font-size: 24px;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.batch-results-placeholder p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* 分类测试结果 */
+.category-result {
+    margin-bottom: 20px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.category-header {
+    background: var(--bg-secondary);
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.category-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.category-title .emoji {
+    font-size: 16px;
+}
+
+.category-stats {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-stats .success-count {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.category-stats .fail-count {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+/* 域名测试结果项 */
+.domain-result-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.2s ease;
+}
+
+.domain-result-item:last-child {
+    border-bottom: none;
+}
+
+.domain-result-item:hover {
+    background: var(--bg-secondary);
+}
+
+.domain-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.domain-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.domain-url {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'Courier New', monospace;
+}
+
+.domain-description {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.domain-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.status-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+}
+
+.status-icon.success {
+    background: #28a745;
+}
+
+.status-icon.failure {
+    background: #dc3545;
+}
+
+.status-icon.testing {
+    background: #ffc107;
+    animation: pulse 1.5s infinite;
+}
+
+.latency-info {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.latency-good {
+    color: #28a745;
+}
+
+.latency-medium {
+    color: #ffc107;
+}
+
+.latency-poor {
+    color: #dc3545;
+}
+
+/* 测试进度指示器 */
+.test-progress {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: var(--info-light);
+    border: 1px solid var(--info);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.test-progress .progress-icon {
+    color: var(--info);
+    animation: spin 1s linear infinite;
+}
+
+.test-progress .progress-text {
+    color: var(--info);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .domain-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .batch-test-controls {
+        flex-direction: column;
+    }
+    
+    .batch-test-controls .button-like {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .domain-result-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .domain-status {
+        align-self: flex-end;
+    }
+}
+
+/* 域名配置面板 */
+.domain-config-panel {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    margin: 15px 0;
+    overflow: hidden;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.config-header {
+    background: var(--bg-secondary);
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.config-header h5 {
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-header h5 i {
+    color: var(--primary);
+    font-size: 12px;
+}
+
+.config-header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.domain-config-content {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* 域名分类 */
+.domain-category {
+    margin-bottom: 20px;
+}
+
+.domain-category:last-child {
+    margin-bottom: 0;
+}
+
+.category-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.category-title .emoji {
+    font-size: 14px;
+}
+
+/* 域名配置项 */
+.domain-config-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.domain-config-item:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+}
+
+.domain-config-item.enabled {
+    background: var(--success-light);
+    border-color: var(--success);
+}
+
+.domain-config-item.disabled {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+    opacity: 0.7;
+}
+
+.domain-info-config {
+    flex: 1;
+    min-width: 0;
+}
+
+.domain-name-config {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.domain-url-config {
+    color: var(--primary);
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 2px;
+}
+
+.domain-desc-config {
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+/* 域名开关 */
+.domain-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.domain-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: var(--text-muted);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.domain-switch.enabled {
+    background: var(--success);
+}
+
+.domain-switch::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.domain-switch.enabled::before {
+    transform: translateX(16px);
+}
+
+.priority-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.priority-badge.high {
+    background: #dc3545;
+    color: white;
+}
+
+.priority-badge.medium {
+    background: var(--warning);
+    color: var(--text-primary);
+}
+
+.priority-badge.low {
+    background: var(--text-muted);
+    color: white;
+}
+
+/* 配置操作按钮 */
+.config-actions {
+    padding: 15px 20px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-primary);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.config-actions .button-like.small {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-width: auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .domain-config-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .domain-toggle {
+        align-self: flex-end;
+    }
+
+    .config-actions {
+        flex-direction: column;
+    }
+
+    .config-actions .button-like {
+        width: 100%;
+    }
+}
+
+/* =================================================================
+   =================== 网络测试设置面板样式 ========================
+   ================================================================= */
+
+/* 网络测试设置面板特有样式已在文件开头定义 */
+
+#network-test-settings .test-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+#network-test-settings .test-controls button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+#network-test-settings .test-controls .btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+#network-test-settings .test-controls .btn-primary:hover {
+    background: var(--primary-hover-color);
+}
+
+#network-test-settings .test-controls .btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+#network-test-settings .test-controls .btn-secondary:hover {
+    background: var(--bg-tertiary);
+}
+
+#network-test-settings .test-controls button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#network-test-settings .test-progress {
+    margin-bottom: 1.5rem;
+    display: none;
+}
+
+#network-test-settings .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+#network-test-settings .progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+#network-test-settings .progress-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+#network-test-settings .test-results {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    min-height: 200px;
+}
+
+#network-test-settings .test-placeholder {
+    color: var(--text-secondary);
+    text-align: center;
+    font-style: italic;
+    margin: 2rem 0;
+}
+
+#network-test-settings .test-running {
+    color: var(--info-color);
+    text-align: center;
+    margin: 2rem 0;
+}
+
+#network-test-settings .test-running::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 0.5rem;
+    border: 2px solid var(--info-color);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#network-test-settings .test-result-success {
+    padding: 1rem;
+    background: var(--success-bg-color);
+    color: var(--success-color);
+    border-radius: 6px;
+    border-left: 4px solid var(--success-color);
+    margin-bottom: 1rem;
+}
+
+#network-test-settings .test-result-error {
+    padding: 1rem;
+    background: var(--danger-bg-color);
+    color: var(--danger-color);
+    border-radius: 6px;
+    border-left: 4px solid var(--danger-color);
+    margin-bottom: 1rem;
+}
+
+#network-test-settings .test-result-success i,
+#network-test-settings .test-result-error i {
+    margin-right: 0.5rem;
+}
+
+#network-test-settings .test-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+#network-test-settings .test-result-item {
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 4px solid;
+}
+
+#network-test-settings .test-result-item.test-result-success {
+    background: var(--success-bg-color);
+    color: var(--success-color);
+    border-left-color: var(--success-color);
+}
+
+#network-test-settings .test-result-item.test-result-error {
+    background: var(--danger-bg-color);
+    color: var(--danger-color);
+    border-left-color: var(--danger-color);
+}
+
+#network-test-settings .test-result-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+#network-test-settings .test-result-details {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+#network-test-settings .test-result-details div {
+    margin-bottom: 0.25rem;
+}
+
+#network-test-settings .test-summary {
+    background: var(--bg-tertiary);
+    padding: 1.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+#network-test-settings .test-summary h5 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+#network-test-settings .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+#network-test-settings .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--bg-primary);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+#network-test-settings .stat-label {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+#network-test-settings .stat-value {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    #network-test-settings .test-controls {
+        flex-direction: column;
+    }
+
+    #network-test-settings .test-controls button {
+        width: 100%;
+    }
+
+    #network-test-settings .test-results-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #network-test-settings .summary-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 批量测试结果样式 */
+#batch-test-results {
+    margin-top: 2rem;
+    display: none;
+}
+
+#batch-test-results .batch-test-header {
+    margin-bottom: 1.5rem;
+}
+
+#batch-test-results .batch-test-header h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+#batch-test-results .test-progress {
+    margin-bottom: 1rem;
+}
+
+#batch-test-results .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+#batch-test-results .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-hover-color));
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+#batch-test-results .progress-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+#batch-test-results .batch-test-summary {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    margin-bottom: 1.5rem;
+}
+
+#batch-test-results .batch-test-summary h5 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+#batch-test-results .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+#batch-test-results .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--surface-primary);
+    border-radius: 6px;
+    border: 1px solid var(--border-primary);
+}
+
+#batch-test-results .stat-item.success {
+    background: var(--success-light);
+    border-color: var(--success);
+    border-width: 2px;
+}
+
+#batch-test-results .stat-item.success .stat-value {
+    color: var(--success);
+    font-size: 1.3rem;
+}
+
+#batch-test-results .stat-item.failure {
+    background: var(--error-light);
+    border-color: var(--error);
+    border-width: 2px;
+}
+
+#batch-test-results .stat-item.failure .stat-value {
+    color: var(--error);
+    font-size: 1.3rem;
+}
+
+#batch-test-results .stat-label {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+#batch-test-results .stat-value {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+}
+
+#batch-test-results .batch-test-results-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#batch-test-results .batch-category-header {
+    margin-top: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 2px solid var(--border-primary);
+}
+
+#batch-test-results .batch-category-header h5 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+#batch-test-results .batch-result-item {
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid;
+    background: var(--surface-primary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#batch-test-results .batch-result-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px var(--shadow-primary);
+}
+
+#batch-test-results .batch-result-item.success {
+    border-left-color: var(--success);
+    border-left-width: 5px;
+    background: var(--success-light);
+}
+
+#batch-test-results .batch-result-item.failure {
+    border-left-color: var(--error);
+    border-left-width: 5px;
+    background: var(--error-light);
+}
+
+#batch-test-results .result-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+#batch-test-results .result-header i {
+    font-size: 1.2rem;
+}
+
+#batch-test-results .batch-result-item.success .result-header i {
+    color: var(--success);
+    font-size: 1.4rem;
+}
+
+#batch-test-results .batch-result-item.failure .result-header i {
+    color: var(--error);
+    font-size: 1.4rem;
+}
+
+#batch-test-results .domain-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+#batch-test-results .domain-status {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+#batch-test-results .batch-result-item.success .domain-status {
+    background: var(--success);
+    color: white;
+    font-weight: 600;
+}
+
+#batch-test-results .batch-result-item.failure .domain-status {
+    background: var(--error);
+    color: white;
+    font-weight: 600;
+}
+
+#batch-test-results .result-details {
+    padding-left: 2rem;
+}
+
+#batch-test-results .domain-url {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+#batch-test-results .domain-info {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+#batch-test-results .domain-description {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+#batch-test-results .error-message {
+    font-size: 0.85rem;
+    color: var(--error);
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--error-light);
+    border-radius: 4px;
+}
+
+#batch-test-results .batch-results-placeholder {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-muted);
+}
+
+#batch-test-results .batch-results-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+#batch-test-results .batch-results-placeholder p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    #batch-test-results .summary-stats {
+        grid-template-columns: 1fr;
+    }
+
+    #batch-test-results .domain-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    #batch-test-results .result-details {
+        padding-left: 0;
+    }
+}
+
+/* 域名配置面板样式 */
+.domain-config-panel {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+}
+
+.domain-config-panel .config-header {
+    margin-bottom: 1.5rem;
+}
+
+.domain-config-panel .config-header h5 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.domain-config-panel .config-header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.domain-config-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.domain-category-group {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-primary);
+}
+
+.domain-category-group h6 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-primary);
+}
+
+.domain-category-description {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.domain-checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.domain-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--surface-primary);
+    border-radius: 4px;
+    border: 1px solid var(--border-primary);
+    transition: all 0.2s ease;
+}
+
+.domain-checkbox-item:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+}
+
+.domain-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.75rem;
+    cursor: pointer;
+}
+
+.domain-checkbox-label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    cursor: pointer;
+}
+
+.domain-checkbox-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.domain-checkbox-url {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.domain-checkbox-description {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.domain-priority-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.domain-priority-badge.high {
+    background: var(--error);
+    color: white;
+}
+
+.domain-priority-badge.medium {
+    background: var(--warning);
+    color: white;
+}
+
+.domain-priority-badge.low {
+    background: var(--text-muted);
+    color: white;
+}
+
+.config-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-primary);
+}
+
+.config-actions button {
+    flex: 1;
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 6px;
+    border: 1px solid var(--border-primary);
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.config-actions button:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-primary);
+}
+
+@media (max-width: 768px) {
+    .config-actions {
+        flex-direction: column;
+    }
+}
+
+
+/* 线路管理警告提示框 */
+.route-warning {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+    border: 2px solid #ff9800;
+    border-left-width: 5px;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+    animation: warningPulse 3s ease-in-out infinite;
+}
+
+.route-warning i {
+    color: #ff9800;
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.route-warning .alert-content {
+    flex: 1;
+}
+
+.route-warning .alert-content strong {
+    display: block;
+    color: #f57c00;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.route-warning .alert-content p {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+@keyframes warningPulse {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(255, 152, 0, 0.25);
+    }
+}
+
+/* 深色主题下的警告框 */
+[data-theme="dark"] .route-warning {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 152, 0, 0.08) 100%);
+    border-color: #ffa726;
+}
+
+[data-theme="dark"] .route-warning i {
+    color: #ffa726;
+}
+
+[data-theme="dark"] .route-warning .alert-content strong {
+    color: #ffb74d;
+}
+
+[data-theme="dark"] .route-warning .alert-content p {
+    color: var(--text-secondary);
+}
