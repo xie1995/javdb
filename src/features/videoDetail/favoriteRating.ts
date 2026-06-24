@@ -6,6 +6,9 @@ import { extractVideoIdFromPage } from '../../platform/browser';
 import { showToast } from '../../platform/browser/toast';
 import type { VideoRecord } from '../../types';
 import { runChunkedWork, saveSubtaskDetail, yieldToMainThread } from '../../platform/tasks';
+import { getSettings } from '../../utils/storage';
+import { selectOptimalMagnet, parseSizeToBytes, extractFileCountFromText } from '../magnets/application/resultMetadata';
+import type { MagnetResult } from '../magnets/domain/types';
 
 /**
  * 影片页收藏与评分增强
@@ -317,6 +320,14 @@ export class VideoFavoriteRatingEnhancer {
 
       showToast(newFavoriteState ? '已添加到收藏' : '已取消收藏', 'success');
       log('[VideoFavoriteRating] Favorite toggled:', newFavoriteState);
+
+      if (newFavoriteState && this.videoId) {
+        setTimeout(() => {
+          handleAutoPushOnFavoriteDetail(this.videoId!).catch((err) => {
+            log('[VideoFavoriteRating] Auto-push error:', err);
+          });
+        }, 500);
+      }
     } catch (error) {
       console.error('[VideoFavoriteRating] Failed to toggle favorite:', error);
       showToast('操作失败，请重试', 'error');
@@ -380,6 +391,171 @@ export class VideoFavoriteRatingEnhancer {
     }
     this.record = null;
     this.videoId = null;
+  }
+}
+
+async function isAutoPushOnFavoriteEnabled(): Promise<boolean> {
+  try {
+    const settings = await getSettings() as any;
+    return !!(settings?.drive115?.enabled && settings?.drive115?.autoPushOnFavorite);
+  } catch (error) {
+    log('[VideoFavoriteRating] Failed to check auto-push setting:', error);
+    return false;
+  }
+}
+
+function collectMagnetsFromDetailPage(): MagnetResult[] {
+  const results: MagnetResult[] = [];
+  try {
+    const magnetContent = document.querySelector('#magnets-content');
+    if (!magnetContent) return results;
+
+    const magnetItems = magnetContent.querySelectorAll('.item.columns');
+    magnetItems.forEach((item) => {
+      try {
+        const nameElement = item.querySelector('.magnet-name .name');
+        const magnetLink = item.querySelector('a[href^="magnet:"]');
+        const metaElement = item.querySelector('.meta');
+        const dateElement = item.querySelector('.date .time');
+        const tagsElements = item.querySelectorAll('.tags .tag');
+
+        if (nameElement && magnetLink) {
+          const name = nameElement.textContent?.trim() || '';
+          const magnet = (magnetLink as HTMLAnchorElement).href;
+          const meta = metaElement?.textContent?.trim() || '';
+          const date = dateElement?.textContent?.trim() || '';
+
+          const sizeMatch = meta.match(/([0-9.]+)\s*(GB|MB|KB|TB)/i);
+          const size = sizeMatch ? `${sizeMatch[1]} ${sizeMatch[2]}` : '';
+
+          const fileCount = extractFileCountFromText(meta);
+
+          let hasSubtitle = false;
+          let quality = '';
+
+          tagsElements.forEach(tag => {
+            const tagText = tag.textContent?.trim() || '';
+            if (tagText.includes('字幕') || tagText.includes('subtitle')) {
+              hasSubtitle = true;
+            }
+            if (tagText.includes('高清') || tagText.includes('HD')) {
+              quality = 'HD';
+            }
+            if (tagText.includes('1080P') || tagText.includes('1080p')) {
+              quality = '1080P';
+            }
+            if (tagText.includes('720P') || tagText.includes('720p')) {
+              quality = '720P';
+            }
+            if (tagText.includes('4K')) {
+              quality = '4K';
+            }
+          });
+
+          results.push({
+            name,
+            magnet,
+            size,
+            sizeBytes: parseSizeToBytes(size),
+            date: date || '',
+            seeders: 0,
+            leechers: 0,
+            source: 'JavDB',
+            hasSubtitle,
+            quality,
+            fileCount: isFinite(fileCount) ? fileCount : undefined,
+          });
+        }
+      } catch (e) {
+        log('[VideoFavoriteRating] Error parsing magnet item:', e);
+      }
+    });
+  } catch (error) {
+    log('[VideoFavoriteRating] Error collecting magnets:', error);
+  }
+  return results;
+}
+
+async function pushMagnetToDrive115(
+  videoId: string,
+  magnetUrl: string,
+  magnetName: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    log(`[VideoFavoriteRating] Auto-pushing to 115: ${videoId} | ${magnetName}`);
+
+    const { addTaskUrlsV2 } = await import('../drive115/router');
+    const settings = await getSettings() as any;
+    const downloadDir = settings?.drive115?.downloadDir || '0';
+    const wpPathId = downloadDir === '' ? '0' : downloadDir;
+
+    const res = await addTaskUrlsV2({
+      urls: magnetUrl,
+      wp_path_id: wpPathId,
+      context: {
+        source: 'auto_push_favorite_detail',
+        videoId,
+        magnetName,
+        pageUrl: window.location.href,
+        wpPathId,
+      } as any,
+    });
+
+    if (res.success) {
+      log(`[VideoFavoriteRating] Auto-push success for ${videoId}`);
+      return { success: true };
+    } else {
+      log(`[VideoFavoriteRating] Auto-push failed for ${videoId}: ${res.message}`);
+      return { success: false, error: res.message || '推送失败' };
+    }
+  } catch (error) {
+    log('[VideoFavoriteRating] Auto-push to 115 failed:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : '未知错误',
+    };
+  }
+}
+
+async function handleAutoPushOnFavoriteDetail(videoId: string): Promise<void> {
+  try {
+    const enabled = await isAutoPushOnFavoriteEnabled();
+    if (!enabled) return;
+
+    log(`[VideoFavoriteRating] Starting auto-push for favorited video: ${videoId}`);
+
+    const magnets = collectMagnetsFromDetailPage();
+
+    if (magnets.length === 0) {
+      log(`[VideoFavoriteRating] No magnets found for ${videoId}, skipping auto-push`);
+      showToast(`${videoId} 未找到磁力链接，跳过自动推送`, 'info');
+      return;
+    }
+
+    const optimalMagnet = selectOptimalMagnet(magnets);
+    if (!optimalMagnet) {
+      log(`[VideoFavoriteRating] Failed to select optimal magnet for ${videoId}`);
+      return;
+    }
+
+    log(`[VideoFavoriteRating] Selected optimal magnet: ${optimalMagnet.name.substring(0, 50)}...`);
+
+    showToast(`${videoId} 正在自动推送到115网盘...`, 'info');
+
+    const result = await pushMagnetToDrive115(
+      videoId,
+      optimalMagnet.magnet,
+      optimalMagnet.name,
+    );
+
+    if (result.success) {
+      showToast(`${videoId} 已自动推送到115网盘`, 'success');
+    } else {
+      showToast(`${videoId} 自动推送失败: ${result.error || '未知错误'}`, 'error');
+    }
+  } catch (error) {
+    log('[VideoFavoriteRating] Auto-push on favorite failed:', error);
+    showToast('自动推送115网盘时发生错误', 'error');
   }
 }
 

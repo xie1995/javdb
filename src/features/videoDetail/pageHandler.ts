@@ -20,6 +20,7 @@ import { newWorksManager } from '../newWorks';
 import { actorExtraInfoService } from '../actorRemarks';
 import { videoDetailEnhancer } from './enhancer';
 import { videoFavoriteRatingEnhancer } from './favoriteRating';
+import type { MagnetResult } from '../magnets/domain/types';
 
 function getActorRemarksTaskTimeoutMs(settings: any): number {
     const seconds = Number(settings?.videoEnhancement?.actorRemarksTaskTimeoutSeconds);
@@ -801,6 +802,10 @@ export async function handleVideoDetailPage(): Promise<void> {
         } catch (e) { log('bindWantSyncOnClick error:', e as any); }
 
         try {
+            bindNativeFavoriteAutoPush(videoId);
+        } catch (e) { log('bindNativeFavoriteAutoPush error:', e as any); }
+
+        try {
             setupStatusChangeObserver(videoId);
             try {
                 chrome.runtime.sendMessage({
@@ -1245,6 +1250,139 @@ async function upsertWantStatus(videoId: string): Promise<void> {
         showToast('同步失败：出现异常', 'error');
     } finally {
         concurrencyManager.finishProcessingVideo(videoId, opId || undefined);
+    }
+}
+
+function bindNativeFavoriteAutoPush(videoId: string): void {
+    try {
+        const favForm = document.querySelector<HTMLFormElement>('form.button_to[action*="/reviews/favorite"]');
+        const favButton = favForm?.querySelector('button') || Array.from(document.querySelectorAll('button')).find(btn => {
+            const text = (btn.textContent || '').trim();
+            return text.includes('收藏') && !text.includes('取消');
+        }) || null;
+        const target: Element | null = favForm || favButton || null;
+        if (!target) return;
+
+        const FLAG = '__bound_fav_autopush__';
+        if ((target as any)[FLAG]) return;
+        (target as any)[FLAG] = true;
+
+        const handler = (_e: Event) => {
+            setTimeout(() => {
+                triggerAutoPushFromNativeFavorite(videoId).catch(err => log('triggerAutoPushFromNativeFavorite error:', err));
+            }, 1000);
+        };
+
+        if (favForm) {
+            favForm.addEventListener('submit', handler, { capture: true });
+        } else if (favButton) {
+            favButton.addEventListener('click', handler, { capture: true });
+        }
+    } catch (e) {
+        log('bindNativeFavoriteAutoPush failed:', e as any);
+    }
+}
+
+async function triggerAutoPushFromNativeFavorite(videoId: string): Promise<void> {
+    try {
+        const { getSettings } = await import('../../utils/storage');
+        const settings = await getSettings() as any;
+        const enabled = !!(settings?.drive115?.enabled && settings?.drive115?.autoPushOnFavorite);
+        if (!enabled) return;
+
+        log(`Native favorite auto-push triggered for ${videoId}`);
+
+        const { selectOptimalMagnet, parseSizeToBytes, extractFileCountFromText } = await import('../magnets/application/resultMetadata');
+
+        const magnets: MagnetResult[] = [];
+        const magnetContent = document.querySelector('#magnets-content');
+        if (magnetContent) {
+            const magnetItems = magnetContent.querySelectorAll('.item.columns');
+            magnetItems.forEach((item) => {
+                try {
+                    const nameElement = item.querySelector('.magnet-name .name');
+                    const magnetLink = item.querySelector('a[href^="magnet:"]');
+                    const metaElement = item.querySelector('.meta');
+                    const dateElement = item.querySelector('.date .time');
+                    const tagsElements = item.querySelectorAll('.tags .tag');
+
+                    if (nameElement && magnetLink) {
+                        const name = nameElement.textContent?.trim() || '';
+                        const magnet = (magnetLink as HTMLAnchorElement).href;
+                        const meta = metaElement?.textContent?.trim() || '';
+                        const date = dateElement?.textContent?.trim() || '';
+
+                        const sizeMatch = meta.match(/([0-9.]+)\s*(GB|MB|KB|TB)/i);
+                        const size = sizeMatch ? `${sizeMatch[1]} ${sizeMatch[2]}` : '';
+
+                        const fileCount = extractFileCountFromText(meta);
+
+                        let hasSubtitle = false;
+                        let quality = '';
+
+                        tagsElements.forEach(tag => {
+                            const tagText = tag.textContent?.trim() || '';
+                            if (tagText.includes('字幕')) hasSubtitle = true;
+                            if (tagText.includes('高清') || tagText.includes('HD')) quality = 'HD';
+                            if (tagText.includes('1080P') || tagText.includes('1080p')) quality = '1080P';
+                            if (tagText.includes('720P') || tagText.includes('720p')) quality = '720P';
+                            if (tagText.includes('4K')) quality = '4K';
+                        });
+
+                        magnets.push({
+                            name,
+                            magnet,
+                            size,
+                            sizeBytes: parseSizeToBytes(size),
+                            date: date || '',
+                            seeders: 0,
+                            leechers: 0,
+                            source: 'JavDB',
+                            hasSubtitle,
+                            quality,
+                            fileCount: isFinite(fileCount) ? fileCount : undefined,
+                        });
+                    }
+                } catch (e) {
+                    log('Error parsing magnet item in native fav:', e);
+                }
+            });
+        }
+
+        if (magnets.length === 0) {
+            log(`No magnets found for native favorite ${videoId}`);
+            return;
+        }
+
+        const optimalMagnet = selectOptimalMagnet(magnets);
+        if (!optimalMagnet) return;
+
+        showToast(`${videoId} 正在自动推送到115网盘...`, 'info');
+
+        const { addTaskUrlsV2 } = await import('../drive115/router');
+        const downloadDir = settings?.drive115?.downloadDir || '0';
+        const wpPathId = downloadDir === '' ? '0' : downloadDir;
+
+        const res = await addTaskUrlsV2({
+            urls: optimalMagnet.magnet,
+            wp_path_id: wpPathId,
+            context: {
+                source: 'auto_push_native_favorite',
+                videoId,
+                magnetName: optimalMagnet.name,
+                pageUrl: window.location.href,
+                wpPathId,
+            } as any,
+        });
+
+        if (res.success) {
+            showToast(`${videoId} 已自动推送到115网盘`, 'success');
+        } else {
+            showToast(`${videoId} 自动推送失败: ${res.message || '未知错误'}`, 'error');
+        }
+    } catch (error) {
+        log('Native favorite auto-push failed:', error);
+        showToast('自动推送115网盘时发生错误', 'error');
     }
 }
 

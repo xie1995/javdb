@@ -32,6 +32,7 @@ import {
   deduplicateMagnetResults,
   detectMagnetQuality,
   detectMagnetSubtitle,
+  extractFileCountFromText,
   extractHashFromMagnet,
   isCrackedVersion,
   isValidMagnetResultName,
@@ -807,6 +808,9 @@ export class MagnetSearchManager {
             const sizeMatch = meta.match(/([0-9.]+)\s*(GB|MB|KB|TB)/i);
             const size = sizeMatch ? `${sizeMatch[1]} ${sizeMatch[2]}` : '';
 
+            // 解析文件数量
+            const fileCount = extractFileCountFromText(meta);
+
             // 检查标签
             let hasSubtitle = false;
             let quality = '';
@@ -841,6 +845,7 @@ export class MagnetSearchManager {
               source: 'JavDB',
               hasSubtitle,
               quality,
+              fileCount: isFinite(fileCount) ? fileCount : undefined,
             });
 
             log(`Collected JavDB magnet ${index + 1}: ${name.substring(0, 50)}...`);

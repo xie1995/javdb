@@ -151,3 +151,50 @@ export function sortMagnetResults(results: MagnetResult[]): MagnetResult[] {
 export function extractHashFromMagnet(magnet: string): string {
   return extractMagnetHash(magnet);
 }
+
+export function extractFileCountFromText(text: string): number {
+  if (!text) return Infinity;
+  const patterns = [
+    /(\d+)\s*個文件/,
+    /(\d+)\s*个文件/,
+    /(\d+)\s*files?/i,
+    /(\d+)\s*file\b/i,
+    /\[(\d+)\s*files?\]/i,
+    /（(\d+)\s*文件）/,
+    /\((\d+)\s*files?\)/i,
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match) {
+      const count = parseInt(match[1], 10);
+      if (!isNaN(count) && count > 0) {
+        return count;
+      }
+    }
+  }
+  return Infinity;
+}
+
+export function extractFileCountFromName(name: string): number {
+  return extractFileCountFromText(name);
+}
+
+export function getMagnetFileCount(magnet: MagnetResult): number {
+  if (magnet.fileCount !== undefined && magnet.fileCount > 0) {
+    return magnet.fileCount;
+  }
+  return extractFileCountFromName(magnet.name);
+}
+
+export function selectOptimalMagnet(magnets: MagnetResult[]): MagnetResult | null {
+  if (magnets.length === 0) return null;
+  const sorted = [...magnets].sort((a, b) => {
+    const fileCountA = getMagnetFileCount(a);
+    const fileCountB = getMagnetFileCount(b);
+    if (fileCountA !== fileCountB) {
+      return fileCountA - fileCountB;
+    }
+    return b.sizeBytes - a.sizeBytes;
+  });
+  return sorted[0];
+}

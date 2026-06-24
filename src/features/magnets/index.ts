@@ -38,13 +38,17 @@ export {
   deduplicateMagnetResults,
   detectMagnetQuality,
   detectMagnetSubtitle,
+  extractFileCountFromName,
+  extractFileCountFromText,
   extractHashFromMagnet,
+  getMagnetFileCount,
   getVideoIdMatchCandidates,
   isCrackedVersion,
   isValidMagnetResultName,
   normalizeMagnetDate,
   parseRelativeMagnetDate,
   parseSizeToBytes,
+  selectOptimalMagnet,
   sortMagnetResults,
 } from './application/resultMetadata';
 export {

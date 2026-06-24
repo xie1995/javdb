@@ -3,7 +3,8 @@ import type { RecordsAdvancedCondition, RecordsAdvancedFieldKey, RecordsAdvanced
 import { STATE } from '../../state';
 import { matchCode } from '../../../features/embyLibrary/domain/matcher';
 import { normalizeCode } from '../../../features/embyLibrary/domain/matcher';
-import { refreshWatchedCodesFromStorage } from './filterModel';
+import { refreshWatchedCodesFromStorage, refreshPushedVideoIds } from './filterModel';
+import { getDrive115AppLogger } from '../../../features/drive115/app';
 
 interface RecordsStats {
   total: number;
@@ -15,6 +16,7 @@ interface RecordsStats {
   inEmby: number;
   embyWatched: number;
   notDownloaded: number;
+  pushed: number;
 }
 
 interface ServerRecordsStats {
@@ -49,7 +51,7 @@ export interface RecordsStatsController {
   applyFilterByType: (filterType: string) => void;
 }
 
-function buildMemoryStats(records: VideoRecord[], now: number): RecordsStats {
+function buildMemoryStats(records: VideoRecord[], now: number, pushedVideoIds: Set<string>): RecordsStats {
   const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
   const oneMonthAgo = now - 30 * 24 * 60 * 60 * 1000;
 
@@ -70,6 +72,10 @@ function buildMemoryStats(records: VideoRecord[], now: number): RecordsStats {
   }
 
   const inEmbyCount = hasEmbyState ? records.filter(record => matchCode(record.id, embyState!)).length : 0;
+
+  const pushedCount = pushedVideoIds.size > 0
+    ? records.filter(record => record.id && pushedVideoIds.has(record.id.toUpperCase())).length
+    : 0;
   
   return {
     total: records.length,
@@ -81,10 +87,11 @@ function buildMemoryStats(records: VideoRecord[], now: number): RecordsStats {
     inEmby: inEmbyCount,
     embyWatched,
     notDownloaded: records.length - inEmbyCount,
+    pushed: pushedCount,
   };
 }
 
-function buildServerStats(serverStats: ServerRecordsStats): RecordsStats {
+function buildServerStats(serverStats: ServerRecordsStats, pushedVideoIds: Set<string>): RecordsStats {
   const embyState = STATE.embyLibraryState;
   const hasEmbyState = embyState && embyState.entries && embyState.entries.length > 0;
   
@@ -106,6 +113,10 @@ function buildServerStats(serverStats: ServerRecordsStats): RecordsStats {
   }
   
   const total = serverStats.total || 0;
+
+  const pushed = pushedVideoIds.size > 0
+    ? STATE.records.filter(record => record.id && pushedVideoIds.has(record.id.toUpperCase())).length
+    : 0;
   
   return {
     total,
@@ -117,6 +128,7 @@ function buildServerStats(serverStats: ServerRecordsStats): RecordsStats {
     inEmby,
     embyWatched,
     notDownloaded: total - inEmby,
+    pushed,
   };
 }
 
@@ -151,12 +163,35 @@ function renderStatsCards(container: HTMLElement, stats: RecordsStats, activeFil
       <div class="stat-value">${stats.thisMonth}</div>
       <div class="stat-label">本月新增</div>
     </div>
+    <div class="stat-card new-works-stat clickable${activeClass('pushed')}" data-filter="pushed" title="点击查看已推送到115网盘的番号">
+      <div class="stat-value">${stats.pushed}</div>
+      <div class="stat-label">已推送</div>
+    </div>
   `;
+}
+
+async function getPushedVideoIds(): Promise<Set<string>> {
+  try {
+    await refreshPushedVideoIds();
+    const logger = getDrive115AppLogger();
+    const logs = await logger.getLogsByType('push_success' as any);
+    const ids = new Set<string>();
+    logs.forEach(log => {
+      if (log.videoId) {
+        ids.add(log.videoId.toUpperCase());
+      }
+    });
+    return ids;
+  } catch (e) {
+    console.warn('Failed to get pushed video ids:', e);
+    return new Set();
+  }
 }
 
 export function createRecordsStatsController(options: CreateRecordsStatsControllerOptions): RecordsStatsController {
   const now = options.now || Date.now;
   let activeFilter: string | null = options.initialActiveFilter || null;
+  let pushedVideoIdsCache: Set<string> = new Set();
 
   const clearQuickFilters = () => {
     options.searchInput.value = '';
@@ -245,6 +280,20 @@ export function createRecordsStatsController(options: CreateRecordsStatsControll
     } else if (filterType === 'thisMonth') {
       options.filterSelect.value = 'all';
       setRecentCondition('month');
+    } else if (filterType === 'pushed') {
+      options.filterSelect.value = 'all';
+      highlightCard(card);
+      getPushedVideoIds().then((ids) => {
+        pushedVideoIdsCache = ids;
+        options.setAdvancedConditions([{
+          id: `cond_pushed_${Date.now()}`,
+          field: 'pushed' as RecordsAdvancedFieldKey,
+          op: 'eq' as RecordsAdvancedComparator,
+          value: 'true',
+        } as RecordsAdvancedCondition]);
+        options.onFilterApplied();
+      });
+      return;
     }
 
     highlightCard(card);
@@ -265,19 +314,21 @@ export function createRecordsStatsController(options: CreateRecordsStatsControll
     const container = options.container;
     if (!container) return;
 
+    pushedVideoIdsCache = await getPushedVideoIds();
+
     let stats: RecordsStats;
     if (options.isServerModeActive()) {
       try {
-        stats = buildServerStats(await options.loadServerStats());
+        stats = buildServerStats(await options.loadServerStats(), pushedVideoIdsCache);
       } catch {
-        stats = buildMemoryStats(options.getRecords(), now());
+        stats = buildMemoryStats(options.getRecords(), now(), pushedVideoIdsCache);
       }
     } else {
-      stats = buildMemoryStats(options.getRecords(), now());
+      stats = buildMemoryStats(options.getRecords(), now(), pushedVideoIdsCache);
     }
 
     renderStatsCards(container, stats, activeFilter);
-    console.log('[DEBUG-FILTER] updateStats rendered, activeFilter:', activeFilter, 'embyWatched:', stats.embyWatched, 'inEmby:', stats.inEmby, 'total:', stats.total);
+    console.log('[DEBUG-FILTER] updateStats rendered, activeFilter:', activeFilter, 'embyWatched:', stats.embyWatched, 'inEmby:', stats.inEmby, 'pushed:', stats.pushed, 'total:', stats.total);
     bindCards();
   };
 
@@ -334,6 +385,19 @@ export function createRecordsStatsController(options: CreateRecordsStatsControll
         options.filterSelect.value = 'all';
         setRecentCondition(filterType === 'thisWeek' ? 'week' : 'month');
         options.onFilterApplied();
+      } else if (filterType === 'pushed') {
+        options.filterSelect.value = 'all';
+        getPushedVideoIds().then((ids) => {
+          pushedVideoIdsCache = ids;
+          options.setAdvancedConditions([{
+            id: `cond_pushed_${Date.now()}`,
+            field: 'pushed' as RecordsAdvancedFieldKey,
+            op: 'eq' as RecordsAdvancedComparator,
+            value: 'true',
+          } as RecordsAdvancedCondition]);
+          options.onFilterApplied();
+          updateStats();
+        });
       }
     }
   };

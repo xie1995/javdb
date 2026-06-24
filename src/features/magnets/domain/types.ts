@@ -10,6 +10,7 @@ export interface MagnetResult {
   sources?: string[];
   quality?: string;
   hasSubtitle: boolean;
+  fileCount?: number;
 }
 
 export type MagnetSourceKey = 'sukebei' | 'btdig' | 'btsow' | 'torrentz2' | 'javbus';

@@ -11,9 +11,13 @@ import { STATE } from '../../state';
 import { matchCode } from '../../../features/embyLibrary/domain/matcher';
 import { normalizeCode } from '../../../features/embyLibrary/domain/matcher';
 import { STORAGE_KEYS } from '../../../utils/config';
+import { getDrive115AppLogger } from '../../../features/drive115/app';
 
 let cachedWatchedCodes: Set<string> | null = null;
 let watchedCodesCacheTime = 0;
+
+let cachedPushedVideoIds: Set<string> | null = null;
+let pushedVideoIdsCacheTime = 0;
 
 function getWatchedCodesSet(): Set<string> | null {
   if (cachedWatchedCodes && Date.now() - watchedCodesCacheTime < 30000) {
@@ -43,6 +47,39 @@ export function refreshWatchedCodesFromStorage(): Promise<void> {
       resolve();
     });
   });
+}
+
+function getPushedVideoIdsSet(): Set<string> | null {
+  if (cachedPushedVideoIds && Date.now() - pushedVideoIdsCacheTime < 30000) {
+    return cachedPushedVideoIds;
+  }
+  return null;
+}
+
+export async function refreshPushedVideoIds(): Promise<void> {
+  try {
+    const logger = getDrive115AppLogger();
+    const logs = await logger.getLogsByType('push_success' as any);
+    const ids = new Set<string>();
+    logs.forEach(log => {
+      if (log.videoId) {
+        ids.add(log.videoId.toUpperCase());
+      }
+    });
+    cachedPushedVideoIds = ids;
+    pushedVideoIdsCacheTime = Date.now();
+    console.log('[filterModel] Pushed video ids refreshed:', ids.size, 'ids');
+  } catch (e) {
+    console.warn('[filterModel] Failed to refresh pushed video ids:', e);
+    cachedPushedVideoIds = new Set();
+    pushedVideoIdsCacheTime = Date.now();
+  }
+}
+
+function matchesPushedCondition(record: VideoRecord): boolean {
+  const pushedSet = getPushedVideoIdsSet();
+  if (!pushedSet) return false;
+  return record.id ? pushedSet.has(record.id.toUpperCase()) : false;
 }
 
 export interface FilterAndSortRecordsInput {
@@ -187,6 +224,10 @@ export function filterAndSortRecords(input: FilterAndSortRecordsInput): VideoRec
         const shouldBeWatched = condition.value === 'true';
         const isWatched = matchesEmbyWatchedCondition(record);
         if (isWatched !== shouldBeWatched) return false;
+      } else if (condition.field === 'pushed') {
+        const shouldBePushed = condition.value === 'true';
+        const isPushed = matchesPushedCondition(record);
+        if (isPushed !== shouldBePushed) return false;
       } else {
         if (!evaluateRecordsAdvancedCondition(record, condition)) return false;
       }

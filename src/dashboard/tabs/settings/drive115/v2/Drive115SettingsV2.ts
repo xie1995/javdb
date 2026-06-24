@@ -13,6 +13,7 @@ import { Drive115V2Pane } from '../Drive115V2Pane';
 // v2 局部设置类型（仅包含 v2 需要的字段，避免依赖 v1 类型与默认值）
 type Drive115V2LocalSettings = {
   enabled: boolean;
+  autoPushOnFavorite?: boolean;
   v2ApiBaseUrl?: string;
   v2AuthMode?: 'openlist_manual' | 'openlist_scan' | 'self_app';
   v2ClientId?: string;
@@ -30,6 +31,7 @@ type Drive115V2LocalSettings = {
 
 const DEFAULT_DRIVE115_V2_SETTINGS: Drive115V2LocalSettings = {
   enabled: true,
+  autoPushOnFavorite: false,
   v2ApiBaseUrl: 'https://proapi.115.com',
   v2AuthMode: 'openlist_manual',
   v2ClientId: '',
@@ -131,6 +133,13 @@ export class Drive115SettingsPanelV2 extends BaseSettingsPanel {
       } catch (_) {}
     });
 
+    // 收藏时自动推送下载
+    const autoPushCheckbox = document.getElementById('drive115AutoPushOnFavorite') as HTMLInputElement | null;
+    autoPushCheckbox?.addEventListener('change', () => {
+      (this.settings as any).autoPushOnFavorite = !!autoPushCheckbox.checked;
+      this.autoSaveSettings();
+    });
+
     // 移除日志相关事件绑定（统一到全局“日志”标签页，不在设置页展示/维护）
   }
 
@@ -140,6 +149,12 @@ export class Drive115SettingsPanelV2 extends BaseSettingsPanel {
     // 启用状态
     const enabledCheckbox = document.getElementById('drive115Enabled') as HTMLInputElement | null;
     if (enabledCheckbox) enabledCheckbox.checked = !!this.settings.enabled;
+
+    // 收藏时自动推送下载
+    const autoPushCheckbox = document.getElementById('drive115AutoPushOnFavorite') as HTMLInputElement | null;
+    if (autoPushCheckbox) {
+      autoPushCheckbox.checked = !!((this.settings as any).autoPushOnFavorite);
+    }
 
     // 仅渲染 v2 Pane 所需字段
     const v2ApiBaseUrlInput = document.getElementById('drive115V2ApiBaseUrl') as HTMLInputElement | null;
@@ -218,6 +233,7 @@ export class Drive115SettingsPanelV2 extends BaseSettingsPanel {
 
     // 2) 可能不在容器内或被选择器遗漏的已知控件（按 ID 明确设置）
     const knownIds = [
+      'drive115AutoPushOnFavorite',
       'drive115V2ApiBaseUrl',
       'drive115V2AuthMode',
       'drive115V2ClientId',
