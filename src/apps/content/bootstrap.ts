@@ -1,0 +1,723 @@
+// src/apps/content/bootstrap.ts
+
+import { getSettings, getValue } from '../../utils/storage';
+import { STORAGE_KEYS } from '../../utils/config';
+import type { VideoRecord } from '../../types';
+import { STATE, SELECTORS, log, currentFaviconState, currentTitleStatus } from '../../features/contentState';
+import { processVisibleItems, setupObserver } from '../../features/listEnhancement/content/itemProcessor';
+import { handleVideoDetailPage, getVideoDetailTaskBlueprints } from '../../features/videoDetail';
+import { checkAndUpdateVideoStatus } from '../../features/videoStatus';
+import { initExportFeature } from '../../features/pageExport/content';
+import { initDrive115Features } from '../../features/drive115/content';
+import { defaultDataAggregator } from '../../features/dataAggregator';
+import { contentFilterManager } from '../../features/contentFilter';
+import { keyboardShortcutsManager } from '../../features/keyboardShortcuts';
+import { magnetSearchManager } from '../../features/magnets';
+import { anchorOptimizationManager } from '../../features/anchorOptimization/content';
+import { listEnhancementManager } from '../../features/listEnhancement';
+import { actorEnhancementManager, actorQuickActionsManager } from '../../features/actorEnhancement';
+import { exposePreviewVolumeDebug, installPreviewVolumeControl } from '../../features/previews';
+import { initOrchestrator, type InitPhase } from './orchestrator';
+import { initInsightsCollector } from '../../features/insights';
+import { performanceOptimizer } from '../../platform/tasks';
+import { actorExtraInfoService } from '../../features/actorRemarks';
+import { waitForElement } from '../../platform/browser/domUtils';
+import { createTaskTimeoutGuard, isTaskTimeoutError } from '../../platform/tasks';
+import { runChunkedWork, yieldToMainThread } from '../../platform/tasks';
+import { PasswordHelper } from '../../features/passwordHelper/content';
+import { showEnhancementLoading } from '../../platform/browser/enhancementLoadingIndicator';
+import {
+    applyOnlineAvailabilitySitePreferences,
+    DEFAULT_ONLINE_AVAILABILITY_SITES,
+    onlineAvailabilityManager,
+} from '../../features/onlineAvailability';
+import { initializeSuperRankingNav, isSuperRankingSupportedHost } from '../../features/rankings';
+import { installContentConsoleSettingsBridge } from './consoleSettingsBridge';
+import { exposeContentDebugManagers, installContentLifecycleHandlers } from './contentLifecycle';
+import { installContentMessageRouter } from './contentMessageRouter';
+import { installContentTelemetryErrorReporter } from './errorReporter';
+import { installOrchestratorStateBridge } from './orchestratorStateBridge';
+import { injectNavbarBadge, removeUnwantedButtons } from './pageChrome';
+import { getLibraryIndex, getWatchedData } from '../../features/embyLibrary/content/realtimeCheck';
+import { initExternalPreviewsContent, updateExternalPreviewConfig } from '../../features/externalPreviews';
+
+installContentConsoleSettingsBridge();
+installContentTelemetryErrorReporter();
+installOrchestratorStateBridge();
+installContentMessageRouter();
+void installPreviewVolumeControl();
+exposePreviewVolumeDebug();
+exposeContentDebugManagers();
+installContentLifecycleHandlers();
+
+function getActorRemarksTaskTimeoutMs(settings: any): number {
+    const seconds = Number(settings?.videoEnhancement?.actorRemarksTaskTimeoutSeconds);
+    if (!Number.isFinite(seconds) || seconds <= 0) return 10000;
+    return Math.max(1000, Math.round(seconds * 1000));
+}
+
+async function runActorRemarksOnActorPage(settings: any, timeoutMs?: number): Promise<void> {
+    try {
+        const enabled = settings?.videoEnhancement?.enableActorRemarks === true;
+        if (!enabled) return;
+
+        const taskTimeoutMs = typeof timeoutMs === 'number' && timeoutMs > 0
+            ? timeoutMs
+            : getActorRemarksTaskTimeoutMs(settings);
+        const timeoutGuard = createTaskTimeoutGuard(taskTimeoutMs);
+        const renderStartedAt = Date.now();
+        const mode = (settings?.videoEnhancement?.actorRemarksMode === 'inline') ? 'inline' : 'panel';
+
+        // 演员页标题区有别名/作品数等 meta，必须优先取 .actor-section-name（主名）
+        const nameEl = (await waitForElement(
+            '.actor-section-name',
+            timeoutGuard.timeoutMs > 0 ? Math.min(8000, timeoutGuard.timeoutMs) : 8000,
+            200
+        )) as HTMLElement | null;
+        if (!nameEl) {
+            log('actorRemarks(actorPage): .actor-section-name not found');
+            return;
+        }
+
+        let name = (nameEl.textContent || '').trim();
+        name = name.replace(/\s+/g, ' ');
+        if (!name) {
+            log('actorRemarks(actorPage): actor name is empty');
+            return;
+        }
+
+        const buildBadgeText = (data: any): string => {
+            const parts: string[] = [];
+            if (typeof data?.age === 'number') parts.push(String(data.age));
+            if (typeof data?.heightCm === 'number') parts.push(`${data.heightCm}cm`);
+            if (data?.cup) parts.push(String(data.cup).toUpperCase());
+            let txt = parts.length ? parts.join(' / ') : '';
+            if (data?.retired) txt = txt ? `${txt} / 引退` : '引退';
+            return txt;
+        };
+
+        const results: Array<any | null> = [];
+        await runChunkedWork([name], {
+            batchSize: 1,
+            shouldStop: () => timeoutGuard.isTimedOut(),
+            yieldAfterBatch: async () => {
+                await yieldToMainThread(0);
+            },
+            onItem: async (actorName) => {
+                timeoutGuard.throwIfTimedOut();
+                const data = await actorExtraInfoService.getActorRemarks(actorName, settings);
+                timeoutGuard.throwIfTimedOut();
+                results.push(data);
+            },
+        });
+        const data = results[0] || null;
+        if (Date.now() - renderStartedAt > Math.max(3000, Math.min(taskTimeoutMs, 8000))) {
+            log('actorRemarks(actorPage): render budget exceeded');
+            return;
+        }
+        const badgeText = data ? buildBadgeText(data) : '';
+        const wikiUrl = data?.wikiUrl || `https://ja.wikipedia.org/wiki/${encodeURIComponent(name)}`;
+        const xslistUrl = (data as any)?.xslistUrl || `https://xslist.org/search?query=${encodeURIComponent(name)}&lg=zh`;
+
+        // 先清理旧节点
+        try {
+            const existingInline = document.querySelector('.jdb-actor-remarks-inline.actor-page') as HTMLElement | null;
+            if (existingInline) existingInline.remove();
+            const existingPanel = document.getElementById('enhanced-actor-remarks-actorpage');
+            if (existingPanel) existingPanel.remove();
+        } catch {}
+
+        if (mode === 'inline') {
+            const wrap = document.createElement('span');
+            wrap.className = 'jdb-actor-remarks-inline actor-page';
+            wrap.style.cssText = 'display:inline-flex;align-items:center;gap:6px;margin-left:8px;vertical-align:middle;';
+
+            if (badgeText) {
+                const infoEl = document.createElement('span');
+                infoEl.textContent = badgeText;
+                infoEl.style.cssText = 'background:#ffedd5;color:#7c2d12;padding:1px 6px;border-radius:999px;font-size:12px;line-height:18px;';
+                wrap.appendChild(infoEl);
+            } else {
+                const link1 = document.createElement('a');
+                link1.href = wikiUrl;
+                link1.target = '_blank';
+                link1.textContent = 'Wiki';
+                link1.style.cssText = 'color:#b45309;text-decoration:underline;font-size:12px;';
+                wrap.appendChild(link1);
+
+                const link2 = document.createElement('a');
+                link2.href = xslistUrl;
+                link2.target = '_blank';
+                link2.textContent = 'xslist';
+                link2.style.cssText = 'color:#b45309;text-decoration:underline;font-size:12px;';
+                wrap.appendChild(link2);
+            }
+
+            // 插到演员名旁边，而不是 h2 title 整块后面
+            nameEl.insertAdjacentElement('afterend', wrap);
+        } else {
+            const panel = document.createElement('div');
+            panel.id = 'enhanced-actor-remarks-actorpage';
+            panel.style.cssText = 'margin:10px 0;padding:10px;background:#fff7ed;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:8px;color:#78350f;font-size:13px;';
+            const title = document.createElement('div');
+            title.textContent = '演员备注';
+            title.style.cssText = 'font-weight:bold;margin-bottom:6px;color:#92400e;';
+            panel.appendChild(title);
+
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+            if (badgeText) {
+                const infoEl = document.createElement('span');
+                infoEl.textContent = badgeText;
+                infoEl.style.cssText = 'background:#ffedd5;color:#7c2d12;padding:2px 6px;border-radius:12px;font-size:12px;';
+                row.appendChild(infoEl);
+            } else {
+                const link1 = document.createElement('a');
+                link1.href = wikiUrl;
+                link1.target = '_blank';
+                link1.textContent = 'Wiki';
+                link1.style.cssText = 'color:#b45309;text-decoration:underline;';
+                row.appendChild(link1);
+
+                const link2 = document.createElement('a');
+                link2.href = xslistUrl;
+                link2.target = '_blank';
+                link2.textContent = 'xslist';
+                link2.style.cssText = 'color:#b45309;text-decoration:underline;';
+                row.appendChild(link2);
+            }
+            panel.appendChild(row);
+
+            nameEl.insertAdjacentElement('afterend', panel);
+        }
+
+        log('actorRemarks(actorPage): injected', { mode, hasBadge: Boolean(badgeText) });
+    } catch (e) {
+        if (isTaskTimeoutError(e)) throw e;
+        log('actorRemarks(actorPage): failed', e);
+    }
+}
+
+// --- Core Logic ---
+
+async function initialize(): Promise<void> {
+    log('Extension initializing...');
+
+    // 首先初始化性能优化器
+    performanceOptimizer.initialize();
+
+    const settingsPromise = getSettings();
+    const recordsPromise = getValue<Record<string, VideoRecord>>('viewed', {});
+    const newWorksConfigPromise = getValue<any>('new_works_config', {});
+    const embyLibraryPromise = Promise.resolve().then(async () => {
+        try {
+            return await getLibraryIndex();
+        } catch {
+            return null;
+        }
+    });
+    const embyWatchedPromise = Promise.resolve().then(async () => {
+        try {
+            return await getWatchedData();
+        } catch {
+            return null;
+        }
+    });
+
+    const settings = await settingsPromise;
+    STATE.settings = settings;
+
+    const path = window.location.pathname;
+    const isVideoPage = path.startsWith('/v/');
+    const isActorPage = path.startsWith('/actors/');
+    const preregisterBlueprints: Array<{ phase: InitPhase; label: string; priority?: number; timeout?: number; visibilityPolicy?: 'foreground_first' | 'background_allowed' | 'foreground_only'; dependsOn?: string[] }> = [];
+
+    if (isVideoPage) {
+        preregisterBlueprints.push(...getVideoDetailTaskBlueprints(settings as any));
+        if ((settings.videoEnhancement as any)?.showLoadingIndicator !== false) {
+            preregisterBlueprints.push({ phase: 'critical', label: 'enhancementUI:showLoadingIndicator', priority: 13, visibilityPolicy: 'background_allowed' });
+        }
+        preregisterBlueprints.push(
+            { phase: 'idle', label: 'drive115:init:video', dependsOn: ['videoStatus:initialSync'] },
+            { phase: 'idle', label: 'insights:collector', dependsOn: ['videoStatus:initialSync'] },
+        );
+        if ((settings.videoEnhancement as any)?.enableActorQuickActions !== false) {
+            preregisterBlueprints.push({ phase: 'high', label: 'actorQuickActions:init', priority: 6, visibilityPolicy: 'background_allowed', dependsOn: ['videoStatus:initialSync'] });
+        }
+    }
+
+    if (isActorPage) {
+        if ((settings.videoEnhancement as any)?.showLoadingIndicator !== false) {
+            preregisterBlueprints.push({ phase: 'critical', label: 'enhancementUI:showLoadingIndicator', priority: 13, visibilityPolicy: 'background_allowed' });
+        }
+        const enabledActorRemarks = (settings as any)?.videoEnhancement?.enabled === true && (settings as any)?.videoEnhancement?.enableActorRemarks === true;
+        if (enabledActorRemarks) {
+            preregisterBlueprints.push({ phase: 'idle', label: 'actorRemarks:actorPage', timeout: getActorRemarksTaskTimeoutMs(settings as any) });
+        }
+        if (settings.userExperience.enableActorEnhancement !== false) {
+            preregisterBlueprints.push({ phase: 'critical', label: 'actorEnhancement:init', visibilityPolicy: 'background_allowed' });
+            if ((settings.actorEnhancement as any)?.enableActionButtons !== false) {
+                preregisterBlueprints.push({ phase: 'critical', label: 'actorEnhancement:actionButtons', priority: 9, visibilityPolicy: 'background_allowed' });
+            }
+        }
+    }
+
+    if (settings.userExperience.enableKeyboardShortcuts) {
+        preregisterBlueprints.push({ phase: 'high', label: 'ux:shortcuts:init', priority: 8 });
+    }
+    if (isSuperRankingSupportedHost() && (settings.userExperience as any).enableSuperRanking !== false) {
+        preregisterBlueprints.push({ phase: 'critical', label: 'superRankingNav:init', priority: 9, visibilityPolicy: 'background_allowed' });
+    }
+    preregisterBlueprints.push({ phase: 'high', label: 'ui:remove-unwanted', priority: 3, visibilityPolicy: (isVideoPage || isActorPage) ? 'background_allowed' : 'foreground_first' });
+    if (settings.userExperience.enableMagnetSearch && isVideoPage) {
+        preregisterBlueprints.push({ phase: 'idle', label: 'ux:magnet:autoSearch' });
+    }
+    if (settings.userExperience.enableAnchorOptimization) {
+        preregisterBlueprints.push({ phase: 'deferred', label: 'anchorOptimization:init' });
+    }
+    if (settings.userExperience.enableListEnhancement !== false && !isVideoPage && !isActorPage) {
+        preregisterBlueprints.push(
+            { phase: 'high', label: 'listEnhancement:init', priority: 7, visibilityPolicy: 'background_allowed' },
+            { phase: 'high', label: 'list:reprocess:after-listEnhancement', priority: 6, visibilityPolicy: 'background_allowed' },
+        );
+    }
+    if (settings.userExperience.enablePasswordHelper) {
+        preregisterBlueprints.push({ phase: 'idle', label: 'passwordHelper:init' });
+    }
+    if (!isVideoPage && !isActorPage) {
+        preregisterBlueprints.push({ phase: 'critical', label: 'list:observe:init', visibilityPolicy: 'background_allowed' });
+    }
+    if (settings.userExperience.enableContentFilter) {
+        preregisterBlueprints.push({ phase: 'idle', label: 'contentFilter:initialize' });
+    }
+    if (!isVideoPage && !isActorPage) {
+        preregisterBlueprints.push({ phase: 'idle', label: 'drive115:init:list' });
+    }
+
+    await initOrchestrator.preregisterBlueprints(preregisterBlueprints);
+
+    const [records, newWorksConfig, embyState, embyWatchedState] = await Promise.all([
+        recordsPromise,
+        newWorksConfigPromise,
+        embyLibraryPromise,
+        embyWatchedPromise,
+    ]);
+    STATE.records = records;
+    if (embyState && (embyState as any).entries) {
+        STATE.embyLibraryState = (embyState as any).index || embyState;
+        if (STATE.embyLibraryState) {
+            log(`[Emby] Library index loaded: ${STATE.embyLibraryState.entries.length} entries, totalCount=${STATE.embyLibraryState.totalCount}`);
+        }
+    } else {
+        log(`[Emby] Library index not loaded (embyState is null or empty). JavDB site may not show "已入库" badges until you sync in Emby settings.`);
+    }
+    if (embyWatchedState && Array.isArray((embyWatchedState as any).codes)) {
+        STATE.embyWatchedState = embyWatchedState as any;
+        log(`[Emby] Watched data loaded: ${STATE.embyWatchedState!.codes.length} codes`);
+    }
+    // 每次浏览 JavDB 页面时，后台自动同步已观看记录（fire-and-forget）
+    try {
+        chrome.runtime.sendMessage({ type: 'EMBY_LIBRARY_SYNC_WATCHED' }, () => {
+            if (chrome.runtime.lastError) { /* 忽略 */ }
+        });
+    } catch {}
+    log(`Loaded ${Object.keys(STATE.records).length} records.`);
+    log('Display settings:', STATE.settings.display);
+
+    // 提前保存原始 favicon，供后续状态切换使用（优先级最高的 UI 反馈）
+    const earlyFaviconLink = document.querySelector<HTMLLinkElement>(SELECTORS.FAVICON);
+    if (earlyFaviconLink) {
+        STATE.originalFaviconUrl = earlyFaviconLink.href;
+        log(`Original favicon URL saved (early): ${STATE.originalFaviconUrl}`);
+    } else {
+        log('No favicon link found (early)');
+    }
+
+    const isCurrentVideoPage = window.location.pathname.startsWith('/v/');
+    if (isCurrentVideoPage && (settings.videoEnhancement as any)?.showLoadingIndicator !== false) {
+        showEnhancementLoading('video');
+        initOrchestrator.add('critical', () => {
+            showEnhancementLoading('video');
+        }, { label: 'enhancementUI:showLoadingIndicator', priority: 13, visibilityPolicy: 'background_allowed' });
+    }
+
+    if (isActorPage && (settings.videoEnhancement as any)?.showLoadingIndicator !== false) {
+        showEnhancementLoading('actor');
+        initOrchestrator.add('critical', () => {
+            showEnhancementLoading('actor');
+        }, { label: 'enhancementUI:showLoadingIndicator', priority: 13, visibilityPolicy: 'background_allowed' });
+    }
+    if (isCurrentVideoPage) {
+        initOrchestrator.add('idle', () => initDrive115Features(), { label: 'drive115:init:video', idle: true, idleTimeout: 5000, delayMs: 1500 });
+
+        initOrchestrator.add('idle', async () => {
+            await initInsightsCollector();
+        }, { label: 'insights:collector', idle: true, idleTimeout: 5000, delayMs: 1800 });
+
+    }
+
+    // 应用磁力搜索的并发与超时（来源于 settings.magnetSearch）
+    const magnetCfg = (settings as any).magnetSearch || {};
+    const pageMaxConcurrentRequests = (magnetCfg.concurrency?.pageMaxConcurrentRequests ?? 2) as number;
+    const magnetRequestTimeout = (magnetCfg.timeoutMs ?? 6000) as number;
+    performanceOptimizer.updateConfig({ maxConcurrentRequests: pageMaxConcurrentRequests, requestTimeout: magnetRequestTimeout });
+
+    // 初始化/更新数据聚合器（无论是否启用多源，都严格按设置开启/关闭各来源，避免默认配置引发不必要的网络请求）
+    log('Data aggregator configured according to settings');
+    defaultDataAggregator.updateConfig({
+        sources: {
+            // 仅当启用了多源增强时才启用 BlogJav，且降低超时与重试，避免长时间阻塞
+            blogJav: {
+                enabled: settings.dataEnhancement.enableMultiSource === true,
+                baseUrl: 'https://blogjav.net',
+                timeout: 8000,
+                maxRetries: 1,
+            },
+            // JavLibrary 已不再使用，禁用
+            javLibrary: {
+                enabled: false,
+                baseUrl: 'https://www.javlibrary.com',
+                timeout: 12000,
+                maxRetries: 1,
+                language: 'en',
+            },
+            // 传统翻译：当 provider=traditional 且全局翻译开启时启用（方案B：单一开关）
+            translator: {
+                enabled: (settings.translation?.provider === 'traditional') &&
+                         (settings.dataEnhancement.enableTranslation === true),
+                service: settings.translation?.traditional?.service || 'google',
+                apiKey: settings.translation?.traditional?.apiKey,
+                timeout: 5000,
+                maxRetries: 1,
+                sourceLanguage: settings.translation?.traditional?.sourceLanguage || 'ja',
+                targetLanguage: settings.translation?.traditional?.targetLanguage || 'zh-CN',
+            },
+            // 其余数据源保持关闭
+            javStore: { enabled: false, baseUrl: '', timeout: 10000 },
+            javSpyl: { enabled: false, baseUrl: '', timeout: 10000 },
+            dmm: { enabled: false, baseUrl: '', timeout: 10000 },
+            fc2: { enabled: false, baseUrl: '', timeout: 10000 },
+        },
+    });
+
+    // 无论是否启用多源，都根据翻译设置初始化 AI 翻译配置，确保定点翻译可用
+    if (settings.dataEnhancement.enableTranslation && settings.translation?.provider === 'ai') {
+        console.log('[JavDB Extension] Initializing AI translator with settings:', {
+            enableTranslation: settings.dataEnhancement.enableTranslation,
+            provider: settings.translation?.provider,
+            aiEnabled: settings.ai?.enabled,
+            selectedModel: settings.ai?.selectedModel
+        });
+
+        defaultDataAggregator.updateAITranslatorConfig({
+            enabled: true,
+            useGlobalModel: true, // 已写死使用 AI 设置中的模型
+            timeout: 30000,
+            maxRetries: 2,
+            sourceLanguage: 'ja',
+            targetLanguage: 'zh-CN',
+        });
+
+        console.log('[JavDB Extension] AI translator configuration updated');
+    } else {
+        console.log('[JavDB Extension] AI translator not initialized:', {
+            enableTranslation: settings.dataEnhancement.enableTranslation,
+            provider: settings.translation?.provider,
+            reason: !settings.dataEnhancement.enableTranslation ? 'Translation disabled' : 'Provider not AI'
+        });
+    }
+
+    // 页面类型判断
+
+    // 演员页：演员备注（受主开关控制）
+    // 优化：缩短延迟到500ms
+    try {
+        const enabledActorRemarks = (settings as any)?.videoEnhancement?.enabled === true && (settings as any)?.videoEnhancement?.enableActorRemarks === true;
+        if (enabledActorRemarks && isActorPage) {
+            const FLAG = '__jdb_actorRemarks_actorPage_scheduled__';
+            if (!(window as any)[FLAG]) {
+                (window as any)[FLAG] = true;
+                const actorRemarksTaskTimeoutMs = getActorRemarksTaskTimeoutMs(settings as any);
+                initOrchestrator.add('idle', async () => {
+                    await runActorRemarksOnActorPage(settings as any, actorRemarksTaskTimeoutMs);
+                }, { label: 'actorRemarks:actorPage', idle: true, idleTimeout: 5000, delayMs: 500, timeout: actorRemarksTaskTimeoutMs });
+            }
+        }
+    } catch {}
+
+    // 初始化用户体验优化功能（通过编排器注册到合适阶段）
+    // 优化：添加微延迟，分批注册任务，减少瞬时压力，优先级8（高）
+    if (settings.userExperience.enableKeyboardShortcuts) {
+        keyboardShortcutsManager.updateConfig({
+            enabled: true,
+            showHelp: true,
+            enableGlobalShortcuts: true,
+            enablePageSpecificShortcuts: true,
+        });
+        initOrchestrator.add('high', () => keyboardShortcutsManager.initialize(), { label: 'ux:shortcuts:init', delayMs: 0, priority: 8 });
+    }
+
+    if (isSuperRankingSupportedHost() && (settings.userExperience as any).enableSuperRanking !== false) {
+        initOrchestrator.add('critical', () => initializeSuperRankingNav(), { label: 'superRankingNav:init', priority: 9, visibilityPolicy: 'background_allowed' });
+    }
+
+    initOrchestrator.add('high', () => removeUnwantedButtons(), { label: 'ui:remove-unwanted', delayMs: 200, priority: 3, visibilityPolicy: (isVideoPage || isActorPage) ? 'background_allowed' : 'foreground_first' });
+
+    if (settings.userExperience.enableMagnetSearch && isVideoPage) {
+        console.log('[JavDB Ext] Scheduling magnet search in idle phase (last)');
+        initOrchestrator.add('idle', () => {
+            try {
+                log('Magnet search manager deferred initialization');
+                const magnetSearchConfig = (settings as any).magnetSearch || {};
+                const sources = magnetSearchConfig.sources || {};
+                magnetSearchManager.updateConfig({
+                    enabled: true,
+                    showInlineResults: true,
+                    showFloatingButton: true,
+                    autoSearch: magnetSearchConfig.autoSearch === true,
+                    blockMojContent: magnetSearchConfig.blockMojContent !== false,
+                    sources: {
+                        sukebei: sources.sukebei !== false,
+                        btdig: sources.btdig !== false,
+                        btsow: sources.btsow !== false,
+                        torrentz2: sources.torrentz2 || false,
+                        javbus: sources.javbus === true,
+                        custom: [],
+                    },
+                    maxResults: 15,
+                    timeout: 8000,
+                });
+                magnetSearchManager.initialize();
+            } catch (e) {
+                log('Deferred magnet search initialization failed:', e);
+            }
+        }, { label: 'ux:magnet:autoSearch', idle: true, idleTimeout: 8000, delayMs: 4000 });
+    }
+
+    if (settings.userExperience.enableAnchorOptimization) {
+        anchorOptimizationManager.updateConfig({
+            enabled: true,
+            showPreviewButton: settings.anchorOptimization?.showPreviewButton !== false,
+            buttonPosition: settings.anchorOptimization?.buttonPosition || 'right-center',
+            customButtons: [],
+        });
+        initOrchestrator.add('deferred', () => anchorOptimizationManager.initialize(), { label: 'anchorOptimization:init', idle: true, delayMs: 1000 });
+    }
+
+    const videoEnhancement = (settings as any)?.videoEnhancement || {};
+    if (
+        isVideoPage
+        && videoEnhancement.enableExternalEntryPanel !== false
+        && videoEnhancement.enableOnlineAvailability !== false
+    ) {
+        initOrchestrator.add('idle', async () => {
+            onlineAvailabilityManager.updateConfig({
+                enabled: true,
+                autoCheck: true,
+                showUnavailable: videoEnhancement.showOnlineAvailabilityFailures === true,
+                timeoutMs: Number(videoEnhancement.onlineAvailabilityTimeoutMs || 8000),
+                sites: applyOnlineAvailabilitySitePreferences(
+                    DEFAULT_ONLINE_AVAILABILITY_SITES,
+                    videoEnhancement.onlineAvailabilitySites,
+                ),
+            } as any);
+            await onlineAvailabilityManager.initialize();
+        }, { label: 'onlineAvailability:check', idle: true, idleTimeout: 8000, delayMs: 1800 });
+    }
+
+    // 初始化列表增强功能（列表/演员页常用）
+    if (settings.userExperience.enableListEnhancement !== false) {
+        listEnhancementManager.updateConfig({
+            enabled: true,
+            enableClickEnhancement: settings.listEnhancement?.enableClickEnhancement !== false,
+            enableClickEnhancementList: (settings.listEnhancement as any)?.enableClickEnhancementList !== false,
+            enableClickEnhancementDetail: (settings.listEnhancement as any)?.enableClickEnhancementDetail !== false,
+            enableVideoPreview: settings.listEnhancement?.enableVideoPreview !== false,
+            enableListOptimization: settings.listEnhancement?.enableListOptimization !== false,
+            enableScrollPaging: settings.listEnhancement?.enableScrollPaging === true,
+            previewDelay: settings.listEnhancement?.previewDelay || 1000,
+            previewVolume: settings.listEnhancement?.previewVolume ?? 0.2,
+            enableRightClickBackground: settings.listEnhancement?.enableRightClickBackground !== false,
+            enableActorWatermark: settings.listEnhancement?.enableActorWatermark === true,
+            actorWatermarkPosition: (settings.listEnhancement as any)?.actorWatermarkPosition || 'top-right',
+            actorWatermarkOpacity: (typeof (settings.listEnhancement as any)?.actorWatermarkOpacity === 'number') ? (settings.listEnhancement as any).actorWatermarkOpacity : 0.8,
+            // 新增：演员过滤
+            hideBlacklistedActorsInList: (settings.listEnhancement as any)?.hideBlacklistedActorsInList === true,
+            hideNonFavoritedActorsInList: (settings.listEnhancement as any)?.hideNonFavoritedActorsInList === true,
+            hideUnrecognizedActorsInList: (settings.listEnhancement as any)?.hideUnrecognizedActorsInList !== false, // 默认true
+            treatSubscribedAsFavorited: (settings.listEnhancement as any)?.treatSubscribedAsFavorited !== false,
+            // 高质量封面
+            enableHighQualityCover: settings.listEnhancement?.enableHighQualityCover !== false,
+            // 🆕 列表显示控制
+            listDisplayControl: {
+                enabled: (settings.listEnhancement as any)?.listDisplayControl?.enabled !== false,
+                columnCount: (settings.listEnhancement as any)?.listDisplayControl?.columnCount || 4,
+                containerWidth: (settings.listEnhancement as any)?.listDisplayControl?.containerWidth || 100,
+                enableContainerExpansion: (settings.listEnhancement as any)?.listDisplayControl?.enableContainerExpansion === true,
+            },
+            // 🆕 状态标签显示
+            showStatusBadge: (settings.listEnhancement as any)?.showStatusBadge !== false, // 默认启用
+            popularityEffects: {
+                enabled: (settings.listEnhancement as any)?.popularityEffects?.enabled === true,                minRating: Math.max(0, Math.min(5, parseFloat(String((settings.listEnhancement as any)?.popularityEffects?.minRating ?? 4)) || 4)),
+                minRatingCount: Math.max(0, parseInt(String((settings.listEnhancement as any)?.popularityEffects?.minRatingCount ?? 350), 10) || 350),
+            },
+        });
+        if (!isVideoPage) {
+            initOrchestrator.add('high', () => listEnhancementManager.initialize(), { label: 'listEnhancement:init', delayMs: 100, priority: 7, visibilityPolicy: 'background_allowed' });
+            initOrchestrator.add('high', () => {
+                try {
+                    log('Reprocessing items after listEnhancement initialization');
+                    processVisibleItems();
+                } catch (e) {
+                    log('Reprocess after listEnhancement failed:', e as any);
+                }
+            }, { label: 'list:reprocess:after-listEnhancement', delayMs: 300, priority: 6, visibilityPolicy: 'background_allowed' });
+        }
+    }
+
+    // 初始化演员页增强功能（仅演员页 critical）
+    if (settings.actorEnhancement?.enabled !== false && isActorPage) {
+        const legacyScanButtonEnabled = (settings.actorEnhancement as any)?.enableScanNewWorks === true;
+        const showActorPageScanButton = newWorksConfig?.showActorPageScanButton === true || legacyScanButtonEnabled;
+        actorEnhancementManager.updateConfig({
+            enabled: true,
+            autoApplyTags: settings.actorEnhancement?.autoApplyTags !== false,
+            defaultTags: settings.actorEnhancement?.defaultTags || ['s', 'd'],
+            defaultSortType: settings.actorEnhancement?.defaultSortType || 0,
+            enableActionButtons: (settings.actorEnhancement as any)?.enableActionButtons !== false,
+            // 新增：演员页“影片分段显示”配置
+            enableTimeSegmentationDivider: (settings.actorEnhancement as any)?.enableTimeSegmentationDivider === true,
+            timeSegmentationMonths: (settings.actorEnhancement as any)?.timeSegmentationMonths || 6,
+            // 新增：演员页"扫描新作品按钮"配置
+            enableScanNewWorks: showActorPageScanButton,
+        });
+        initOrchestrator.add('critical', () => actorEnhancementManager.init(), { label: 'actorEnhancement:init', visibilityPolicy: 'background_allowed' });
+    }
+
+    // 初始化演员标记增强功能（仅影片页 high）
+    if ((settings.videoEnhancement as any)?.enableActorQuickActions !== false && isVideoPage) {
+        actorQuickActionsManager.updateConfig({
+            enabled: true,
+            showDelay: 300,
+            hideDelay: 200,
+        });
+        initOrchestrator.add('high', () => actorQuickActionsManager.init(), { label: 'actorQuickActions:init', delayMs: 500, priority: 6, visibilityPolicy: 'background_allowed' });
+    }
+
+    // 初始化密码显示助手（全局生效）
+    // 优化：缩短延迟到600ms
+    if (settings.userExperience.enablePasswordHelper) {
+        const passwordHelperConfig = (settings as any).passwordHelper || { showMethod: 0, waitTime: 300 };
+        const passwordHelper = new PasswordHelper(
+            passwordHelperConfig.showMethod || 0,
+            passwordHelperConfig.waitTime || 350
+        );
+        initOrchestrator.add('deferred', () => {
+            passwordHelper.init();
+            log('Password helper initialized');
+        }, { label: 'passwordHelper:init', idle: true, delayMs: 600 });
+    }
+
+    // 更稳健地识别搜索结果页：不仅依赖 DOM，还检查 URL
+    const url = new URL(window.location.href);
+    const isSearchPath = url.pathname === '/search';
+    const hasQParam = url.searchParams.has('q');
+    STATE.isSearchPage = !!document.querySelector(SELECTORS.SEARCH_RESULT_PAGE) || (isSearchPath && hasQParam);
+    if (STATE.isSearchPage) {
+        log('Search page detected (/search?q=...), hiding functions will be disabled.');
+    }
+
+    // 注意：原始 favicon 已在上方提前保存，这里无需再次保存
+
+    // 将列表观察初始化纳入编排器（列表/演员页 critical）
+    const pathNow = window.location.pathname;
+    if (!pathNow.startsWith('/v/') && !pathNow.startsWith('/actors/')) {
+        initOrchestrator.add('critical', () => {
+            processVisibleItems();
+            setupObserver();
+        }, { label: 'list:observe:init', visibilityPolicy: 'background_allowed' });
+    }
+
+    if (settings.userExperience.enableContentFilter) {
+        initOrchestrator.add('idle', async () => {
+            contentFilterManager.initialize();
+            log('Content filter initialized after default hide processing');
+        }, { label: 'contentFilter:initialize', idle: true, idleTimeout: 5000, delayMs: 2500 });
+    }
+
+    if (!window.location.pathname.startsWith('/v/') && !window.location.pathname.startsWith('/actors/')) {
+        initOrchestrator.add('idle', () => initDrive115Features(), { label: 'drive115:init:list', idle: true, idleTimeout: 5000, delayMs: 1800 });
+    }
+
+    // 启动统一编排器（处理 deferred / idle 阶段任务）
+    try {
+        await initOrchestrator.run();
+    } catch (e) {
+        log('Init orchestrator run failed:', e);
+    }
+
+    if (isCurrentVideoPage) {
+        void handleVideoDetailPage().catch((e) => {
+            log('Video detail bootstrap failed:', e);
+        });
+
+        checkAndUpdateVideoStatus();
+        let lastStatusSignature = '';
+        let stableCount = 0;
+        const statusIntervalId = setInterval(() => {
+            try {
+                checkAndUpdateVideoStatus();
+                const signature = `${document.title}|${currentFaviconState ?? 'null'}|${currentTitleStatus ?? 'null'}`;
+                if (signature === lastStatusSignature && signature.includes('null') === false) {
+                    stableCount++;
+                } else {
+                    stableCount = 0;
+                    lastStatusSignature = signature;
+                }
+                if (stableCount >= 3) {
+                    clearInterval(statusIntervalId);
+                    log('Status appears stable. Stopping status polling.');
+                }
+            } catch (e) {
+                log('Status polling error:', e);
+            }
+        }, 5000);
+    }
+
+    initExportFeature();
+
+    // 外部预览图功能
+    try {
+        const externalPreviewEnabled = (settings as any).videoEnhancement?.enableExternalPreviews !== false;
+        if (externalPreviewEnabled) {
+            updateExternalPreviewConfig({
+                enabled: true,
+                listPreviewEnabled: (settings as any).videoEnhancement?.enableListPreviewImages !== false,
+                detailPreviewEnabled: (settings as any).videoEnhancement?.enableDetailPreviewImages !== false,
+                onlineVideoEnabled: (settings as any).videoEnhancement?.enableOnlineVideoLinks !== false,
+            });
+            initExternalPreviewsContent();
+            log('External previews initialized');
+        }
+    } catch (e) {
+        log('External previews initialization failed:', e);
+    }
+}
+
+// --- Entry Point ---
+
+// 防止重复初始化
+let isInitialized = false;
+
+export function onExecute() {
+    if (isInitialized) {
+        // 静默跳过重复初始化
+        return;
+    }
+    isInitialized = true;
+    // 标记已注入，供 background executeScript 检查防重复
+    (window as any).__javdbExtensionInjected = true;
+    // 立即注入顶栏标识，不等待编排器
+    injectNavbarBadge();
+    initialize().catch(err => console.error('[JavDB Ext] Initialization failed:', err));
+}

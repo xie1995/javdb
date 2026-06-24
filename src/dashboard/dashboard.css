@@ -1,0 +1,218 @@
+/* ============================================
+   Dashboard 主样式入口
+   基于 ITCSS 架构 + 日夜主题系统
+   合并优化后的单一样式系统
+   ============================================ */
+
+/* 1. Settings - 主题变量（日夜切换） */
+@import url('./styles/01-settings/variables.css');
+
+/* 2. Generic - 基础重置 */
+@import url('./styles/02-generic/reset.css');
+
+/* 3. Elements - 元素默认样式 */
+@import url('./styles/03-elements/base.css');
+
+/* 4. Components - 组件样式 */
+@import url('./styles/04-components/layout.css');
+@import url('./styles/04-components/button.css');
+@import url('./styles/04-components/modal.css');
+@import url('./styles/04-components/modalLegacy.css');
+@import url('./styles/04-components/toast.css');
+@import url('./styles/04-components/card.css');
+@import url('./styles/04-components/tabs.css');
+@import url('./styles/04-components/table.css');
+@import url('./styles/04-components/form.css');
+@import url('./styles/04-components/dropdown.css');
+@import url('./styles/04-components/badge.css');
+@import url('./styles/04-components/alert.css');
+@import url('./styles/04-components/progress.css');
+@import url('./styles/04-components/skeleton.css');
+@import url('./styles/04-components/pagination.css');
+@import url('./styles/04-components/breadcrumb.css');
+@import url('./styles/04-components/themeSwitcher.css');
+@import url('./styles/04-components/monthRangePicker.css');
+@import url('./styles/04-components/toggle.css');
+@import url('./styles/04-components/userProfile.css');
+
+/* 5. Pages - 页面特定样式 */
+@import url('./styles/05-pages/home.css');
+@import url('./styles/05-pages/insights.css');
+@import url('./styles/05-pages/records.css');
+@import url('./styles/05-pages/actors.css');
+@import url('./styles/05-pages/lists.css');
+@import url('./styles/05-pages/newWorks.css');
+@import url('./styles/05-pages/logs.css');
+@import url('./styles/05-pages/sync.css');
+@import url('./styles/05-pages/drive115Tasks.css');
+@import url('./styles/05-pages/cloudflareVerification.css');
+@import url('./styles/05-pages/settings/index.css');
+
+/* 6. Utilities - 工具类 */
+@import url('./styles/06-utilities/helpers.css');
+
+/* ============================================
+   页面特定样式补充
+   ============================================ */
+
+/* 演员页增强配置样式 */
+.actor-config-container {
+    margin-top: 15px;
+}
+
+/* 上次应用标签显示样式 */
+.last-applied-tags {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.tag-display-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.tag-display-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.tag-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-outline:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.applied-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 0;
+    align-items: center;
+}
+
+.applied-tag {
+    background: var(--accent-color);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.no-tags-message {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Advanced Search (Records Tab) */
+.advanced-search-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.advanced-search-panel .adv-controls,
+.advanced-search-panel .adv-presets,
+.advanced-search-panel .adv-quicktime {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.advanced-search-panel .button-like {
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+
+.advanced-search-panel input[type="text"],
+.advanced-search-panel input[type="number"],
+.advanced-search-panel select {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 8px;
+    height: 32px;
+}
+
+.adv-conditions-list {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.adv-condition-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1.5fr auto;
+    gap: 8px;
+    align-items: center;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.adv-condition-row .adv-field,
+.adv-condition-row .adv-operator,
+.adv-condition-row .adv-value {
+    width: 100%;
+}
+
+.adv-condition-row .adv-remove {
+    height: 32px;
+    min-width: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.advanced-search-panel .adv-hint {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+@media (max-width: 960px) {
+    .adv-condition-row {
+        grid-template-columns: 1fr 1fr 1fr auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .adv-condition-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    .adv-condition-row .adv-value {
+        grid-column: span 2;
+    }
+}

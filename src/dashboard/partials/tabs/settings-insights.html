@@ -1,0 +1,124 @@
+﻿<div class="settings-page" id="insights-settings">
+    <div class="settings-page-header">
+        <button class="settings-back-btn" data-action="back-to-settings">
+            <i class="fas fa-arrow-left"></i> 返回设置
+        </button>
+        <h2>报告设置</h2>
+        <p class="settings-description">配置报告生成所用的聚合参数，仅影响本地统计与 AI 提示词输入。</p>
+    </div>
+    <div class="settings-page-body">
+        <!-- 数据源与范围 -->
+        <div class="settings-card settings-section">
+            <h4>数据源与范围</h4>
+            <p class="section-description">配置报告统计的数据来源和状态范围。</p>
+            
+            <div class="form-group">
+                <label for="insightsSource">数据源模式:</label>
+                <select id="insightsSource" class="text-input">
+                    <option value="views">仅观看记录</option>
+                    <option value="compare">对比模式（观看 vs 浏览）</option>
+                    <option value="auto">自动选择</option>
+                </select>
+                <p class="input-description">选择报告使用的数据来源。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="insightsStatusScope">统计状态范围:</label>
+                <select id="insightsStatusScope" class="text-input">
+                    <option value="viewed">仅已观看</option>
+                    <option value="viewed_browsed">已观看 + 已浏览</option>
+                    <option value="viewed_browsed_want">已观看 + 已浏览 + 想看</option>
+                </select>
+                <p class="input-description">选择统计时包含的状态类型。</p>
+            </div>
+        </div>
+
+        <!-- 聚合参数 -->
+        <div class="settings-card settings-section">
+            <h4>聚合参数</h4>
+            <p class="section-description">配置报告数据的聚合方式和统计维度。</p>
+            
+            <div class="form-grid">
+                <div class="form-group-inline">
+                    <label for="insightsTopN">Top N 排行数量:</label>
+                    <input type="number" id="insightsTopN" class="text-input" min="1" max="50" value="10">
+                    <button type="button" class="help-btn" title="排行榜显示的条目数量（1-50）">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+
+                <div class="form-group-inline">
+                    <label for="insightsMinTagCount">最小标签计数:</label>
+                    <input type="number" id="insightsMinTagCount" class="text-input" min="0" max="999" value="3">
+                    <button type="button" class="help-btn" title="标签至少出现的次数才会被统计（0-999）">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+
+                <div class="form-group-inline">
+                    <label for="insightsChangeThresholdRatio">显著变化阈值:</label>
+                    <input type="number" id="insightsChangeThresholdRatio" class="text-input" min="0" max="1" step="0.01" value="0.08">
+                    <button type="button" class="help-btn" title="判断趋势显著变化的阈值比例（0-1）">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+
+                <div class="form-group-inline">
+                    <label for="insightsRisingLimit">上升标签展示数:</label>
+                    <input type="number" id="insightsRisingLimit" class="text-input" min="0" max="50" value="5">
+                    <button type="button" class="help-btn" title="显示上升趋势标签的数量（0-50）">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+
+                <div class="form-group-inline">
+                    <label for="insightsFallingLimit">下降标签展示数:</label>
+                    <input type="number" id="insightsFallingLimit" class="text-input" min="0" max="50" value="5">
+                    <button type="button" class="help-btn" title="显示下降趋势标签的数量（0-50）">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+
+                <div class="form-group-inline">
+                    <label for="insightsMinMonthlySamples">最小月度样本量:</label>
+                    <input type="number" id="insightsMinMonthlySamples" class="text-input" min="0" max="999" value="10">
+                    <button type="button" class="help-btn" title="月报生成所需的最小样本数量（0-999）">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自动生成设置 -->
+        <div class="settings-card settings-section">
+            <h4>自动生成设置</h4>
+            <p class="section-description">配置报告的自动生成选项。</p>
+            
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="insightsAutoMonthlyEnabled">
+                    <span class="checkmark"></span>
+                    <span>启用自动月报</span>
+                </label>
+                <p class="input-description">每月自动生成上月的观影报告。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="insightsAutoMinuteOfDay">触发时间（分钟）:</label>
+                <input type="number" id="insightsAutoMinuteOfDay" class="text-input" min="0" max="1439" value="10">
+                <p class="input-description">每月 1 日触发的时间，以当天的第几分钟表示（0-1439，例如 10 表示 00:10）。</p>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="insightsAutoCompensateEnabled">
+                    <span class="checkmark"></span>
+                    <span>启用启动补偿</span>
+                </label>
+                <p class="input-description">如果错过定时生成，在浏览器启动时自动补生成。</p>
+            </div>
+
+            <div id="insights-auto-tip" style="display: none; margin-top: 16px; padding: 12px; background: var(--info-bg, #e3f2fd); border-left: 4px solid var(--info, #2196f3); border-radius: 6px; font-size: 13px; color: var(--text-primary);"></div>
+        </div>
+    </div>
+</div>

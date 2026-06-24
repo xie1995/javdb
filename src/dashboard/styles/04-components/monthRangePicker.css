@@ -1,0 +1,212 @@
+/* ===================================================================
+   月份范围选择器样式 - Month Range Picker Styles
+   ================================================================ */
+
+.month-range-picker {
+  display: inline-block;
+}
+
+.month-range-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.month-range-separator {
+  color: var(--text-muted);
+  font-size: 14px;
+  user-select: none;
+}
+
+.month-picker-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.month-picker-input {
+  width: 120px;
+  height: 32px;
+  padding: 6px 32px 6px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.month-picker-input:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
+}
+
+.month-picker-input:focus {
+  border-color: var(--primary);
+  background: var(--surface-primary);
+  box-shadow: var(--ring);
+}
+
+.month-picker-input::placeholder {
+  color: var(--text-muted);
+}
+
+.month-picker-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.month-picker-wrapper:hover .month-picker-icon {
+  color: var(--text-secondary);
+}
+
+/* 下拉面板 */
+.month-picker-dropdown {
+  position: absolute;
+  z-index: 1000;
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  padding: 12px;
+  min-width: 280px;
+  animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 年份选择器 */
+.month-picker-year-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.year-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.year-nav-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+}
+
+.year-nav-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  transform: scale(1.05);
+}
+
+.year-nav-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.year-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* 月份网格 */
+.month-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.month-btn {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.month-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.month-btn:active {
+  transform: translateY(0);
+}
+
+.month-btn.current {
+  border-color: var(--primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  background: var(--surface-primary);
+}
+
+.month-btn.selected {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.month-btn.selected:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .month-picker-dropdown {
+    min-width: 260px;
+  }
+  
+  .month-picker-grid {
+    gap: 6px;
+  }
+  
+  .month-btn {
+    height: 32px;
+    font-size: 12px;
+  }
+}

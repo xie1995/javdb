@@ -1,0 +1,575 @@
+import { ExtensionSettings, KeywordFilterRule, ActorSyncConfig, NewWorksGlobalConfig } from '../types';
+import { normalizeDrive115Settings } from '../features/drive115/app';
+import { DEFAULT_AI_SETTINGS } from '../types/ai';
+import { DEFAULT_EMBY_LIBRARY_CONFIG } from '../features/embyLibrary/domain/types';
+
+export const SERVER_API_BASE_URL = 'https://jbd-server.we-together.club';
+export const TELEMETRY_REPORT_ENDPOINT = `${SERVER_API_BASE_URL}/v1/telemetry/report`;
+
+export const STORAGE_KEYS = {
+    // A single key for all viewed records, which is an object
+    // where keys are video IDs and values are objects with { title, status, timestamp }.
+    VIEWED_RECORDS: 'viewed',
+
+    // Stores all settings, including display and WebDAV configurations.
+    SETTINGS: 'settings',
+
+    // Key for storing persistent logs.
+    LOGS: 'persistent_logs',
+
+    // Key for storing last import statistics.
+    LAST_IMPORT_STATS: 'last_import_stats',
+
+    // Key for storing user profile information.
+    USER_PROFILE: 'user_profile',
+
+    // Key for storing actor records.
+    ACTOR_RECORDS: 'actor_records',
+
+    // Key for storing restore backups.
+    RESTORE_BACKUP: 'restore_backup',
+
+    // WebDAV 恢复：记忆上次选择的备份文件（完整路径或 URL）
+    WEBDAV_LAST_SELECTED_BACKUP: 'webdav_last_selected_backup',
+
+    // 新作品功能相关存储键
+    NEW_WORKS_SUBSCRIPTIONS: 'new_works_subscriptions',
+    NEW_WORKS_RECORDS: 'new_works_records',
+    NEW_WORKS_CONFIG: 'new_works_config',
+    
+    // 高级搜索方案存储键
+    ADV_SEARCH_PRESETS: 'adv_search_presets',
+
+    // IndexedDB 迁移状态标记
+    IDB_MIGRATED: 'idb_migrated',
+    // IndexedDB 日志迁移状态标记（将旧的 STORAGE_KEYS.LOGS 迁移到 IDB logs 表）
+    IDB_LOGS_MIGRATED: 'idb_logs_migrated',
+    // IndexedDB 演员数据迁移状态标记（将旧的 STORAGE_KEYS.ACTOR_RECORDS 迁移到 IDB actors 表）
+    IDB_ACTORS_MIGRATED: 'idb_actors_migrated',
+
+    // Emby 联动：库配置
+    EMBY_LIBRARY_CONFIG: 'emby_library_config',
+    // Emby 联动：库索引缓存
+    EMBY_LIBRARY_INDEX: 'emby_library_index',
+    // Emby 联动：已观看番号永久记录（即使 Emby 中文件已删除也保留）
+    EMBY_WATCHED_PERMANENT: 'emby_watched_permanent',
+
+} as const;
+
+export const VIDEO_STATUS = {
+    VIEWED: 'viewed', // 已观看
+    WANT: 'want',     // 我想看
+    BROWSED: 'browsed', // 已浏览
+    UNTRACKED: 'untracked' // 未标记（仅入库/清单归属等）
+} as const;
+
+// 演员同步默认配置
+export const DEFAULT_ACTOR_SYNC_CONFIG: ActorSyncConfig = {
+    enabled: true, // 默认启用演员同步
+    autoSync: false, // 默认不自动同步
+    syncInterval: 1440, // 24小时同步一次
+    batchSize: 20, // 每批处理20个演员
+    maxRetries: 3, // 最大重试3次
+    requestInterval: 3, // 请求间隔3秒
+    urls: {
+        collectionActors: 'https://javdb.com/users/collection_actors', // 收藏演员列表URL
+        actorDetail: 'https://javdb.com/actors/{{ACTOR_ID}}', // 演员详情页URL模板
+    },
+};
+
+// 新作品功能默认配置
+export const DEFAULT_NEW_WORKS_CONFIG: NewWorksGlobalConfig = {
+    checkInterval: 24, // 24小时检查一次
+    requestInterval: 3, // 请求间隔3秒
+    autoCheckEnabled: false, // 默认不开启自动检查
+    concurrency: 1, // 默认并发数为1
+    showActorPageScanButton: false, // 默认不在演员页显示快捷扫描入口
+    filters: {
+        excludeViewed: true, // 默认排除已看
+        excludeBrowsed: true, // 默认排除已浏览
+        excludeWant: false, // 默认不排除想看
+        dateRange: 3, // 默认近3个月
+        categoryFilters: [], // 默认不限制类别（空数组表示全选）
+        excludeAR: false, // 默认不排除AR影片
+        applyContentFilter: false, // 默认不应用智能内容过滤
+    },
+    maxWorksPerCheck: 100, // 固定值100，不再通过UI配置
+    autoCleanup: true, // 默认启用自动清理
+    cleanupDays: 30, // 30天后清理
+};
+
+// 状态优先级定义：数字越大优先级越高
+// 已看 > 想看 > 已浏览
+export const STATUS_PRIORITY = {
+    [VIDEO_STATUS.UNTRACKED]: 0,
+    [VIDEO_STATUS.BROWSED]: 1, // 已浏览 - 最低优先级
+    [VIDEO_STATUS.WANT]: 2,    // 我想看 - 中等优先级
+    [VIDEO_STATUS.VIEWED]: 3   // 已观看 - 最高优先级
+} as const;
+
+export const DEFAULT_SETTINGS: ExtensionSettings = {
+    // 主题设置
+    theme: 'light',
+    autoUpdateCheck: true,
+    updateCheckInterval: '24',
+    includePrerelease: false,
+    
+    display: {
+        hideViewed: false, // Corresponds to VIEWED status
+        hideBrowsed: false, // Corresponds to BROWSED status
+        hideVR: false,
+        hideWant: false,
+    },
+    // 演员库配置默认值
+    actorLibrary: {
+        blacklist: {
+            hideInList: true,
+            showBadge: true,
+        }
+    },
+    webdav: {
+        enabled: true,
+        url: '',
+        username: '',
+        password: '',
+        clientId: '',
+        deviceLabel: '',
+        browserName: '',
+        clientInstalledAt: '',
+        clientLastSeenAt: '',
+        clientLastSyncAt: '',
+        clientLastSyncStatus: '',
+        clientLastUploadId: '',
+        uploadIndexLimit: 50,
+        autoSync: false,
+        syncInterval: 1440, // 24 hours in minutes
+        // 默认保留天数：7 天
+        retentionDays: 10,
+        warningDays: 7,
+        lastSync: ''
+    },
+    dataSync: {
+        requestInterval: 3, // 请求间隔3秒，缓解服务器压力
+        batchSize: 20, // 每批处理20个视频
+        maxRetries: 3, // 最大重试3次
+        urls: {
+            wantWatch: 'https://javdb.com/users/want_watch_videos', // 想看视频列表URL
+            watchedVideos: 'https://javdb.com/users/watched_videos', // 已看视频列表URL
+            collectionActors: 'https://javdb.com/users/collection_actors', // 收藏演员列表URL
+        },
+    },
+    searchEngines: [
+        {
+            id: 'javdb',
+            icon: 'assets/javdb.ico',
+            name: 'JavDB',
+            urlTemplate: 'https://javdb.com/search?q={{ID}}&f=all',
+            category: 'search'
+        },
+        {
+            id: 'javbus',
+            icon: 'assets/javbus.ico',
+            name: 'Javbus',
+            urlTemplate: 'https://www.javbus.com/search/{{ID}}&type=&parent=ce',
+            category: 'search'
+        },
+        {
+            id: 'sehuatang',
+            icon: 'assets/sehuatang.ico',
+            name: '98堂',
+            urlTemplate: 'https://sehuatang.net/search.php?mod=forum&srchtxt={{ID}}',
+            category: 'search'
+        },
+        {
+            id: 'btsow',
+            icon: 'assets/btsow.png',
+            name: 'BTSOW',
+            urlTemplate: 'https://btsow.com/search/{{ID}}',
+            category: 'search'
+        },
+        {
+            id: 'javlib',
+            icon: 'assets/javlibrary.ico',
+            name: 'JAVLib',
+            urlTemplate: 'https://www.javlibrary.com/cn/vl_searchbyid.php?keyword={{ID}}',
+            category: 'search'
+        },
+        {
+            id: 'jable',
+            icon: 'assets/jable.ico',
+            name: 'Jable',
+            urlTemplate: 'https://jable.tv/search/{{ID}}/',
+            category: 'resource'
+        },
+        {
+            id: 'missav',
+            icon: 'assets/missav.ico',
+            name: 'MISSAV',
+            urlTemplate: 'https://missav.ws/search/{{ID}}',
+            category: 'resource'
+        },
+        {
+            id: '123av',
+            icon: 'assets/123av.png',
+            name: '123AV',
+            urlTemplate: 'https://123av.com/zh/search?keyword={{ID}}',
+            category: 'resource'
+        },
+        {
+            id: 'google',
+            icon: 'assets/google.ico',
+            name: 'Google',
+            urlTemplate: 'https://www.google.com/search?q={{ID}}',
+            category: 'search'
+        },
+        {
+            id: 'dmm',
+            icon: 'assets/dmm.ico',
+            name: 'FANZA/DMM',
+            urlTemplate: 'https://www.dmm.co.jp/search/=/searchstr={{ID}}',
+            category: 'resource',
+            contexts: ['detail']
+        },
+        {
+            id: 'sukebei',
+            icon: 'assets/sukebei.png',
+            name: 'Sukebei',
+            urlTemplate: 'https://sukebei.nyaa.si/?f=0&c=0_0&q={{ID}}',
+            category: 'resource',
+            contexts: ['detail']
+        },
+        {
+            id: 'subtitlecat',
+            icon: 'assets/subtitlecat.ico',
+            name: 'SubTitleCat',
+            urlTemplate: 'https://subtitlecat.com/index.php?search={{ID}}',
+            category: 'subtitle',
+            contexts: ['detail']
+        },
+        {
+            id: 'xunlei-subtitle',
+            icon: 'assets/xunlei.png',
+            name: '迅雷字幕',
+            urlTemplate: 'https://api-shoulei-ssl.xunlei.com/oracle/subtitle?gcid=&cid=&name={{ID}}',
+            category: 'subtitle',
+            contexts: ['detail']
+        },
+        {
+            id: 'fc2ppvdb',
+            icon: 'assets/fc2ppvdb.ico',
+            name: 'FC2PPVDB',
+            urlTemplate: 'https://fc2ppvdb.com/articles/{{FC2_ID}}',
+            category: 'resource',
+            match: 'fc2',
+            contexts: ['detail']
+        },
+        {
+            id: 'fc2db',
+            icon: 'assets/fc2db.png',
+            name: 'FC2DB',
+            urlTemplate: 'https://fc2db.net/work/{{FC2_ID}}/',
+            category: 'resource',
+            match: 'fc2',
+            contexts: ['detail']
+        }
+    ],
+    logging: {
+        maxLogEntries: 5000,
+        maxMagnetPushEntries: 10000,
+        verboseMode: false, // 详细日志模式（默认关闭以减少噪音）
+        showStorageLogs: false, // 显示存储相关日志（默认关闭）
+        // 统一控制台代理默认配置
+        consoleLevel: 'DEBUG',
+        consoleFormat: {
+            showTimestamp: true,
+            showSource: true,
+            color: true,
+            timeZone: 'Asia/Shanghai',
+        },
+        consoleCategories: {
+            core: true,
+            orchestrator: true,
+            drive115: true,
+            magnet: true,
+            actor: true,
+            storage: true,
+            general: true,
+        },
+    },
+
+    telemetry: {
+        enabled: true,
+        endpoint: TELEMETRY_REPORT_ENDPOINT,
+        channel: 'stable',
+    },
+
+    drive115: normalizeDrive115Settings({}),
+
+    // 新增：数据增强默认配置
+    dataEnhancement: {
+        enableMultiSource: false, // 仍未启用
+        enableVideoPreview: true, // 启用：视频预览增强
+        enableTranslation: false,
+    },
+
+    // 新增：翻译服务默认配置
+    translation: {
+        provider: 'traditional' as const, // 默认使用传统翻译服务
+        displayMode: 'append' as const,
+        targets: {
+            currentTitle: true,
+        },
+        traditional: {
+            service: 'google' as const, // 默认使用Google翻译
+            sourceLanguage: 'ja', // 日语
+            targetLanguage: 'zh-CN', // 简体中文
+        },
+        ai: {
+            useGlobalModel: true, // 默认使用全局AI模型
+        },
+    },
+
+    // 新增：用户体验默认配置
+    userExperience: {
+        enableContentFilter: false,
+        enableKeyboardShortcuts: false, // 开发中，暂时关闭
+        enableMagnetSearch: false,
+        enableAnchorOptimization: false,
+        enableListEnhancement: true, // 默认启用列表增强
+        enableActorEnhancement: false,
+        enableSuperRanking: true,
+        showEnhancedTooltips: false, // 开发中，暂时关闭
+        enablePasswordHelper: false, // 密码显示助手，默认关闭
+    },
+
+    // 新增：网络加速默认配置
+    networkAcceleration: {
+        github: {
+            enabled: true, // 默认启用 GitHub 加速
+            proxyService: 'ghproxy', // 默认使用 ghproxy.com
+            customProxyUrl: '',
+        },
+    },
+
+    // 新增：线路默认配置
+    routes: {
+        javdb: {
+            primary: 'https://javdb.com',
+            alternatives: [
+                {
+                    url: 'https://javdb570.com',
+                    enabled: true,
+                    description: '备用线路1',
+                    addedAt: Date.now()
+                },
+                {
+                    url: 'https://javdb36.com',
+                    enabled: true,
+                    description: '备用线路2',
+                    addedAt: Date.now()
+                }
+            ]
+        },
+        javbus: {
+            primary: 'https://www.javbus.com',
+            alternatives: [
+                {
+                    url: 'https://www.seejav.cyou',
+                    enabled: true,
+                    description: '防屏蔽地址1',
+                    addedAt: Date.now()
+                },
+                {
+                    url: 'https://www.busjav.cyou',
+                    enabled: true,
+                    description: '防屏蔽地址2',
+                    addedAt: Date.now()
+                },
+                {
+                    url: 'https://www.fanbus.cyou',
+                    enabled: true,
+                    description: '防屏蔽地址3',
+                    addedAt: Date.now()
+                }
+            ]
+        }
+    },
+
+    // 磁力资源搜索默认配置
+    magnetSearch: {
+        sources: {
+            sukebei: true,
+            btdig: true,
+            btsow: true,
+            torrentz2: false,
+            javbus: false,
+            custom: [],
+        },
+        autoSearch: false,
+        blockMojContent: true,
+        maxResults: 15,
+        timeoutMs: 6000,
+        concurrency: {
+            pageMaxConcurrentRequests: 2,
+            bgGlobalMaxConcurrent: 4,
+            bgPerHostMaxConcurrent: 1,
+            bgPerHostRateLimitPerMin: 12,
+        },
+    },
+
+    // 新增：影片页增强默认配置
+    videoEnhancement: {
+        enabled: false,
+        enableCoverImage: true,
+        enableTranslation: true,
+        showLoadingIndicator: true,
+        enableReviewBreaker: true,
+        enableFC2Breaker: true,
+        // 新增：默认开启”想看同步”和”115推送后自动已看”（保持旧行为）
+        enableWantSync: true,
+        autoMarkWatchedAfter115: true,
+        autoMarkWatchedStars: 4, // 默认4星
+        // 新增：演员备注（Wiki/xslist）
+        enableActorRemarks: false,
+        actorRemarksMode: 'panel' as const,
+        actorRemarksTTLDays: 0,
+        actorRemarksTaskTimeoutSeconds: 10,
+        // 新增：影片页收藏与评分
+        enableVideoFavoriteRating: true, // 默认启用
+        enableRelatedLists: true,
+        enableExternalEntryPanel: true,
+        enableExternalSearch: true,
+        enableOnlineAvailability: true,
+        showOnlineAvailabilityFailures: false,
+        onlineAvailabilitySites: {},
+        enableSubtitleSearch: true,
+    },
+
+    // 新增：内容过滤默认配置
+    contentFilter: {
+        enabled: false,
+        keywordRules: [] as KeywordFilterRule[],
+    },
+
+    // 新增：锚点优化默认配置（仅在详情页生效）
+    anchorOptimization: {
+        enabled: false,
+        showPreviewButton: true,
+        buttonPosition: 'right-center' as const,
+    },
+
+    // 新增：列表增强默认配置
+    listEnhancement: {
+        enabled: true, // 默认启用
+        enableClickEnhancement: true,
+        enableClickEnhancementList: true,
+        enableClickEnhancementDetail: true,
+        enableVideoPreview: true,
+        enableScrollPaging: false, // 默认关闭滚动翻页
+        enableListOptimization: true,
+        previewDelay: 1000,
+        previewVolume: 0.2,
+        enableRightClickBackground: true,
+        // 新增：演员水印默认配置
+        enableActorWatermark: false,
+        actorWatermarkPosition: 'top-right',
+        actorWatermarkOpacity: 0.4,
+        // 新增：基于演员偏好的过滤默认配置
+        hideBlacklistedActorsInList: false,
+        hideNonFavoritedActorsInList: false,
+        hideUnrecognizedActorsInList: true, // 默认隐藏无法识别演员的作品
+        treatSubscribedAsFavorited: true,
+        // 新增：列表页显示控制默认配置
+        listDisplayControl: {
+            enabled: true,
+            columnCount: 4,
+            containerWidth: 100,
+            enableContainerExpansion: false,
+        },
+        showStatusBadge: true,
+        enableStatusQuickAction: false,
+    },
+
+    // 新增：演员同步配置
+    actorSync: DEFAULT_ACTOR_SYNC_CONFIG,
+
+    // 新增：演员页增强默认配置
+    actorEnhancement: {
+        enabled: false,
+        autoApplyTags: false,
+        defaultTags: [],
+        defaultSortType: 0,
+        // 新增：演员页“影片分段显示”默认配置
+        enableTimeSegmentationDivider: false,
+        // 默认以 6 个月为阈值
+        timeSegmentationMonths: 6,
+    },
+
+    // 新增：AI功能配置
+    ai: DEFAULT_AI_SETTINGS,
+
+    // 新增：报告（Insights）默认配置
+    insights: {
+        topN: 10,
+        changeThresholdRatio: 0.08,
+        minTagCount: 3,
+        risingLimit: 5,
+        fallingLimit: 5,
+        statusScope: 'viewed',
+        source: 'auto',
+        minMonthlySamples: 10,
+        // 自动月报：默认关闭，仅用户开启时才注册闹钟与补偿
+        autoMonthlyEnabled: false,
+        autoCompensateOnStartupEnabled: false,
+        autoMonthlyMinuteOfDay: 10,
+        prompts: {
+            persona: 'doctor',
+            enableCustom: false,
+            systemOverride: '',
+            rulesOverride: '',
+        },
+    },
+
+    version: '0.0.0',
+    // Dashboard 番号库：是否在列表中显示封面
+    showCoversInRecords: false,
+    // Dashboard 番号库：视图模式（列表/卡片）
+    recordsViewMode: 'list' as 'list' | 'card',
+
+    // Emby 联动
+    embyLibrary: DEFAULT_EMBY_LIBRARY_CONFIG,
+};
+
+// WebDAV恢复配置
+export const RESTORE_CONFIG = {
+    // 数据加载策略
+    loading: {
+        enableProgressiveLoading: true,
+        chunkSize: 1000,
+        maxConcurrentAnalysis: 3,
+        timeoutMs: 60000
+    },
+
+    // 用户界面配置
+    ui: {
+        defaultMode: 'quick' as 'quick' | 'wizard' | 'expert',
+        showAdvancedByDefault: false,
+        enableAnimations: true,
+        stepTransitionMs: 300
+    },
+
+    // 错误处理配置
+    errorHandling: {
+        maxRetries: 3,
+        enableFallback: true,
+        logLevel: 'info' as 'debug' | 'info' | 'warn' | 'error',
+        showDetailedErrors: false
+    },
+
+    // 默认策略配置
+    defaults: {
+        strategy: 'smart' as 'smart' | 'local' | 'cloud' | 'manual',
+        autoSelectContent: true,
+        enableConflictResolution: true
+    }
+};

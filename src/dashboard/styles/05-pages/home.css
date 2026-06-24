@@ -1,0 +1,1060 @@
+.home-page { display: grid; gap: 16px; }
+
+.home-welcome h2 { margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.home-subtitle { margin: 0; color: var(--text-secondary); }
+
+/* 趋势概览容器内边距 */
+.home-charts {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 24px !important;
+  border-radius: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 26%),
+    radial-gradient(circle at top right, rgba(20, 184, 166, 0.10), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.80));
+  box-shadow: 0 22px 52px rgba(15, 23, 42, 0.10);
+  backdrop-filter: blur(18px);
+}
+
+[data-theme="dark"] .home-charts {
+  border-color: rgba(148, 163, 184, 0.14);
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.14), transparent 26%),
+    radial-gradient(circle at top right, rgba(20, 184, 166, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.88));
+  box-shadow: 0 26px 56px rgba(0, 0, 0, 0.26);
+}
+
+.home-charts::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, transparent 28%),
+    linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.04) 100%);
+  pointer-events: none;
+}
+
+.home-charts::after {
+  content: "";
+  position: absolute;
+  inset: auto -80px -80px auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.10) 0%, rgba(59, 130, 246, 0.04) 38%, transparent 72%);
+  pointer-events: none;
+}
+
+.home-charts > * {
+  position: relative;
+  z-index: 1;
+}
+
+.home-charts h2 {
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+/* 数据概览 Hero 面板 */
+.home-stats {
+  order: 1;
+  margin: 16px 0 18px;
+}
+
+.home-charts h2 {
+  order: 0;
+}
+
+.home-charts-topbar,
+.home-charts .trend-row,
+.home-charts .home-charts-grid {
+  order: 2;
+}
+
+.home-stats-shell {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+  border-radius: 26px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(20, 184, 166, 0.10), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.88));
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10);
+  backdrop-filter: blur(18px);
+}
+
+[data-theme="dark"] .home-stats-shell {
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(20, 184, 166, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.90));
+  box-shadow: 0 26px 56px rgba(0, 0, 0, 0.30);
+}
+
+.home-stats-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, transparent 32%),
+    linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+.home-stats-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.home-stats-copy h3 {
+  font-size: 18px;
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.home-stats-copy p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-stats-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+[data-theme="dark"] .home-stats-live {
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.home-stats-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--success);
+  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.12);
+}
+
+.home-kpi-hero {
+  display: flex;
+  padding: 18px 0 22px;
+  margin-bottom: 22px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.home-kpi-side {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.home-kpi-side-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 96px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.50);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+[data-theme="dark"] .home-kpi-side-item {
+  background: rgba(15, 23, 42, 0.40);
+}
+
+.home-kpi-side-item span {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.home-kpi-side-item strong {
+  margin-top: 8px;
+  font-size: clamp(22px, 4vw, 30px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+
+.home-kpi-side-item.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.home-kpi-side-item.clickable:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .home-kpi-side-item.clickable:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.home-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease, border-color .2s ease;
+}
+.home-refresh-btn:hover { transform: translateY(-1px); box-shadow: var(--elev-2); }
+.home-refresh-btn.loading { opacity: .7; cursor: wait; }
+.home-refresh-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+.home-refresh-btn i { color: var(--primary); }
+
+.home-stats .stat-item .stat-value { 
+    font-size: clamp(18px, 3.4vw, 24px); 
+    font-weight: 780;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
+.home-stats .stat-item .stat-label { font-size: 12px; }
+
+.home-quick-links .quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+/* 趋势行：三卡同排，自动换行 */
+.home-charts .trend-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+@media (max-width: 1200px) {
+  .home-charts .trend-row {
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .home-charts .trend-row {
+    grid-template-columns: 1fr;
+  }
+}
+.home-quick-links .quick-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background-color .2s ease;
+  box-shadow: var(--elev-1);
+}
+.home-quick-links .quick-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elev-2);
+  border-color: var(--border-hover);
+}
+.home-quick-links .quick-link i { font-size: 18px; color: var(--primary); }
+.home-quick-links .quick-link span { font-weight: 600; }
+
+/* 首页三个概览区块颜色映射（与以往一致） */
+.home-sections .stat-item[data-stat="total"] .stat-value { color: #007bff; }
+.home-sections .stat-item[data-stat="viewed"] .stat-value { color: #28a745; }
+.home-sections .stat-item[data-stat="browsed"] .stat-value { color: #17a2b8; }
+.home-sections .stat-item[data-stat="want"] .stat-value { color: #fd7e14; }
+
+/* 额外指标配色 */
+.home-sections .stat-item[data-stat="last7"] .stat-value { color: #6f42c1; }
+.home-sections .stat-item[data-stat="last30"] .stat-value { color: #6c757d; }
+
+/* 演员库维度配色 */
+.home-sections .stat-item[data-stat="female"] .stat-value { color: #d63384; }
+.home-sections .stat-item[data-stat="male"] .stat-value { color: #0d6efd; }
+.home-sections .stat-item[data-stat="unknown"] .stat-value { color: #6c757d; }
+.home-sections .stat-item[data-stat="censored"] .stat-value { color: #fd7e14; }
+.home-sections .stat-item[data-stat="uncensored"] .stat-value { color: #17a2b8; }
+.home-sections .stat-item[data-stat="blacklisted"] .stat-value { color: #dc3545; }
+.home-sections .stat-item[data-stat="recentlyAdded"] .stat-value { color: #28a745; }
+.home-sections .stat-item[data-stat="recentlyUpdated"] .stat-value { color: #007bff; }
+
+/* 新作品维度配色 */
+.home-sections .stat-item[data-stat="unread"] .stat-value { color: #ffc107; }
+.home-sections .stat-item[data-stat="today"] .stat-value { color: #ff5722; }
+.home-sections .stat-item[data-stat="week"] .stat-value { color: #20c997; }
+
+.home-charts .home-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  grid-template-areas:
+    'tags status'
+    'newworks newworks'
+    'change newtags';
+  gap: 14px;
+}
+.home-charts .chart-card { height: 280px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--elev-1); }
+.home-charts #homeStatusDonut { grid-area: status; }
+.home-charts #homeNewWorksBars { grid-area: newworks; }
+.home-charts #homeTagsTop { grid-area: tags; }
+.home-charts #homeTagsChange { grid-area: change; }
+.home-charts #homeNewTagsTop { grid-area: newtags; }
+
+.home-charts .chart-card {
+  padding: 20px 16px 16px 16px;
+  box-sizing: border-box;
+}
+
+.home-charts .chart-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 292px;
+  padding: 18px 18px 16px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.28), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 250, 252, 0.48));
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 24px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(16px);
+  isolation: isolate;
+}
+
+[data-theme="dark"] .home-charts .chart-card {
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.76), rgba(30, 41, 59, 0.60));
+  border-color: rgba(148, 163, 184, 0.14);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+}
+
+.home-charts .chart-card::before,
+.home-charts .chart-card::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.home-charts .chart-card::after {
+  right: -44px;
+  bottom: -44px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.04) 38%, transparent 72%);
+}
+
+.home-charts .chart-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.home-charts .chart-card-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+}
+
+.home-charts .chart-card-body {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.home-charts .chart-empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.home-charts #homeRecordsTrend::after { background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.04) 38%, transparent 72%); }
+.home-charts #homeActorsTrend::after { background: radial-gradient(circle, rgba(34, 197, 94, 0.10) 0%, rgba(34, 197, 94, 0.04) 38%, transparent 72%); }
+.home-charts #homeNewWorksTrend::after { background: radial-gradient(circle, rgba(20, 184, 166, 0.10) 0%, rgba(20, 184, 166, 0.04) 38%, transparent 72%); }
+.home-charts #homeStatusDonut::after { background: radial-gradient(circle, rgba(59, 130, 246, 0.10) 0%, rgba(20, 184, 166, 0.04) 38%, transparent 72%); }
+.home-charts #homeTagsTop::after { background: radial-gradient(circle, rgba(245, 158, 11, 0.10) 0%, rgba(167, 139, 250, 0.04) 38%, transparent 72%); }
+.home-charts #homeTagsChange::after { background: radial-gradient(circle, rgba(244, 63, 94, 0.08) 0%, rgba(16, 185, 129, 0.04) 38%, transparent 72%); }
+.home-charts #homeNewTagsTop::after { background: radial-gradient(circle, rgba(124, 58, 237, 0.10) 0%, rgba(59, 130, 246, 0.04) 38%, transparent 72%); }
+
+.home-charts .chart-title {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+[data-theme="dark"] .home-charts .chart-title {
+  color: rgba(203, 213, 225, 0.92) !important;
+}
+
+.home-charts #homeTagsPager {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="dark"] .home-charts #homeTagsPager {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+/* 趋势概览 顶部工具条与刷新按钮（同排且靠右） */
+.home-charts-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 10px 0 14px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(14px);
+}
+[data-theme="dark"] .home-charts-topbar {
+  border-color: rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.44);
+}
+.home-charts-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.home-charts-toolbar label {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.home-charts-toolbar select,
+.home-charts-toolbar input[type="date"] {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  border-radius: 999px;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease, background-color .2s ease;
+  backdrop-filter: blur(12px);
+}
+.home-charts-toolbar select:focus,
+.home-charts-toolbar input[type="date"]:focus {
+  border-color: var(--primary);
+  box-shadow: var(--ring);
+}
+.home-charts-toolbar #homeChartsRangeSep { color: var(--muted); }
+.home-charts-toolbar #homeChartsRangeApply.btn-primary {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 12px;
+  border-radius: 999px;
+}
+[data-theme="dark"] .home-charts-toolbar select,
+[data-theme="dark"] .home-charts-toolbar input[type="date"] {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.68);
+}
+
+/* 图表分页控件（用于 标签 Top 50） */
+.chart-pager { display: flex; align-items: center; gap: 6px; }
+.chart-pager-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.70);
+  color: var(--text);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .15s ease, transform .15s ease;
+}
+.chart-pager-btn:hover { box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08); transform: translateY(-1px); }
+.chart-pager-btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+.chart-pager-text { font-size: 12px; color: var(--muted); min-width: 42px; text-align: center; }
+
+[data-theme="dark"] .chart-pager-btn {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+/* 响应式：窄屏改为单列顺序（trend -> tags -> status -> newworks -> weekday -> mini） */
+@media (max-width: 860px) {
+  .home-charts .home-charts-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'recordsTrend'
+      'actorsTrend'
+      'newworksTrend'
+      'tags'
+      'status'
+      'newworks'
+      'change'
+      'newtags'
+  }
+  .home-charts .chart-card { height: 260px; }
+}
+
+/* ===================================================================
+   统计概览样式
+   ================================================================ */
+
+#stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+}
+
+#stats-overview > div {
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+    padding: 18px 18px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.20);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.90), rgba(248, 250, 252, 0.76));
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    backdrop-filter: blur(14px);
+    isolation: isolate;
+}
+
+[data-theme="dark"] #stats-overview > div {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(30, 41, 59, 0.92));
+    border-color: rgba(148, 163, 184, 0.18);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+}
+
+#stats-overview > div:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+    border-color: var(--border-hover);
+}
+
+#stats-overview > div::before {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 16px;
+    border-radius: 14px;
+    color: #ffffff;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+    z-index: 1;
+}
+
+#stats-overview > div::after {
+    content: "";
+    position: absolute;
+    inset: auto -28px -28px auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, transparent 68%);
+    pointer-events: none;
+}
+
+#stats-overview > div > * {
+    position: relative;
+    z-index: 2;
+}
+
+#stats-overview > div[data-stat="total"] {
+    grid-column: span 2;
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.18), rgba(255, 255, 255, 0.90));
+}
+
+[data-theme="dark"] #stats-overview > div[data-stat="total"] {
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.24), rgba(30, 41, 59, 0.94));
+}
+
+#stats-overview > div[data-stat="viewed"] {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.15), rgba(255, 255, 255, 0.90));
+}
+
+#stats-overview > div[data-stat="browsed"] {
+    background: linear-gradient(145deg, rgba(20, 184, 166, 0.15), rgba(255, 255, 255, 0.90));
+}
+
+#stats-overview > div[data-stat="want"] {
+    background: linear-gradient(145deg, rgba(245, 158, 11, 0.16), rgba(255, 255, 255, 0.90));
+}
+
+[data-theme="dark"] #stats-overview > div[data-stat="viewed"] {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.18), rgba(30, 41, 59, 0.94));
+}
+
+[data-theme="dark"] #stats-overview > div[data-stat="browsed"] {
+    background: linear-gradient(145deg, rgba(20, 184, 166, 0.18), rgba(30, 41, 59, 0.94));
+}
+
+[data-theme="dark"] #stats-overview > div[data-stat="want"] {
+    background: linear-gradient(145deg, rgba(245, 158, 11, 0.18), rgba(30, 41, 59, 0.94));
+}
+
+#stats-overview .stat-value {
+    font-size: clamp(26px, 5vw, 34px) !important;
+    line-height: 1;
+    font-weight: 800 !important;
+    letter-spacing: -0.04em;
+    color: var(--text-primary) !important;
+    margin-bottom: 6px;
+    display: block;
+}
+
+#stats-overview .stat-label {
+    font-size: 12px !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+}
+
+/* 不同统计项的颜色 */
+#stats-overview > div[data-stat="total"] .stat-value {
+    color: var(--primary) !important;
+}
+
+#stats-overview > div[data-stat="viewed"] .stat-value {
+    color: var(--success) !important;
+}
+
+#stats-overview > div[data-stat="browsed"] .stat-value {
+    color: var(--info) !important;
+}
+
+#stats-overview > div[data-stat="want"] .stat-value {
+    color: var(--warning) !important;
+}
+
+/* 图标 */
+#stats-overview > div[data-stat="total"]::before {
+    content: "\f022";
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+}
+
+#stats-overview > div[data-stat="viewed"]::before {
+    content: "\f00c";
+    background: linear-gradient(135deg, var(--success), var(--success-hover));
+}
+
+#stats-overview > div[data-stat="browsed"]::before {
+    content: "\f06e";
+    background: linear-gradient(135deg, var(--info), var(--info-hover));
+}
+
+#stats-overview > div[data-stat="want"]::before {
+    content: "\f005";
+    background: linear-gradient(135deg, var(--warning), var(--warning-hover));
+}
+
+/* ===================================================================
+   数据概览 - stats-section 样式
+   ================================================================ */
+
+.stats-section {
+  position: relative;
+  overflow: hidden;
+  background: transparent !important;
+  padding: 18px 0 0;
+  border-radius: 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: none;
+  transition: border-color 0.2s ease;
+  backdrop-filter: none;
+}
+
+[data-theme="dark"] .stats-section {
+  background: transparent !important;
+  border-top-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+.stats-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.stats-section h4::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: radial-gradient(circle, var(--primary) 0%, rgba(59, 130, 246, 0.18) 68%, rgba(59, 130, 246, 0) 72%);
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.10);
+}
+
+.stats-section .stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+    gap: 6px 20px;
+    margin-top: 0;
+}
+
+/* 统计卡片样式 */
+.stats-section .stat-item {
+    position: relative;
+    overflow: hidden;
+    min-height: 86px;
+    background: rgba(255, 255, 255, 0.50);
+    padding: 12px 16px;
+    border-radius: 14px;
+    text-align: center;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    box-shadow: none;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    isolation: isolate;
+}
+
+[data-theme="dark"] .stats-section .stat-item {
+    background: rgba(15, 23, 42, 0.40);
+}
+
+.stats-section .stat-item:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] .stats-section .stat-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.stats-section .stat-item > * {
+    position: relative;
+    z-index: 1;
+}
+
+.stats-section .stat-value {
+    font-size: clamp(20px, 3.5vw, 28px);
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: 0;
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.stats-section .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.35;
+    white-space: normal;
+}
+
+.stats-section .stat-item[data-stat="total"] .stat-value {
+    font-size: clamp(34px, 6vw, 46px);
+}
+
+.stats-section .stat-item[data-stat="total"] .stat-label {
+    font-size: 11px;
+}
+
+.stats-section .stat-item[data-stat="total"] .stat-value {
+    color: var(--primary);
+}
+
+.stats-section .stat-item[data-stat="viewed"] .stat-value {
+    color: var(--success);
+}
+
+.stats-section .stat-item[data-stat="browsed"] .stat-value {
+    color: var(--info);
+}
+
+.stats-section .stat-item[data-stat="want"] .stat-value,
+.stats-section .stat-item[data-stat="unread"] .stat-value,
+.stats-section .stat-item[data-stat="today"] .stat-value {
+    color: var(--warning);
+}
+
+.stats-section .stat-item[data-stat="last7"] .stat-value {
+    color: #6f42c1;
+}
+
+.stats-section .stat-item[data-stat="last30"] .stat-value,
+.stats-section .stat-item[data-stat="unknown"] .stat-value {
+    color: #64748b;
+}
+
+.stats-section .stat-item[data-stat="female"] .stat-value {
+    color: #d63384;
+}
+
+.stats-section .stat-item[data-stat="male"] .stat-value {
+    color: #0d6efd;
+}
+
+.stats-section .stat-item[data-stat="censored"] .stat-value {
+    color: #fd7e14;
+}
+
+.stats-section .stat-item[data-stat="uncensored"] .stat-value {
+    color: #17a2b8;
+}
+
+.stats-section .stat-item[data-stat="blacklisted"] .stat-value {
+    color: #dc3545;
+}
+
+.stats-section .stat-item[data-stat="recentlyAdded"] .stat-value {
+    color: #28a745;
+}
+
+.stats-section .stat-item[data-stat="recentlyUpdated"] .stat-value {
+    color: #007bff;
+}
+
+/* home-sections 容器 */
+.home-sections {
+    display: grid;
+    gap: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    #stats-overview {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    #stats-overview > div[data-stat="total"] {
+        grid-column: span 1;
+    }
+
+    .stats-section .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    }
+
+    .home-kpi-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .home-kpi-hero::after {
+        right: -20px;
+        top: 0;
+        opacity: 0.7;
+    }
+
+    .home-kpi-side-item {
+        min-height: 84px;
+    }
+}
+
+@media (max-width: 768px) {
+    #stats-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-section .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+    }
+    
+    .stats-section .stat-item {
+        min-height: 68px;
+        padding: 8px 0 8px 14px;
+    }
+    
+    .stats-section .stat-value {
+        font-size: 20px;
+    }
+
+    .stats-section .stat-item[data-stat="total"] {
+        grid-column: span 1;
+    }
+
+    .home-stats-shell {
+        padding: 18px;
+        border-radius: 22px;
+    }
+
+    .home-kpi-main-value {
+        font-size: clamp(42px, 10vw, 56px);
+    }
+
+    .home-kpi-side {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    #stats-overview > div {
+        min-height: 108px;
+        padding: 16px 16px 14px;
+    }
+
+    #stats-overview .stat-value {
+        font-size: 24px !important;
+    }
+
+    .stats-section .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+    
+    .stats-section {
+        padding: 14px 0 0;
+    }
+    
+    .stats-section .stat-item {
+        min-height: 64px;
+        padding: 8px 0 8px 12px;
+    }
+    
+    .stats-section .stat-value {
+        font-size: 18px;
+    }
+    
+    .stats-section .stat-label {
+        font-size: 11px;
+    }
+}
+
+/* 图表加载动画 */
+.chart-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.42), transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.90), rgba(248, 250, 252, 0.82));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+[data-theme="dark"] .chart-loading-overlay {
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 58%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.84));
+}
+
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.chart-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(148, 163, 184, 0.22);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: chart-spin 0.8s linear infinite;
+}
+
+@keyframes chart-spin {
+  to { transform: rotate(360deg); }
+}
+
+.chart-loading-text {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
+}

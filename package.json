@@ -1,0 +1,61 @@
+{
+  "name": "javdb-extension",
+  "type": "module",
+  "version": "1.20.3",
+  "description": "Jav 助手",
+  "scripts": {
+    "vitepress:dev": "vitepress dev vitepress --host 127.0.0.1 --port 5174",
+    "vitepress:build": "vitepress build vitepress",
+    "vitepress:preview": "vitepress preview vitepress",
+    "docs:dev": "pnpm run vitepress:dev",
+    "docs:build": "pnpm run vitepress:build",
+    "docs:preview": "pnpm run vitepress:preview",
+    "build": "rimraf dist-zip && node --import tsx scripts/build.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm run test:unit && pnpm run test:regression && pnpm run test:extension",
+    "test:unit": "vitest run --config vitest.unit.config.cjs",
+    "test:regression": "vitest run --config vitest.regression.config.cjs",
+    "test:dom": "vitest run --config vitest.dom.config.cjs",
+    "test:extension": "vitest run --config vitest.extension.config.cjs",
+    "test:coverage": "vitest run --config vitest.config.cjs --coverage && vitest run --config vitest.dom.config.cjs --coverage && vitest run --config vitest.extension.config.cjs --coverage",
+    "test:watch": "vitest --config vitest.config.cjs",
+    "lint": "pnpm run typecheck",
+    "ci": "pnpm run typecheck && pnpm run test && pnpm run test:dom && pnpm run build && pnpm run docs:build",
+    "version:major": "pnpm tsx scripts/version.ts major",
+    "version:minor": "pnpm tsx scripts/version.ts minor",
+    "version:patch": "pnpm tsx scripts/version.ts patch",
+    "version:build": "pnpm tsx scripts/version.ts"
+  },
+  "dependencies": {
+    "fs-extra": "^10.1.0",
+    "idb": "^7.1.1",
+    "isomorphic-git": "^1.38.5",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.4.0",
+    "@types/archiver": "^6.0.3",
+    "@types/chrome": "^0.1.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.1.0",
+    "@vitest/coverage-v8": "^2.1.9",
+    "archiver": "^7.0.1",
+    "jsdom": "^29.1.1",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.16.2",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-mermaid": "^2.0.17",
+    "vitest": "^2.1.9"
+  },
+  "pnpm": {
+    "neverBuiltDependencies": [
+      "esbuild"
+    ],
+    "ignoredBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "packageManager": "pnpm@10.17.0"
+}

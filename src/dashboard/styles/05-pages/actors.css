@@ -1,0 +1,3046 @@
+/* ===================================================================
+   演员库样式 - Actors Page Styles
+   ================================================================ */
+
+.actors-page {
+    --actors-primary: #2563eb;
+    --actors-info: #0891b2;
+    --actors-success: #059669;
+    --actors-card: color-mix(in srgb, var(--surface-primary) 92%, #ffffff 8%);
+    --actors-card-soft: color-mix(in srgb, var(--surface-secondary) 88%, #ffffff 12%);
+    --actors-border: color-mix(in srgb, var(--border-primary) 78%, transparent);
+    --actors-muted: var(--text-secondary);
+    --actors-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+    --actors-shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.06);
+    --actors-glow: rgba(59, 130, 246, 0.18);
+    position: relative;
+    overflow: visible;
+    padding: 14px;
+    border: 1px solid var(--actors-border);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(37, 99, 235, 0.10), transparent 34%),
+        radial-gradient(circle at 90% 8%, rgba(8, 145, 178, 0.12), transparent 30%),
+        var(--surface-primary);
+}
+
+[data-theme="dark"] .actors-page {
+    --actors-card: color-mix(in srgb, var(--surface-primary) 92%, #0f172a 8%);
+    --actors-card-soft: color-mix(in srgb, var(--surface-secondary) 88%, #0f172a 12%);
+    --actors-border: color-mix(in srgb, var(--border-primary) 84%, rgba(148, 163, 184, 0.18));
+    --actors-shadow: 0 20px 56px rgba(0, 0, 0, 0.30);
+    --actors-shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.22);
+    --actors-glow: rgba(96, 165, 250, 0.2);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(96, 165, 250, 0.14), transparent 34%),
+        radial-gradient(circle at 90% 8%, rgba(45, 212, 191, 0.10), transparent 30%),
+        var(--surface-primary);
+}
+
+.actors-page-hero {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.actors-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--actors-info) 13%, transparent);
+    color: var(--actors-info);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.actors-page-hero h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.actors-page-hero p {
+    margin: 3px 0 0;
+    color: var(--actors-muted);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.actors-hero-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--actors-primary) 18%, transparent), color-mix(in srgb, var(--actors-info) 14%, transparent));
+    color: var(--actors-primary);
+    border: 1px solid var(--actors-border);
+    box-shadow: var(--actors-shadow-soft);
+    flex: 0 0 auto;
+}
+
+.actors-page .stats-section,
+.actors-page .actors-filter-panel,
+.actors-page .actor-list-wrapper,
+.actors-page .pagination-controls {
+    margin: 12px 0 0;
+}
+
+.actors-page .stats-section {
+    padding: 18px;
+    border: 1px solid var(--actors-border);
+    border-radius: 20px;
+    background: var(--actors-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.actors-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.actors-section-header h4 {
+    margin: 0 0 4px;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.actors-section-header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.actors-page .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    gap: 12px;
+}
+
+.actors-page .stat-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 86px;
+    padding: 16px;
+    border: 1px solid var(--actors-border);
+    border-radius: 16px;
+    background:
+        linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent 58%),
+        var(--surface-primary);
+    box-shadow: none;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.actors-page .stat-card.clickable {
+    cursor: pointer;
+}
+
+.actors-page .stat-card:hover,
+.actors-page .stat-card.active {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
+}
+
+.actors-page .stat-value {
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 850;
+    letter-spacing: -0.03em;
+}
+
+.actors-page .stat-label {
+    margin-top: 6px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.actors-filter-panel {
+    padding: 12px;
+    border: 1px solid var(--actors-border);
+    border-radius: 20px;
+    background: var(--actors-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.actors-search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.actors-search-field i {
+    position: absolute;
+    left: 15px;
+    z-index: 1;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.actors-search-field #actorSearchInput {
+    width: 100%;
+    padding-left: 42px;
+}
+
+/* 搜索和过滤区域 */
+.actors-page .search-and-filter {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr auto auto;
+    gap: 12px;
+    margin-bottom: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+/* 搜索输入框 */
+#actorSearchInput {
+    padding: 12px 16px;
+    border: 1px solid var(--actors-border, var(--border-primary));
+    border-radius: 12px;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+}
+
+#actorSearchInput:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+    transform: none;
+}
+
+#actorSearchInput::placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* 统一的下拉选择框样式 */
+#actorGenderFilter,
+#actorCategoryFilter,
+#actorBlacklistFilter,
+#actorStatusFilter,
+#actorSortSelect {
+    padding: 12px 16px;
+    border: 1px solid var(--actors-border, var(--border-primary));
+    border-radius: 12px;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 14px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 44px;
+    height: 46px;
+}
+
+#actorGenderFilter:hover,
+#actorCategoryFilter:hover,
+#actorBlacklistFilter:hover,
+#actorStatusFilter:hover,
+#actorSortSelect:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    transform: none;
+}
+
+#actorGenderFilter:focus,
+#actorCategoryFilter:focus,
+#actorBlacklistFilter:focus,
+#actorStatusFilter:focus,
+#actorSortSelect:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+    transform: none;
+}
+
+/* 每页数量选择器容器 */
+.page-size-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--actors-border, var(--border-primary));
+    border-radius: 12px;
+    background: var(--input-bg);
+    box-shadow: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 46px;
+    white-space: nowrap;
+}
+
+.page-size-wrapper:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    transform: none;
+}
+
+.page-size-label {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+#actorPageSizeSelect {
+    padding: 4px 8px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 4px center;
+    background-repeat: no-repeat;
+    background-size: 12px;
+    padding-right: 24px;
+    min-width: 60px;
+    text-align: center;
+}
+
+#actorPageSizeSelect:hover {
+    border-color: var(--primary);
+    background-color: var(--bg-hover);
+}
+
+#actorPageSizeSelect:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* 拉黑 + 订阅 组合容器 */
+.actor-blacklist-and-sub {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 只看已订阅开关容器，适配搜索区风格 */
+.actor-subscribed-only {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 2px solid var(--border-primary);
+    border-radius: 12px;
+    background: var(--input-bg);
+    box-shadow: var(--shadow-sm);
+    height: 100%;
+    min-height: 44px;
+}
+.actor-subscribed-only .label-text {
+    font-size: 14px;
+    color: var(--text-primary);
+}
+.actor-subscribed-only:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* 黑名单角标与弱化样式 */
+.actor-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    line-height: 1;
+}
+
+.actor-badge-blacklisted {
+    background: #fdecec;
+    color: #b22a2a;
+    border: 1px solid #f5c2c2;
+}
+
+/* 已订阅图标样式 */
+.actor-subscribed-icon {
+    color: #28a745;
+    font-size: 14px;
+    margin-left: 8px;
+    animation: bellRing 2s ease-in-out infinite;
+}
+
+@keyframes bellRing {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    10%, 30% {
+        transform: rotate(-10deg);
+    }
+    20%, 40% {
+        transform: rotate(10deg);
+    }
+    50% {
+        transform: rotate(0deg);
+    }
+}
+
+.actor-subscribed-icon:hover {
+    color: #218838;
+    animation: none;
+}
+
+.actor-card[data-blacklisted="true"] {
+    opacity: 0.5;
+    filter: saturate(0.9) grayscale(0.1);
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .search-and-filter {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 12px;
+    }
+
+    #actorSearchInput {
+        grid-column: 1 / -1;
+    }
+    
+    .page-size-wrapper,
+    .view-toggle {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-and-filter {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    #actorSearchInput {
+        grid-column: 1;
+    }
+    
+    .page-size-wrapper,
+    .view-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* 演员头像样式 */
+.actor-avatar {
+    position: relative;
+    display: inline-block;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+.actor-avatar-small {
+    width: 32px;
+    height: 32px;
+}
+
+.actor-avatar-medium {
+    width: 48px;
+    height: 48px;
+}
+
+.actor-avatar-large {
+    width: 64px;
+    height: 64px;
+}
+
+.actor-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+.actor-avatar-loading .actor-avatar-img {
+    opacity: 0.7;
+}
+
+.actor-avatar-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid #ccc;
+    border-top-color: #007bff;
+    border-radius: 50%;
+    animation: actor-avatar-spin 1s linear infinite;
+}
+
+.actor-avatar-error {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.actor-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes actor-avatar-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+
+
+
+/* 演员列表 */
+.actor-list-wrapper {
+    position: relative;
+    min-height: 200px;
+}
+
+.loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.actor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+/* 卡片视图下的别名居左对齐 */
+.actor-grid .actor-card-aliases {
+    align-items: flex-start;
+}
+
+.actor-grid .actor-aliases-list {
+    justify-content: flex-start;
+}
+
+
+/* 演员卡片 */
+.actor-card {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 16px;
+    padding: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 演员卡片背景 */
+.actor-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.actor-card[data-has-avatar="true"]::before {
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+}
+
+/* 渐变遮罩 */
+.actor-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(180deg,
+        rgba(0, 0, 0, 0.05) 0%,
+        rgba(0, 0, 0, 0.1) 30%,
+        rgba(0, 0, 0, 0.2) 60%,
+        rgba(255, 255, 255, 0.8) 85%,
+        rgba(255, 255, 255, 0.95) 100%);
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.actor-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary);
+}
+
+.actor-card:hover::after {
+    background: linear-gradient(180deg,
+        rgba(0, 0, 0, 0.02) 0%,
+        rgba(0, 0, 0, 0.08) 30%,
+        rgba(0, 0, 0, 0.15) 60%,
+        rgba(255, 255, 255, 0.85) 85%,
+        rgba(255, 255, 255, 0.98) 100%);
+}
+
+.actor-card-avatar {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    margin-top: 80px;
+    margin-bottom: 16px;
+}
+
+/* 头像样式增强 */
+.actor-avatar {
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.actor-card-info {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    margin-bottom: 12px;
+    padding: 0 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* 改为顶部对齐，避免内容过多时挤压 */
+    min-height: 0; /* 允许内容收缩 */
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+/* 演员主要名字 */
+.actor-card-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    cursor: pointer;
+    position: relative;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background: transparent;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36px;
+}
+
+.actor-card-name:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.actor-card-name:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* 复制图标样式 */
+.actor-name-copy-icon {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.actor-card-name:hover .actor-name-copy-icon {
+    opacity: 1;
+}
+
+/* 演员别名容器 */
+.actor-card-aliases {
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    position: relative;
+    /* 默认不限制高度，让内容自然显示 */
+}
+
+.actor-card-aliases::before {
+    content: "别名";
+    font-size: 10px;
+    color: #adb5bd;
+    margin-bottom: 2px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0; /* 防止标题被压缩 */
+}
+
+/* 别名列表容器 */
+.actor-aliases-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: flex-start;
+    max-width: 100%;
+    /* 默认不限制高度 */
+}
+
+/* 当有溢出时才应用高度限制 */
+.actor-card-aliases.has-overflow:not(.expanded) {
+    max-height: 80px; /* 限制最大高度 */
+    overflow: hidden; /* 隐藏溢出内容 */
+}
+
+.actor-card-aliases.has-overflow:not(.expanded) .actor-aliases-list {
+    max-height: 60px; /* 限制别名列表高度 */
+    overflow-y: auto; /* 添加垂直滚动 */
+    overflow-x: hidden;
+    padding: 2px; /* 为滚动条留出空间 */
+    scrollbar-width: thin; /* Firefox 滚动条样式 */
+    scrollbar-color: #dee2e6 transparent;
+}
+
+/* Webkit 滚动条样式 */
+.actor-aliases-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.actor-aliases-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.actor-aliases-list::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 2px;
+}
+
+.actor-aliases-list::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+}
+
+/* 别名展开/收起功能 */
+.actor-card-aliases.expanded {
+    max-height: none; /* 展开时移除高度限制 */
+}
+
+.actor-card-aliases.expanded .actor-aliases-list {
+    max-height: none; /* 展开时移除高度限制 */
+}
+
+/* 展开/收起按钮 */
+.aliases-toggle-btn {
+    position: absolute;
+    bottom: -2px;
+    right: 8px;
+    background: rgba(248, 249, 250, 0.95);
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 2px 6px;
+    font-size: 10px;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+    z-index: 4;
+    display: none; /* 默认隐藏 */
+}
+
+.actor-card-aliases.has-overflow .aliases-toggle-btn {
+    display: block; /* 有溢出时显示 */
+}
+
+.aliases-toggle-btn:hover {
+    background: rgba(233, 236, 239, 0.95);
+    color: #495057;
+    transform: scale(1.05);
+}
+
+/* 渐变遮罩效果（当有溢出时） - 已移除 */
+/* .actor-card-aliases.has-overflow:not(.expanded)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(transparent, rgba(255, 255, 255, 0.9));
+    pointer-events: none;
+    z-index: 3;
+} */
+
+/* 展开状态下的最大高度限制 */
+.actor-card-aliases.expanded {
+    max-height: 150px; /* 即使展开也要有最大高度限制 */
+}
+
+.actor-card-aliases.expanded .actor-aliases-list {
+    max-height: 130px; /* 展开状态下的最大高度 */
+}
+
+/* 确保演员信息区域不会被别名挤压 */
+.actor-card-meta,
+.actor-card-sync {
+    flex-shrink: 0; /* 防止元信息被压缩 */
+    margin-top: auto; /* 推到底部 */
+}
+
+/* 单个别名样式 */
+.actor-alias {
+    font-size: 11px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+    position: relative;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.actor-alias:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.actor-alias:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* 别名复制图标 */
+.actor-alias-copy-icon {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-size: 10px;
+    color: #6c757d;
+}
+
+.actor-alias:hover .actor-alias-copy-icon {
+    opacity: 1;
+}
+
+/* 复制动画效果 */
+.actor-card-name.copying,
+.actor-alias.copying {
+    background: #d4edda !important;
+    border-color: #c3e6cb !important;
+    transform: scale(1.02);
+    animation: copyPulse 0.3s ease-out;
+}
+
+@keyframes copyPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 8px rgba(40, 167, 69, 0.1);
+    }
+    100% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+/* 名字文本样式优化 */
+.actor-name-text,
+.actor-alias-text {
+    flex: 1;
+    text-align: center;
+    word-break: break-word;
+    line-height: 1.2;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+    .actor-card-name {
+        font-size: 14px;
+        padding: 6px 10px;
+        min-height: 32px;
+    }
+
+    .actor-alias {
+        font-size: 11px;
+        padding: 3px 6px;
+        max-width: 100px; /* 移动端减小别名最大宽度 */
+    }
+
+    .actor-name-copy-icon,
+    .actor-alias-copy-icon {
+        font-size: 10px;
+    }
+
+    /* 移动端别名容器优化 */
+    .actor-card-aliases {
+        max-height: 70px; /* 移动端稍微增加高度 */
+    }
+
+    .actor-aliases-list {
+        max-height: 50px; /* 移动端调整列表高度 */
+    }
+
+    .aliases-toggle-btn {
+        padding: 1px 4px;
+        font-size: 9px;
+        right: 4px;
+    }
+}
+
+.actor-card-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.actor-gender {
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.actor-gender-female {
+    background: #ffe6f0;
+    color: #d63384;
+}
+
+.actor-gender-male {
+    background: #e6f3ff;
+    color: #0d6efd;
+}
+
+.actor-gender-unknown {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+/* 演员分类标签 */
+.actor-category {
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.actor-category-censored {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.actor-category-uncensored {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.actor-category-western {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.actor-category-unknown {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.actor-works-count {
+    font-size: 11px;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.actor-card-sync {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: #6c757d;
+    margin-bottom: 8px;
+}
+
+.sync-status {
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.sync-status-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.sync-status-failed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.sync-status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.sync-status-unknown {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.sync-time {
+    font-size: 10px;
+}
+
+/* 演员卡片操作按钮 */
+.actor-card-actions {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(--surface-primary);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-secondary);
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.actor-action-btn {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    font-size: 12px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.actor-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* 查看作品按钮 - 蓝色 */
+.actor-works-btn {
+    background: var(--info-light);
+    color: var(--info);
+    border-color: var(--info);
+}
+
+.actor-works-btn:hover {
+    background: var(--info);
+    color: white;
+    border-color: var(--info);
+}
+
+/* 编辑按钮 - 橙色 */
+.actor-edit-btn {
+    background: var(--warning-light);
+    color: var(--warning);
+    border-color: var(--warning);
+}
+
+.actor-edit-btn:hover {
+    background: var(--warning);
+    color: white;
+    border-color: var(--warning);
+}
+
+/* 删除按钮 - 红色 */
+.actor-delete-btn {
+    background: var(--danger-light);
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+.actor-delete-btn:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+/* 拉黑/取消拉黑按钮 - 灰色/黑色 */
+.actor-blacklist-toggle-btn {
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+.actor-blacklist-toggle-btn:hover {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.actor-card[data-blacklisted="true"] .actor-blacklist-toggle-btn {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.actor-card[data-blacklisted="true"] .actor-blacklist-toggle-btn:hover {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+/* 订阅按钮 - 绿色 */
+.actor-subscribe-toggle-btn {
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+.actor-subscribe-toggle-btn:hover {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+.actor-subscribe-toggle-btn[data-sub="1"] {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+.actor-subscribe-toggle-btn[data-sub="1"]:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+/* 刷新元数据按钮 - 紫色 */
+.actor-refresh-btn {
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+.actor-refresh-btn:hover {
+    background: #6f42c1;
+    color: white;
+    border-color: #6f42c1;
+}
+
+/* 无演员状态 */
+.no-actors {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.no-actors-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.no-actors-text {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.no-actors-hint {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* 测试结果样式 */
+.test-results {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.test-result-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.test-result-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.test-result-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 响应式设计 - 演员卡片 */
+@media (max-width: 1200px) {
+    .actor-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .actor-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .actor-card {
+        height: 360px;
+    }
+
+    .sync-controls {
+        flex-direction: column;
+    }
+
+    .sync-btn {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .actor-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .actor-card {
+        height: 340px;
+    }
+
+    .actor-card::before,
+    .actor-card::after {
+        height: 160px;
+    }
+
+    .actor-card-avatar {
+        margin-top: 60px;
+    }
+}
+
+/* 演员编辑模态框样式 */
+.edit-actor-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--surface-overlay);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.edit-modal-content {
+    background: var(--surface-primary);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface-secondary);
+}
+
+.edit-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.edit-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.edit-modal-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.edit-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* 表单容器 - 左右布局 - 演员库专用 */
+.edit-actor-modal .edit-form-container {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+/* JSON编辑器容器 - 演员库专用 */
+.edit-actor-modal .json-editor-container {
+    flex: 0 0 450px !important; /* 固定宽度450px，不伸缩 */
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.edit-actor-modal .edit-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0; /* 防止flex子元素溢出 */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: var(--ring);
+}
+
+.form-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.json-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.json-editor label {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.json-editor textarea {
+    font-family: 'SF Mono', Consolas, 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    resize: vertical;
+    min-height: 200px;
+    transition: all 0.2s ease;
+}
+
+.json-editor textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: var(--ring);
+}
+
+.json-editor-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-secondary {
+    padding: 8px 16px;
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--bg-secondary);
+    transform: translateY(-1px);
+}
+
+.edit-modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: var(--surface-secondary);
+}
+
+.btn-primary {
+    padding: 10px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* 响应式设计 - 编辑模态框 */
+@media (max-width: 768px) {
+    .edit-modal-content {
+        max-width: 95%;
+        margin: 10px;
+    }
+
+    .edit-modal-body {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .edit-modal-header,
+    .edit-modal-footer {
+        padding: 16px 20px;
+    }
+}
+
+/* ===================================================================
+   演员编辑弹窗深色主题适配 - Dark Theme for Actor Edit Modal
+   ================================================================ */
+
+[data-theme="dark"] .edit-actor-modal {
+    background-color: var(--surface-overlay);
+}
+
+[data-theme="dark"] .edit-modal-content {
+    background: var(--surface-primary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .edit-modal-header {
+    background-color: var(--bg-secondary);
+    border-bottom-color: var(--border-primary);
+}
+
+[data-theme="dark"] .edit-modal-header h3 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .edit-modal-close {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .edit-modal-close:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .edit-modal-footer {
+    background-color: var(--bg-secondary);
+    border-top-color: var(--border-primary);
+}
+
+[data-theme="dark"] .btn-primary {
+    background-color: var(--primary);
+    color: var(--text-inverse);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background-color: var(--bg-secondary);
+}
+
+
+/* 统计卡片可点击样式 */
+.stats-section .stat-card.clickable {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.stats-section .stat-card.clickable:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    filter: brightness(1.1);
+}
+
+.stats-section .stat-card.clickable:active {
+    transform: translateY(-2px) scale(1.01);
+}
+
+/* 激活状态 */
+.stats-section .stat-card.clickable.active {
+    outline: 3px solid #ffd700;
+    outline-offset: 2px;
+    box-shadow: 0 8px 24px rgba(255, 215, 0, 0.5);
+    animation: cardPulse 0.6s ease-out;
+}
+
+@keyframes cardPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 添加点击提示图标 */
+.stats-section .stat-card.clickable::after {
+    content: '👆';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stats-section .stat-card.clickable:hover::after {
+    opacity: 0.6;
+}
+
+/* 演员库概览：沿用首页色系，但保留卡片布局 */
+#actorStatsContainer .stat-card.new-works-stat {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-primary);
+}
+
+#actorStatsContainer .stat-card.new-works-stat .stat-value {
+    color: var(--actor-stat-accent, var(--text-primary));
+}
+
+#actorStatsContainer .stat-card.new-works-stat .stat-label {
+    color: var(--text-secondary);
+}
+
+#actorStatsContainer .stat-card[data-filter="all"] {
+    --actor-stat-accent: var(--primary);
+}
+
+#actorStatsContainer .stat-card[data-filter="female"] {
+    --actor-stat-accent: #d63384;
+}
+
+#actorStatsContainer .stat-card[data-filter="male"] {
+    --actor-stat-accent: #0d6efd;
+}
+
+#actorStatsContainer .stat-card[data-filter="censored"] {
+    --actor-stat-accent: #fd7e14;
+}
+
+#actorStatsContainer .stat-card[data-filter="uncensored"] {
+    --actor-stat-accent: var(--info);
+}
+
+#actorStatsContainer .stat-card[data-filter="blacklisted"] {
+    --actor-stat-accent: #dc3545;
+}
+
+#actorStatsContainer .stat-card[data-filter="recentlyAdded"] {
+    --actor-stat-accent: var(--success);
+}
+
+#actorStatsContainer .stat-card.clickable:hover {
+    border-color: var(--actor-stat-accent, var(--primary));
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+#actorStatsContainer .stat-card.clickable.active {
+    outline-color: var(--primary-light);
+    border-color: var(--actor-stat-accent, var(--primary));
+    background: color-mix(in srgb, var(--surface-primary) 88%, var(--actor-stat-accent, var(--primary)) 12%);
+    box-shadow: 0 12px 28px rgba(59, 130, 246, 0.16);
+}
+
+[data-theme="dark"] #actorStatsContainer .stat-card.new-works-stat {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: 0 8px 20px rgba(2, 6, 23, 0.24);
+}
+
+[data-theme="dark"] #actorStatsContainer .stat-card.clickable:hover {
+    box-shadow: 0 12px 26px rgba(2, 6, 23, 0.30);
+}
+
+[data-theme="dark"] #actorStatsContainer .stat-card.clickable.active {
+    outline-color: rgba(96, 165, 250, 0.32);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.38);
+}
+
+/* ===================================================================
+   列表视图样式 - List View Styles
+   ================================================================ */
+
+/* 列表容器 */
+.actor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 列表视图下的演员卡片 */
+.actor-list .actor-card {
+    height: auto;
+    min-height: 100px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    padding: 16px 20px;
+    gap: 20px;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.actor-list .actor-card:hover {
+    transform: translateX(4px);
+    border-left-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 列表视图下不显示背景图 */
+.actor-list .actor-card::before,
+.actor-list .actor-card::after {
+    display: none;
+}
+
+/* 列表视图下的头像容器 */
+.actor-list .actor-card-avatar {
+    margin: 0;
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    position: relative;
+}
+
+/* 列表视图下的头像改为方形圆角 */
+.actor-list .actor-card-avatar .actor-avatar {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 12px !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.actor-list .actor-card-avatar .actor-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.actor-list .actor-card:hover .actor-card-avatar .actor-avatar {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+    filter: saturate(1.03);
+}
+
+/* 列表视图下的信息区域 - 优化为更清晰的三列布局 */
+.actor-list .actor-card-info {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(200px, auto) 1fr minmax(200px, auto);
+    grid-template-rows: auto auto;
+    gap: 12px 20px;
+    padding: 0;
+    align-items: start;
+}
+
+/* 列表视图下的名字 - 第一行第一列 */
+.actor-list .actor-card-name {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    max-width: 100%;
+}
+
+/* 列表视图下的元信息 - 第一行第二列 */
+.actor-list .actor-card-meta {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.actor-list .actor-card-meta > * {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* 社交媒体链接容器 - 在元信息区域内 */
+.actor-list .actor-card-meta .actor-social-links {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding: 0;
+    margin-left: 4px;
+}
+
+/* 列表视图下的同步信息 - 第一行第三列 */
+.actor-list .actor-card-sync {
+    grid-column: 3;
+    grid-row: 1;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+.actor-list .actor-card-sync .sync-status {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.actor-list .actor-card-sync .sync-time {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.actor-list .actor-card-sync .sync-time::before {
+    content: '🕐';
+    font-size: 14px;
+}
+
+/* 列表视图下的别名 - 第二行，跨三列 */
+.actor-list .actor-card-aliases {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-bottom: 0;
+    max-height: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+}
+
+/* 列表视图下移除渐变遮罩效果 */
+.actor-list .actor-card-aliases::after {
+    display: none;
+}
+
+/* 列表视图下隐藏"别名"标签 */
+.actor-list .actor-card-aliases::before {
+    display: none;
+}
+
+.actor-list .actor-card-aliases .actor-aliases-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: none;
+    flex: 1;
+    justify-content: flex-start;
+}
+
+.actor-list .actor-card-aliases .actor-alias {
+    padding: 4px 10px;
+    font-size: 12px;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    white-space: nowrap;
+}
+
+/* 列表视图下隐藏别名展开按钮 */
+.actor-list .actor-card-aliases .aliases-toggle-btn {
+    display: none;
+}
+
+/* 列表视图下的操作按钮 */
+.actor-list .actor-card-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    margin-left: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.actor-list .actor-action-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    padding: 0;
+    min-width: 36px;
+}
+
+/* 查看作品按钮 - 蓝色 */
+.actor-list .actor-works-btn {
+    background: var(--info-light);
+    color: var(--info);
+    border-color: var(--info);
+}
+
+.actor-list .actor-works-btn:hover {
+    background: var(--info);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* 编辑按钮 - 橙色 */
+.actor-list .actor-edit-btn {
+    background: var(--warning-light);
+    color: var(--warning);
+    border-color: var(--warning);
+}
+
+.actor-list .actor-edit-btn:hover {
+    background: var(--warning);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* 删除按钮 - 红色 */
+.actor-list .actor-delete-btn {
+    background: var(--danger-light);
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+.actor-list .actor-delete-btn:hover {
+    background: var(--danger);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* 拉黑/取消拉黑按钮 - 灰色/黑色 */
+.actor-list .actor-blacklist-toggle-btn {
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+.actor-list .actor-blacklist-toggle-btn:hover {
+    background: #6c757d;
+    color: white;
+    transform: scale(1.1);
+}
+
+.actor-list .actor-card[data-blacklisted="true"] .actor-blacklist-toggle-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.actor-list .actor-card[data-blacklisted="true"] .actor-blacklist-toggle-btn:hover {
+    background: var(--success);
+    color: white;
+}
+
+/* 订阅按钮 - 绿色 */
+.actor-list .actor-subscribe-toggle-btn {
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+.actor-list .actor-subscribe-toggle-btn:hover {
+    background: var(--success);
+    color: white;
+    transform: scale(1.1);
+}
+
+.actor-list .actor-subscribe-toggle-btn[data-sub="1"] {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+.actor-list .actor-subscribe-toggle-btn[data-sub="1"]:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* 刷新元数据按钮 - 紫色 */
+.actor-list .actor-refresh-btn {
+    background: rgba(111, 66, 193, 0.1);
+    color: #6f42c1;
+    border-color: #6f42c1;
+}
+
+.actor-list .actor-refresh-btn:hover {
+    background: #6f42c1;
+    color: white;
+    transform: scale(1.1);
+}
+
+.actor-list .actor-refresh-btn.refreshing {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 列表视图下的性别标签样式优化 */
+.actor-list .actor-gender {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.actor-list .actor-gender::before {
+    font-size: 14px;
+}
+
+.actor-list .actor-gender-female::before {
+    content: '♀';
+}
+
+.actor-list .actor-gender-male::before {
+    content: '♂';
+}
+
+.actor-list .actor-gender-unknown::before {
+    content: '?';
+}
+
+/* 列表视图下的分类标签样式优化 */
+.actor-list .actor-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.actor-list .actor-category::before {
+    font-size: 12px;
+}
+
+.actor-list .actor-category-censored::before {
+    content: '🔒';
+}
+
+.actor-list .actor-category-uncensored::before {
+    content: '🔓';
+}
+
+.actor-list .actor-category-western::before {
+    content: '🌍';
+}
+
+/* 列表视图下的作品数量样式 */
+.actor-list .actor-works-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.actor-list .actor-works-count::before {
+    content: '🎬';
+    font-size: 12px;
+}
+
+/* 列表视图下的黑名单徽章 */
+.actor-list .actor-badge-blacklisted {
+    background: var(--danger-light);
+    color: var(--danger);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.actor-list .actor-badge-blacklisted::before {
+    content: '🚫';
+    font-size: 12px;
+}
+
+/* 列表视图下的订阅按钮高亮 */
+.actor-list .actor-subscribe-toggle-btn[data-sub="1"] {
+    background: var(--warning-light);
+    color: var(--warning);
+    border-color: var(--warning);
+}
+
+/* 列表视图下的拉黑状态卡片样式 */
+.actor-list .actor-card[data-blacklisted="true"] {
+    opacity: 0.7;
+    background: var(--surface-secondary);
+}
+
+/* 列表视图下添加分隔线效果 */
+.actor-list .actor-card:not(:last-child) {
+    border-bottom: 1px solid var(--border-primary);
+    margin-bottom: 0;
+}
+
+/* 视图切换按钮样式 */
+.view-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    border: 2px solid var(--border-primary);
+    border-radius: 12px;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+    height: 50px;
+    position: relative;
+    overflow: hidden;
+    min-width: 110px;
+}
+
+.view-toggle:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.view-toggle.list-mode {
+    background: var(--surface-secondary, #f8f9fa) !important;
+    color: var(--text-primary, #495057) !important;
+    border-color: var(--border-primary, #dee2e6) !important;
+}
+
+.view-toggle.card-mode {
+    background: var(--primary-light, #dbeafe) !important;
+    color: var(--primary, #3b82f6) !important;
+    border-color: var(--primary, #3b82f6) !important;
+}
+
+.view-icon {
+    font-size: 16px;
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    margin-right: 6px;
+}
+
+.view-toggle.switching .view-icon {
+    animation: iconFlip 0.5s ease;
+}
+
+@keyframes iconFlip {
+    0% {
+        transform: rotateY(0deg) scale(1);
+    }
+    50% {
+        transform: rotateY(180deg) scale(0.8);
+    }
+    100% {
+        transform: rotateY(360deg) scale(1);
+    }
+}
+
+.view-text {
+    font-weight: 500;
+    display: inline-block;
+    transition: opacity 0.2s ease;
+}
+
+/* 响应式 - 列表视图 */
+@media (max-width: 1024px) {
+    .actor-list .actor-card {
+        grid-template-columns: auto 1fr;
+        gap: 16px;
+    }
+
+    .actor-list .actor-card-actions {
+        grid-column: 2;
+        grid-row: 1 / -1;
+        align-self: start;
+        margin-left: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .actor-list .actor-card {
+        grid-template-columns: auto 1fr;
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .actor-list .actor-card-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .actor-list .actor-card-info {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .actor-list .actor-card-name {
+        grid-column: 1;
+        font-size: 16px;
+    }
+
+    .actor-list .actor-card-meta {
+        grid-column: 1;
+        grid-row: 2;
+        margin-left: 0;
+    }
+
+    .actor-list .actor-card-aliases {
+        grid-row: 3;
+    }
+
+    .actor-list .actor-card-sync {
+        grid-row: 4;
+        flex-wrap: wrap;
+    }
+
+    .actor-list .actor-card-actions {
+        grid-column: 2;
+        grid-row: 1 / -1;
+        gap: 6px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .actor-list .actor-action-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .actor-list .actor-card {
+        grid-template-columns: 1fr;
+    }
+
+    .actor-list .actor-card-avatar {
+        margin: 0 auto;
+    }
+
+    .actor-list .actor-card-actions {
+        grid-column: 1;
+        grid-row: auto;
+        flex-direction: row;
+        justify-content: center;
+        margin-top: 8px;
+        flex-wrap: wrap;
+    }
+}
+
+/* 搜索和过滤区域响应式 - 添加视图切换按钮后 */
+@media (max-width: 1400px) {
+    .search-and-filter {
+        grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr auto auto;
+    }
+}
+
+@media (max-width: 1200px) {
+    .search-and-filter {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .page-size-wrapper {
+        grid-column: span 1;
+    }
+    
+    .view-toggle {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-and-filter {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .page-size-wrapper,
+    .view-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Wiki数据样式 */
+.actor-wiki-age,
+.actor-wiki-height,
+.actor-wiki-cup,
+.actor-wiki-retired {
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.actor-wiki-retired {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+/* 社交媒体链接样式 */
+.actor-social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-left: 4px;
+}
+
+.actor-social-link:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+.actor-social-link i {
+    font-size: 12px;
+}
+
+/* 列表视图下的Wiki数据样式 */
+.actor-list .actor-wiki-age,
+.actor-list .actor-wiki-height,
+.actor-list .actor-wiki-cup,
+.actor-list .actor-wiki-retired {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.actor-list .actor-social-link {
+    width: 28px;
+    height: 28px;
+}
+
+.actor-list .actor-social-link i {
+    font-size: 14px;
+}
+
+/* 夜间模式下的别名样式优化 */
+[data-theme="dark"] .actor-alias {
+    background: rgba(51, 65, 85, 0.3);
+    border-color: rgba(71, 85, 105, 0.5);
+}
+
+[data-theme="dark"] .actor-alias:hover {
+    background: rgba(71, 85, 105, 0.5);
+    border-color: rgba(100, 116, 139, 0.7);
+}
+
+/* 夜间模式下的卡片渐变遮罩优化 */
+[data-theme="dark"] .actor-card::after {
+    background: linear-gradient(180deg,
+        rgba(0, 0, 0, 0.1) 0%,
+        rgba(0, 0, 0, 0.2) 30%,
+        rgba(0, 0, 0, 0.4) 60%,
+        rgba(15, 23, 42, 0.8) 85%,
+        rgba(15, 23, 42, 0.95) 100%);
+}
+
+[data-theme="dark"] .actor-card:hover::after {
+    background: linear-gradient(180deg,
+        rgba(0, 0, 0, 0.05) 0%,
+        rgba(0, 0, 0, 0.15) 30%,
+        rgba(0, 0, 0, 0.3) 60%,
+        rgba(15, 23, 42, 0.85) 85%,
+        rgba(15, 23, 42, 0.98) 100%);
+}
+
+/* 夜间模式下的演员名字容器优化 */
+[data-theme="dark"] .actor-card-name {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .actor-card-name:hover {
+    background: rgba(71, 85, 105, 0.3);
+    border-color: rgba(100, 116, 139, 0.5);
+}
+
+
+/* ===================================================================
+   批量操作样式 - Batch Operations
+   ================================================================ */
+
+/* 批量操作栏 */
+.batch-operations,
+#actorBatchOperations {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    animation: slideDown 0.3s ease-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.batch-operations-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.select-all-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.select-all-label {
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+    user-select: none;
+    margin: 0;
+}
+
+.selected-count,
+#actorSelectedCount {
+    color: #6c757d;
+    font-size: 14px;
+    padding: 6px 12px;
+    background: var(--surface-primary);
+    border-radius: 16px;
+    border: 1px solid #dee2e6;
+    font-weight: 500;
+}
+
+.batch-operations-right {
+    display: flex;
+    gap: 12px;
+}
+
+.batch-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 38px;
+    white-space: nowrap;
+    min-width: fit-content;
+}
+
+.batch-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.batch-btn i {
+    font-size: 14px;
+}
+
+.batch-refresh-btn,
+.batch-btn.batch-refresh-btn {
+    background: #17a2b8;
+    color: white;
+}
+
+.batch-refresh-btn:hover:not(:disabled),
+.batch-btn.batch-refresh-btn:hover:not(:disabled) {
+    background: #138496;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+}
+
+.batch-blacklist-btn,
+.batch-btn.batch-blacklist-btn {
+    background: #fd7e14;
+    color: white;
+}
+
+.batch-blacklist-btn:hover:not(:disabled),
+.batch-btn.batch-blacklist-btn:hover:not(:disabled) {
+    background: #e8590c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(253, 126, 20, 0.3);
+}
+
+.batch-subscribe-btn,
+.batch-btn.batch-subscribe-btn {
+    background: #28a745;
+    color: white;
+}
+
+.batch-subscribe-btn:hover:not(:disabled),
+.batch-btn.batch-subscribe-btn:hover:not(:disabled) {
+    background: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.batch-delete-btn,
+.batch-btn.batch-delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.batch-delete-btn:hover:not(:disabled),
+.batch-btn.batch-delete-btn:hover:not(:disabled) {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.batch-cancel-btn,
+.batch-btn.batch-cancel-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.batch-cancel-btn:hover,
+.batch-btn.batch-cancel-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+/* 演员卡片批量模式样式 */
+.actor-card.batch-mode {
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.actor-card.batch-mode::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    background: white;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.actor-card.batch-mode:hover {
+    background: rgba(0, 123, 255, 0.05);
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+.actor-card.batch-mode:hover::before {
+    border-color: #007bff;
+}
+
+.actor-card.selected {
+    background: rgba(0, 123, 255, 0.1);
+    border-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+}
+
+.actor-card.selected::before {
+    content: '✓';
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* 列表视图的选中样式 */
+.actor-list .actor-card.batch-mode::before {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.actor-list .actor-card.selected::before {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* 卡片视图的选中样式 */
+.actor-grid .actor-card.batch-mode::before {
+    top: 12px;
+    left: 12px;
+}
+
+.actor-grid .actor-card.selected::before {
+    top: 12px;
+    left: 12px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .batch-operations,
+    #actorBatchOperations {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .batch-operations-left,
+    .batch-operations-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .batch-operations-right {
+        flex-wrap: wrap;
+    }
+
+    .batch-btn {
+        flex: 1;
+        min-width: calc(50% - 6px);
+    }
+}
+
+/* ===================================================================
+   演员库现代化覆盖 - Scoped Modern Overrides
+   ================================================================ */
+
+.actors-page .actor-list-wrapper {
+    min-height: 260px;
+    padding: 18px;
+    border: 1px solid var(--actors-border);
+    border-radius: 22px;
+    background: var(--actors-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.actors-page .actor-grid {
+    grid-template-columns: repeat(auto-fill, minmax(286px, 1fr));
+    gap: 18px;
+    margin-top: 0;
+}
+
+.actors-page .actor-card {
+    border: 1px solid var(--actors-border);
+    border-radius: 20px;
+    background:
+        linear-gradient(180deg, transparent 0 200px, var(--surface-primary) 200px),
+        var(--surface-primary);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.actors-page .actor-grid .actor-card[data-has-avatar="true"] {
+    background-image:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.02) 0%, rgba(15, 23, 42, 0.24) 58%, var(--surface-primary) 200px),
+        var(--avatar-bg),
+        linear-gradient(180deg, transparent 0 200px, var(--surface-primary) 200px);
+    background-position: top center, top center, center;
+    background-repeat: no-repeat;
+    background-size: 100% 200px, 100% 200px, auto;
+}
+
+.actors-page .actor-card::before {
+    background:
+        linear-gradient(135deg, rgba(59, 130, 246, 0.88), rgba(20, 184, 166, 0.72)),
+        var(--avatar-bg, none);
+}
+
+.actors-page .actor-card::after {
+    background: linear-gradient(180deg,
+        rgba(15, 23, 42, 0.04) 0%,
+        rgba(15, 23, 42, 0.16) 52%,
+        color-mix(in srgb, var(--surface-primary) 82%, transparent) 86%,
+        var(--surface-primary) 100%);
+}
+
+.actors-page .actor-card:hover {
+    transform: translateY(-5px);
+    border-color: color-mix(in srgb, var(--primary) 70%, var(--border-primary));
+    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.15);
+}
+
+.actors-page .actor-avatar {
+    border: 3px solid rgba(255, 255, 255, 0.92);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.22);
+}
+
+.actors-page .actor-card-name {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.actors-page .actor-card-name:hover,
+.actors-page .actor-alias:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border-primary));
+}
+
+.actors-page .actor-card-meta > span,
+.actors-page .actor-social-link,
+.actors-page .sync-status {
+    border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.actors-page .actor-gender-female {
+    background: rgba(236, 72, 153, 0.12);
+    color: #db2777;
+}
+
+.actors-page .actor-gender-male {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+}
+
+.actors-page .actor-gender-unknown,
+.actors-page .actor-category-unknown,
+.actors-page .sync-status-unknown,
+.actors-page .actor-works-count {
+    background: var(--actors-card-soft);
+    color: var(--text-secondary);
+}
+
+.actors-page .actor-category-censored {
+    background: rgba(245, 158, 11, 0.13);
+    color: #d97706;
+}
+
+.actors-page .actor-category-uncensored {
+    background: rgba(20, 184, 166, 0.13);
+    color: #0d9488;
+}
+
+.actors-page .actor-category-western {
+    background: rgba(168, 85, 247, 0.13);
+    color: #9333ea;
+}
+
+.actors-page .sync-status-success {
+    background: rgba(34, 197, 94, 0.14);
+    color: #16a34a;
+}
+
+.actors-page .sync-status-failed {
+    background: rgba(239, 68, 68, 0.14);
+    color: #dc2626;
+}
+
+.actors-page .sync-status-pending {
+    background: rgba(245, 158, 11, 0.14);
+    color: #d97706;
+}
+
+.actors-page .actor-card-actions {
+    gap: 10px;
+    padding: 14px 16px 16px;
+    background:
+        linear-gradient(180deg, transparent, color-mix(in srgb, var(--surface-secondary) 36%, transparent)),
+        var(--surface-primary);
+}
+
+.actors-page .actor-action-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    padding: 0;
+    border-radius: 12px;
+}
+
+.actors-page .actor-action-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+}
+
+.actors-page .actor-list {
+    gap: 10px;
+}
+
+.actors-page .actor-list .actor-card {
+    grid-template-columns: 76px minmax(0, 1fr) auto;
+    min-height: 112px;
+    padding: 16px 18px;
+    border-left: 0;
+}
+
+.actors-page .actor-list .actor-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--primary) 62%, var(--border-primary));
+}
+
+.actors-page .actor-list .actor-card:not(:last-child) {
+    border-bottom: 1px solid var(--actors-border);
+}
+
+.actors-page .actor-list .actor-card-avatar {
+    width: 64px;
+    height: 64px;
+}
+
+.actors-page .actor-list .actor-card-info {
+    grid-template-columns: minmax(160px, 0.9fr) minmax(220px, 1.2fr) minmax(150px, auto);
+    gap: 10px 16px;
+}
+
+.actors-page .actor-list .actor-card-actions {
+    align-self: center;
+}
+
+.actors-page #actorBatchOperations {
+    margin: 0 24px 18px;
+    border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--border-primary));
+    border-radius: 18px;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent), transparent),
+        var(--actors-card);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
+}
+
+.actors-page .select-all-label {
+    color: var(--text-primary);
+}
+
+.actors-page #actorSelectedCount {
+    border-color: var(--actors-border);
+    background: var(--surface-primary);
+    color: var(--text-secondary);
+}
+
+.actors-page .batch-btn {
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.actors-page .no-actors {
+    margin: 0;
+    padding: 72px 20px;
+    border: 1px dashed var(--actors-border);
+    border-radius: 18px;
+    background: var(--actors-card-soft);
+}
+
+.actors-page .no-actors-icon {
+    display: inline-flex;
+    width: 64px;
+    height: 64px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    font-size: 34px;
+    opacity: 1;
+}
+
+.actors-page .pagination-controls {
+    padding-bottom: 24px;
+}
+
+.actors-page .view-toggle {
+    height: 46px;
+    padding: 0 16px;
+    border: 1px solid var(--actors-border);
+    border-radius: 12px;
+    background: var(--input-bg);
+    box-shadow: none;
+}
+
+.actors-page .actor-card.batch-mode::before {
+    top: 12px;
+    left: 12px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid color-mix(in srgb, var(--border-primary) 82%, #fff 18%);
+    border-radius: 6px;
+    background: var(--surface-primary);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.actors-page .actor-card.selected::before {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.actors-page .actor-list .actor-card.batch-mode::before,
+.actors-page .actor-list .actor-card.selected::before {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+[data-theme="dark"] .actors-page .actor-card {
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+}
+
+[data-theme="dark"] .actors-page .actor-card:hover {
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.38);
+}
+
+[data-theme="dark"] .actors-page .actor-card::after {
+    background: linear-gradient(180deg,
+        rgba(2, 6, 23, 0.02) 0%,
+        rgba(2, 6, 23, 0.34) 52%,
+        color-mix(in srgb, var(--surface-primary) 78%, transparent) 86%,
+        var(--surface-primary) 100%);
+}
+
+[data-theme="dark"] .actors-page .actor-gender-female {
+    color: #f472b6;
+}
+
+[data-theme="dark"] .actors-page .actor-gender-male {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .actors-page .actor-category-censored {
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .actors-page .actor-category-uncensored {
+    color: #2dd4bf;
+}
+
+[data-theme="dark"] .actors-page .actor-category-western {
+    color: #c084fc;
+}
+
+@media (max-width: 1200px) {
+    .actors-page .search-and-filter {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .actors-page .actors-search-field,
+    .actors-page #actorSortSelect {
+        grid-column: span 2;
+    }
+
+    .actors-page .actor-list .actor-card-info {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .actors-page .actor-list .actor-card-sync {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-content: flex-start;
+    }
+
+    .actors-page .actor-list .actor-card-aliases {
+        grid-row: 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .actors-page-hero {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .actors-page .stats-section,
+    .actors-page .actors-filter-panel,
+    .actors-page .actor-list-wrapper,
+    .actors-page .pagination-controls {
+        margin-top: 12px;
+    }
+
+    .actors-page .search-and-filter,
+    .actors-page .actors-search-field,
+    .actors-page #actorSortSelect {
+        grid-template-columns: 1fr;
+        grid-column: auto;
+    }
+
+    .actors-page .actor-list .actor-card {
+        grid-template-columns: 64px 1fr;
+        gap: 14px;
+    }
+
+    .actors-page .actor-list .actor-card-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}
