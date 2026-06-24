@@ -4,7 +4,7 @@
 import { STORAGE_KEYS, DEFAULT_SETTINGS } from './config';
 import type { ExtensionSettings } from '../types';
 import { log } from './logController';
-import { dedupeSearchEngines, migrateSearchEngineTemplateIcon } from './searchEngines';
+import { dedupeSearchEngines, migrateSearchEngineTemplateIcon } from '../features/externalSearch/domain/searchEngines';
 import { createChromeStorage } from '../platform/storage/chromeStorage';
 
 const VIEWED_RECORDS_STORAGE_KEY = 'viewed';

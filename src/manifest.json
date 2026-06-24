@@ -42,7 +42,7 @@
     "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https: http:;"
   },
   "background": {
-    "service_worker": "background/background.ts",
+    "service_worker": "apps/background/bootstrap.ts",
     "type": "module"
   },
   "content_scripts": [
@@ -54,7 +54,7 @@
         "*://javdb570.com/*"
       ],
       "js": [
-        "content/index.ts"
+        "apps/content/bootstrap.ts"
       ],
       "run_at": "document_end"
     },
@@ -68,7 +68,7 @@
         "http://127.0.0.1/*"
       ],
       "js": [
-        "content/index.ts"
+        "apps/content/bootstrap.ts"
       ],
       "run_at": "document_end"
     },
@@ -78,7 +78,7 @@
         "*://*.115.com/*"
       ],
       "js": [
-        "content/drive115-content.ts"
+        "apps/content/drive115Content.ts"
       ],
       "run_at": "document_end"
     },
@@ -87,7 +87,7 @@
         "*://captchaapi.115.com/*"
       ],
       "js": [
-        "content/drive115-verify.ts"
+        "apps/content/drive115Verify.ts"
       ],
       "run_at": "document_end"
     },

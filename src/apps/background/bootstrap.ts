@@ -8,7 +8,7 @@ import { installDrive115V2Proxy } from '../../features/drive115/v2/backgroundPro
 import { ensureMigrationsStart } from '../../platform/storage/migrations';
 import { registerMiscRouter } from './miscMessageRouter';
 import { registerWebDAVRouter } from '../../features/webdavSync/background/controller';
-import { globalTaskCenter } from '../../background/globalTaskCenter';
+import { globalTaskCenter } from '../../platform/tasks/globalTaskCenter';
 import { registerNetProxyRouter } from '../../platform/network/backgroundFetchRouter';
 import { installConsoleProxyWithSettings } from '../../platform/logging/backgroundConsole';
 import {
