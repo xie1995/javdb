@@ -611,6 +611,11 @@ export function initRecordsTab(): void {
         renderCoordinator.render();
     }
 
+    window.addEventListener('emby-data-updated', () => {
+        updateStats();
+        render();
+    });
+
     stateRefreshController = createRecordsStateRefreshController({
         resetCurrentPage: () => {
             currentPage = 1;

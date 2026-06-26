@@ -185,7 +185,26 @@ export async function initializeGlobalState(): Promise<void> {
         STATE.logs = [];
     }
     STATE.isInitialized = true;
-    // console.log("Global state initialized.", STATE);
+
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName !== 'local') return;
+
+        if (changes[STORAGE_KEYS.EMBY_LIBRARY_INDEX]) {
+            const newValue = changes[STORAGE_KEYS.EMBY_LIBRARY_INDEX].newValue as LibraryIndex | undefined;
+            if (newValue && Array.isArray(newValue.entries)) {
+                STATE.embyLibraryState = newValue;
+                window.dispatchEvent(new CustomEvent('emby-data-updated'));
+            }
+        }
+
+        if (changes[STORAGE_KEYS.EMBY_WATCHED_PERMANENT]) {
+            const newValue = changes[STORAGE_KEYS.EMBY_WATCHED_PERMANENT].newValue as EmbyWatchedData | undefined;
+            if (newValue && Array.isArray(newValue.codes)) {
+                STATE.embyWatchedState = newValue;
+                window.dispatchEvent(new CustomEvent('emby-data-updated'));
+            }
+        }
+    });
 }
 
 /**
