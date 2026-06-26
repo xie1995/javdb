@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkeqj0Gpd9ncC7DGVYZ8qy6iLgQk7RlZGiac3NSrr2s1frmVkQ388M0+Os1s8HBIbFH6bQN0vbVRuR0Vaa86xNwp2fYj/1+otLrpm898gKQ7uC/QPJWyVslI9iTdrjzDJ6HuWhfEEQiRmvCBU9gA3DrFp3v7X9eMAyIJndr02D6oAtvuev3nMnt/SKczn0Vdb+W0P9tOmfxtxJ8Y7aHl8oH3q1g7e5G6/5IdETObgyia1Duutzaiwo7pxFGDxZOmX4NLbe5lcBc280RwnjV0xgtlOKq+CdNHbp6MsSYnRDc6Fzfc3wIJgzh1DzGj9wAtpfYQQvHXZNiZd0YODpm8V6wIDAQAB",
   "name": "Jav 助手",
-  "version": "1.20.5",
+  "version": "1.20.6",
   "description": "Jav视频浏览助手，提供观看标记、高级筛选和数据管理功能。",
   "permissions": [
     "storage",
