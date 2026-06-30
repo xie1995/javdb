@@ -245,7 +245,6 @@ export class GlobalTaskCenter {
   }
 
   registerTask(descriptor: GlobalTaskDescriptor, sender?: chrome.runtime.MessageSender): { ok: true; taskId: string; tabId: number } {
-    this.cleanupStaleTasks();
     const existing = this.store.getTask(descriptor.taskId);
     if (existing) return { ok: true, taskId: descriptor.taskId, tabId: existing.descriptor.tabId };
     const dedupeKey = descriptor.dedupeKey || `${descriptor.label}:${descriptor.pageUrl}`;
@@ -276,7 +275,6 @@ export class GlobalTaskCenter {
   }
 
   requestLease(taskId: string): LeaseResponse {
-    this.cleanupStaleTasks();
     const task = this.store.getTask(taskId);
     if (!task) return { granted: false, waitReason: 'task-not-found' };
     const bucket = resolveTaskBucket(task.descriptor.label);
@@ -347,7 +345,6 @@ export class GlobalTaskCenter {
   }
 
   pauseTask(taskId: string, reason: string = 'paused'): { ok: true } {
-    this.cleanupStaleTasks();
     const task = this.store.getTask(taskId);
     if (task && task.runtime.status !== 'done' && task.runtime.status !== 'canceled') {
       task.runtime.status = 'paused';
@@ -359,7 +356,6 @@ export class GlobalTaskCenter {
   }
 
   resumeTask(taskId: string): { ok: true } {
-    this.cleanupStaleTasks();
     const task = this.store.getTask(taskId);
     if (task && task.runtime.status === 'paused') {
       task.runtime.status = 'queued';
@@ -371,7 +367,6 @@ export class GlobalTaskCenter {
   }
 
   heartbeatTask(taskId: string): { ok: true } {
-    this.cleanupStaleTasks();
     const task = this.store.getTask(taskId);
     if (task) {
       task.runtime.heartbeatTs = Date.now();
@@ -382,7 +377,6 @@ export class GlobalTaskCenter {
   }
 
   completeTask(taskId: string): { ok: true } {
-    this.cleanupStaleTasks();
     const task = this.store.getTask(taskId);
     if (task) {
       task.runtime.status = 'done';
@@ -396,7 +390,6 @@ export class GlobalTaskCenter {
   }
 
   failTask(taskId: string, _error: string): { ok: true } {
-    this.cleanupStaleTasks();
     const task = this.store.getTask(taskId);
     if (task) {
       task.runtime.status = 'error';
@@ -409,7 +402,6 @@ export class GlobalTaskCenter {
   }
 
   cancelTask(taskId: string, reason: string): { ok: true } {
-    this.cleanupStaleTasks();
     const task = this.store.getTask(taskId);
     if (task) {
       task.runtime.status = 'canceled';
@@ -421,7 +413,6 @@ export class GlobalTaskCenter {
   }
 
   cancelTasksByPageInstance(pageInstanceId: string, reason: string): { ok: true; canceled: number } {
-    this.cleanupStaleTasks();
     let canceled = 0;
     for (const record of this.store.listTasks()) {
       if (record?.descriptor?.pageInstanceId !== pageInstanceId) continue;
@@ -436,7 +427,6 @@ export class GlobalTaskCenter {
   }
 
   cancelTasksByTabId(tabId: number, reason: string): { ok: true; canceled: number } {
-    this.cleanupStaleTasks();
     let canceled = 0;
     for (const record of this.store.listTasks()) {
       if (record?.descriptor?.tabId !== tabId) continue;
@@ -451,7 +441,6 @@ export class GlobalTaskCenter {
   }
 
   updateVisibility(tabId: number, visible: boolean): { ok: true } {
-    this.cleanupStaleTasks();
     this.store.setVisibility(tabId, visible);
     return { ok: true };
   }
@@ -481,7 +470,6 @@ export class GlobalTaskCenter {
   }
 
   stopAllActiveTasks(reason: string = 'manual-stop-all'): { ok: true; canceled: number } {
-    this.cleanupStaleTasks();
     let canceled = 0;
     for (const record of this.store.listTasks()) {
       if (['done', 'error', 'canceled'].includes(record.runtime.status)) continue;

@@ -1,5 +1,6 @@
 import type { VideoRecord } from '../../../types';
 import { hideRecordsProgressModal, showRecordsProgressModal, updateRecordsProgressModal } from './progressModalController';
+import { buildBatchExportContent, triggerDownload } from '../../../features/records/batchExport';
 
 type MessageType = 'info' | 'warn' | 'warning' | 'error' | 'success';
 
@@ -138,6 +139,33 @@ export function createRecordsExportController(options: CreateRecordsExportContro
     }
   };
 
+  const exportAsDownloadList = async () => {
+    try {
+      const records = await options.getRecords();
+      if (records.length === 0) {
+        options.showMessage('没有数据可导出', 'warn');
+        return;
+      }
+
+      const result = buildBatchExportContent(records, {
+        format: 'txt',
+        onlyWithMagnet: false,
+        maxCount: 500,
+      });
+
+      triggerDownload(result);
+
+      const msgParts = [`成功导出 ${result.count} 条记录（下载清单格式）`];
+      if (result.skippedNoMagnet > 0) {
+        msgParts.push(`${result.skippedNoMagnet} 条无磁力链接已跳过`);
+      }
+      options.showMessage(msgParts.join('，'), 'success');
+    } catch (error: any) {
+      console.error('[Records] 导出下载清单失败:', error);
+      options.showMessage(`导出失败: ${error.message}`, 'error');
+    }
+  };
+
   const handleExportRecords = async () => {
     const modal = document.createElement('div');
     modal.className = 'custom-confirm-modal';
@@ -154,9 +182,13 @@ export function createRecordsExportController(options: CreateRecordsExportContro
               <input type="radio" name="exportFormat" value="json" checked style="margin-right: 8px;">
               JSON 格式（完整数据，包含所有字段）
             </label>
-            <label style="display: block; cursor: pointer;">
+            <label style="display: block; margin-bottom: 8px; cursor: pointer;">
               <input type="radio" name="exportFormat" value="excel" style="margin-right: 8px;">
               Excel 格式（CSV文件，适合表格查看）
+            </label>
+            <label style="display: block; cursor: pointer;">
+              <input type="radio" name="exportFormat" value="downloadList" style="margin-right: 8px;">
+              磁力下载清单（TXT，一行一个磁力链接，可导入下载工具）
             </label>
           </div>
           <p style="margin-top: 16px; font-size: 12px; color: #666;">
@@ -187,6 +219,8 @@ export function createRecordsExportController(options: CreateRecordsExportContro
       closeModal();
       if (selectedFormat === 'json') {
         await exportAsJSON();
+      } else if (selectedFormat === 'downloadList') {
+        await exportAsDownloadList();
       } else {
         await exportAsCsv();
       }

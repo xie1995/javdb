@@ -44,7 +44,7 @@ export class ReviewBreakerService {
         if (parts.length === 3) {
           const timestamp = parseInt(parts[0], 10);
           if (!isNaN(timestamp) && curr - timestamp <= 300) {
-            log(`[ReviewBreaker] Using cached signature: ${storedSign.substring(0, 30)}...`);
+            log(`[ReviewBreaker] Using cached signature`);
             return storedSign;
           }
         }
@@ -96,7 +96,8 @@ export class ReviewBreakerService {
       log(`[ReviewBreaker] Fetching reviews for movie: ${movieId}, page: ${page}`);
       const url = `${this.API_BASE}/v1/movies/${movieId}/reviews`;
 
-      const sorts = ['hotly', 'hot', 'latest'];
+    // Use fastest sort first to minimize API load
+    const sorts = ['latest', 'hot', 'hotly'];
       let response: any | null = null;
       let lastErr: any = null;
       for (const s of sorts) {

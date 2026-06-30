@@ -56,6 +56,7 @@ import type {
   MagnetExternalSearchResult,
 } from '../domain/types';
 import { fetchJavbusAjaxViaRuntime } from '../../../platform/browser/javbusRuntimeClient';
+import { scoreMagnetResult } from '../application/qualityScore';
 
 // 磁链缓存 TTL（默认 7 天）
 const MAGNET_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -1234,6 +1235,28 @@ export class MagnetSearchManager {
       crackedTag.textContent = '破解';
       crackedTag.style.marginLeft = '4px';
       tagsDiv.appendChild(crackedTag);
+    }
+
+    // 添加质量评分标签（仅在外部源有做种数据时显示）
+    if (result.seeders !== undefined && result.leechers !== undefined) {
+      const scored = scoreMagnetResult(result);
+      if (scored.flags.length > 0) {
+        scored.flags.forEach((flag) => {
+          const flagTag = document.createElement('span');
+          flagTag.className = 'tag is-link is-small is-light';
+          flagTag.textContent = flag;
+          flagTag.style.marginLeft = '4px';
+          flagTag.title = `质量评分: ${scored.qualityScore}/100`;
+          tagsDiv.appendChild(flagTag);
+        });
+      }
+      // 始终显示评分数值（便于对比）
+      const scoreTag = document.createElement('span');
+      scoreTag.className = 'tag is-dark is-small is-light';
+      scoreTag.textContent = `★${scored.qualityScore}`;
+      scoreTag.style.marginLeft = '4px';
+      scoreTag.title = `质量评分: ${scored.qualityScore}/100 (做种比例:${scored.scoreBreakdown.seedRatioScore} 文件大小:${scored.scoreBreakdown.fileSizeScore} 关键词:${scored.scoreBreakdown.qualityKeywordScore})`;
+      tagsDiv.appendChild(scoreTag);
     }
 
     magnetLink.appendChild(nameSpan);

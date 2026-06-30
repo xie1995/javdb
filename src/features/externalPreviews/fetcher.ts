@@ -52,6 +52,15 @@ function normalizeCodeStrict(s: string): string {
   return String(s).trim().toUpperCase().replace(/[\s\-_]/g, '');
 }
 
+/** 安全地解析相对 URL */
+function getSafeUrl(href: string, baseUrl: string): string {
+  try {
+    return new URL(href, baseUrl).toString();
+  } catch {
+    return href;
+  }
+}
+
 function smartExtractLink(doc: Document, code: string, baseUrl: string): string | null {
   if (!code || !doc) return null;
   const cleanTarget = normalizeCodeStrict(code);
@@ -177,11 +186,11 @@ async function fetchFromJavStore(code: string): Promise<string | null> {
     const articleDoc = parser.parseFromString(articleHtml, 'text/html');
 
     // 原脚本：.prose a[href*='_s.jpg'] 或 a[href*='.jpg'] 排除 p[ls].jpg，使用 .href 获取完整 URL
-    const _sLink = articleDoc.querySelector(".prose a[href*='_s.jpg'], .entry-content a[href*='_s.jpg']");
+    const _sLink = articleDoc.querySelector(".prose a[href*='_s.jpg'], .entry-content a[href*='_s.jpg']") as HTMLAnchorElement | null;
     let url = _sLink?.href || '';
     
     if (!url) {
-      const allLinks = articleDoc.querySelectorAll("a[href*='.jpg']");
+      const allLinks = articleDoc.querySelectorAll<HTMLAnchorElement>("a[href*='.jpg']");
       for (const a of allLinks) {
         if (!/p[ls]\.jpg/i.test(a.href || '')) {
           url = a.href || '';
@@ -216,12 +225,13 @@ async function fetchFromBlogJav(code: string): Promise<string | null> {
     // 原脚本：找包含 "View More Info" 的 article，取 .entry-title a
     const fallbackUrl = Array.from(searchDoc.querySelectorAll('article'))
       .find(a => a.textContent.includes('View More Info'))
-      ?.querySelector('.entry-title a')?.href;
+      ?.querySelector('.entry-title a');
+    const articleLink = (fallbackUrl as HTMLAnchorElement | null)?.href || null;
     
-    debugLog('[BlogJav] Article link:', fallbackUrl);
-    if (!fallbackUrl) return null;
+    debugLog('[BlogJav] Article link:', articleLink);
+    if (!articleLink) return null;
 
-    const articleHtml = await fetchHtml(fallbackUrl);
+    const articleHtml = await fetchHtml(articleLink);
     const articleDoc = parser.parseFromString(articleHtml, 'text/html');
 
     // 原脚本：找 .entry-content img 中 width>0 && width<height 的

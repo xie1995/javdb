@@ -73,7 +73,7 @@ export function initRecordsTab(): void {
         advConditions = [{ id: 'init_not_downloaded', field: 'inEmby', op: 'eq', value: 'false' }];
     }
 
-    console.log('[DEBUG-FILTER] initRecordsTab: initialFilterType:', initialFilterType, 'advConditions:', JSON.stringify(advConditions));
+    // Filter state initialized from localStorage
 
     // 同时触发后台自动同步已观看记录（fire-and-forget）
     try {
@@ -292,7 +292,6 @@ export function initRecordsTab(): void {
         },
         setAdvancedConditions: (conditions) => {
             advConditions = conditions;
-            console.log('[DEBUG-FILTER] setAdvancedConditions (from statsController):', JSON.stringify(conditions));
         },
         renderAdvancedConditions: () => advancedConditionsController.renderConditions(),
         onFilterApplied: () => {
@@ -627,7 +626,6 @@ export function initRecordsTab(): void {
 
     if (initialFilterType === 'embyWatched') {
         watchedRefreshStarted.then(() => {
-            console.log('[DEBUG-FILTER] watchedRefreshStarted.then firing resetAndRender');
             stateRefreshController.resetAndRender();
         });
     }
@@ -734,7 +732,7 @@ export function initRecordsTab(): void {
             onOpenListPicker: (targetRecord) => {
                 batchOperationsRuntime.listPickerRuntime.openSingle(targetRecord);
             },
-            onTranslate: async (targetRecord, translateButton) => {
+            onTranslate: async (targetRecord: VideoRecord, translateButton: HTMLButtonElement) => {
                 translateButton.classList.add('is-loading');
                 translateButton.disabled = true;
                 try {
@@ -856,16 +854,12 @@ export function initRecordsTab(): void {
 
     window.addEventListener('records:filter-change', () => {
         try {
-            console.log('[DEBUG-FILTER] records:filter-change event received');
             const filterStr = localStorage.getItem('recordsFilter');
-            console.log('[DEBUG-FILTER] localStorage recordsFilter:', filterStr);
             if (filterStr) {
                 const filter = JSON.parse(filterStr);
                 localStorage.removeItem('recordsFilter');
-                console.log('[DEBUG-FILTER] parsed type:', filter.type, 'statsController exists:', !!statsController);
                 
                 if (filter.type && statsController) {
-                    console.log('[DEBUG-FILTER] calling applyFilterByType with:', filter.type);
                     statsController.applyFilterByType(filter.type);
                 }
             }

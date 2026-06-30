@@ -2,6 +2,13 @@ import { ExtensionSettings, KeywordFilterRule, ActorSyncConfig, NewWorksGlobalCo
 import { normalizeDrive115Settings } from '../features/drive115/app';
 import { DEFAULT_AI_SETTINGS } from '../types/ai';
 import { DEFAULT_EMBY_LIBRARY_CONFIG } from '../features/embyLibrary/domain/types';
+import { DEFAULT_MAGNET_SEARCH_SETTINGS } from '../features/magnets/domain/config';
+import { DEFAULT_WEBDAV_SETTINGS } from '../features/webdavSync/domain/config';
+import { DEFAULT_VIDEO_ENHANCEMENT_SETTINGS } from '../features/videoDetail/domain/config';
+import { DEFAULT_CONTENT_FILTER_SETTINGS } from '../features/contentFilter/domain/config';
+import { DEFAULT_INSIGHTS_SETTINGS } from '../features/insights/domain/config';
+import { DEFAULT_LIST_ENHANCEMENT_SETTINGS } from '../features/listEnhancement/domain/settingsDefaults';
+import { DEFAULT_ACTOR_ENHANCEMENT_SETTINGS, DEFAULT_ACTOR_SYNC_SETTINGS } from '../features/actors/domain/config';
 
 export const SERVER_API_BASE_URL = 'https://jbd-server.we-together.club';
 export const TELEMETRY_REPORT_ENDPOINT = `${SERVER_API_BASE_URL}/v1/telemetry/report`;
@@ -127,27 +134,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
             showBadge: true,
         }
     },
-    webdav: {
-        enabled: true,
-        url: '',
-        username: '',
-        password: '',
-        clientId: '',
-        deviceLabel: '',
-        browserName: '',
-        clientInstalledAt: '',
-        clientLastSeenAt: '',
-        clientLastSyncAt: '',
-        clientLastSyncStatus: '',
-        clientLastUploadId: '',
-        uploadIndexLimit: 50,
-        autoSync: false,
-        syncInterval: 1440, // 24 hours in minutes
-        // 默认保留天数：7 天
-        retentionDays: 10,
-        warningDays: 7,
-        lastSync: ''
-    },
+    webdav: DEFAULT_WEBDAV_SETTINGS,
     dataSync: {
         requestInterval: 3, // 请求间隔3秒，缓解服务器压力
         batchSize: 20, // 每批处理20个视频
@@ -396,60 +383,13 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
     },
 
     // 磁力资源搜索默认配置
-    magnetSearch: {
-        sources: {
-            sukebei: true,
-            btdig: true,
-            btsow: true,
-            torrentz2: false,
-            javbus: false,
-            custom: [],
-        },
-        autoSearch: false,
-        blockMojContent: true,
-        maxResults: 15,
-        timeoutMs: 6000,
-        concurrency: {
-            pageMaxConcurrentRequests: 2,
-            bgGlobalMaxConcurrent: 4,
-            bgPerHostMaxConcurrent: 1,
-            bgPerHostRateLimitPerMin: 12,
-        },
-    },
+    magnetSearch: DEFAULT_MAGNET_SEARCH_SETTINGS,
 
     // 新增：影片页增强默认配置
-    videoEnhancement: {
-        enabled: false,
-        enableCoverImage: true,
-        enableTranslation: true,
-        showLoadingIndicator: true,
-        enableReviewBreaker: true,
-        enableFC2Breaker: true,
-        // 新增：默认开启”想看同步”和”115推送后自动已看”（保持旧行为）
-        enableWantSync: true,
-        autoMarkWatchedAfter115: true,
-        autoMarkWatchedStars: 4, // 默认4星
-        // 新增：演员备注（Wiki/xslist）
-        enableActorRemarks: false,
-        actorRemarksMode: 'panel' as const,
-        actorRemarksTTLDays: 0,
-        actorRemarksTaskTimeoutSeconds: 10,
-        // 新增：影片页收藏与评分
-        enableVideoFavoriteRating: true, // 默认启用
-        enableRelatedLists: true,
-        enableExternalEntryPanel: true,
-        enableExternalSearch: true,
-        enableOnlineAvailability: true,
-        showOnlineAvailabilityFailures: false,
-        onlineAvailabilitySites: {},
-        enableSubtitleSearch: true,
-    },
+    videoEnhancement: { ...DEFAULT_VIDEO_ENHANCEMENT_SETTINGS },
 
     // 新增：内容过滤默认配置
-    contentFilter: {
-        enabled: false,
-        keywordRules: [] as KeywordFilterRule[],
-    },
+    contentFilter: DEFAULT_CONTENT_FILTER_SETTINGS,
 
     // 新增：锚点优化默认配置（仅在详情页生效）
     anchorOptimization: {
@@ -459,76 +399,19 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
     },
 
     // 新增：列表增强默认配置
-    listEnhancement: {
-        enabled: true, // 默认启用
-        enableClickEnhancement: true,
-        enableClickEnhancementList: true,
-        enableClickEnhancementDetail: true,
-        enableVideoPreview: true,
-        enableScrollPaging: false, // 默认关闭滚动翻页
-        enableListOptimization: true,
-        previewDelay: 1000,
-        previewVolume: 0.2,
-        enableRightClickBackground: true,
-        // 新增：演员水印默认配置
-        enableActorWatermark: false,
-        actorWatermarkPosition: 'top-right',
-        actorWatermarkOpacity: 0.4,
-        // 新增：基于演员偏好的过滤默认配置
-        hideBlacklistedActorsInList: false,
-        hideNonFavoritedActorsInList: false,
-        hideUnrecognizedActorsInList: true, // 默认隐藏无法识别演员的作品
-        treatSubscribedAsFavorited: true,
-        // 新增：列表页显示控制默认配置
-        listDisplayControl: {
-            enabled: true,
-            columnCount: 4,
-            containerWidth: 100,
-            enableContainerExpansion: false,
-        },
-        showStatusBadge: true,
-        enableStatusQuickAction: false,
-    },
+    listEnhancement: DEFAULT_LIST_ENHANCEMENT_SETTINGS,
 
     // 新增：演员同步配置
-    actorSync: DEFAULT_ACTOR_SYNC_CONFIG,
+    actorSync: DEFAULT_ACTOR_SYNC_SETTINGS,
 
     // 新增：演员页增强默认配置
-    actorEnhancement: {
-        enabled: false,
-        autoApplyTags: false,
-        defaultTags: [],
-        defaultSortType: 0,
-        // 新增：演员页“影片分段显示”默认配置
-        enableTimeSegmentationDivider: false,
-        // 默认以 6 个月为阈值
-        timeSegmentationMonths: 6,
-    },
+    actorEnhancement: DEFAULT_ACTOR_ENHANCEMENT_SETTINGS,
 
     // 新增：AI功能配置
     ai: DEFAULT_AI_SETTINGS,
 
     // 新增：报告（Insights）默认配置
-    insights: {
-        topN: 10,
-        changeThresholdRatio: 0.08,
-        minTagCount: 3,
-        risingLimit: 5,
-        fallingLimit: 5,
-        statusScope: 'viewed',
-        source: 'auto',
-        minMonthlySamples: 10,
-        // 自动月报：默认关闭，仅用户开启时才注册闹钟与补偿
-        autoMonthlyEnabled: false,
-        autoCompensateOnStartupEnabled: false,
-        autoMonthlyMinuteOfDay: 10,
-        prompts: {
-            persona: 'doctor',
-            enableCustom: false,
-            systemOverride: '',
-            rulesOverride: '',
-        },
-    },
+    insights: DEFAULT_INSIGHTS_SETTINGS,
 
     version: '0.0.0',
     // Dashboard 番号库：是否在列表中显示封面

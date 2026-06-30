@@ -224,9 +224,67 @@ export interface OldVideoRecord extends Partial<VideoRecord> {
 // ============================================================
 
 /**
- * 扩展设置（占位类型，实际定义在各个模块中）
+ * 扩展设置（详尽的键类型签名 - 主要键已强类型化，剩余使用索引签名兜底）
+ * 类型来源: src/utils/config.ts 中的 DEFAULT_SETTINGS
  */
 export interface ExtensionSettings {
+  theme: string;
+  autoUpdateCheck: boolean;
+  updateCheckInterval: string;
+  includePrerelease: boolean;
+  display: {
+    hideViewed: boolean;
+    hideBrowsed: boolean;
+    hideVR: boolean;
+    hideWant: boolean;
+  };
+  actorLibrary: {
+    blacklist: {
+      hideInList: boolean;
+      showBadge: boolean;
+    };
+  };
+  webdav: Record<string, any>;
+  dataSync: {
+    requestInterval: number;
+    batchSize: number;
+    maxRetries: number;
+    urls: {
+      wantWatch: string;
+      watchedVideos: string;
+      collectionActors: string;
+    };
+  };
+  searchEngines: Array<{
+    id: string;
+    icon: string;
+    name: string;
+    urlTemplate: string;
+    category: string;
+    contexts?: string[];
+    match?: string;
+  }>;
+  logging: Record<string, any>;
+  telemetry: Record<string, any>;
+  drive115: Record<string, any>;
+  dataEnhancement: Record<string, any>;
+  translation: Record<string, any>;
+  userExperience: Record<string, any>;
+  networkAcceleration: Record<string, any>;
+  routes: Record<string, any>;
+  magnetSearch: Record<string, any>;
+  videoEnhancement: Record<string, any>;
+  contentFilter: Record<string, any>;
+  anchorOptimization: Record<string, any>;
+  listEnhancement: Record<string, any>;
+  actorSync: Record<string, any>;
+  actorEnhancement: Record<string, any>;
+  ai: Record<string, any>;
+  insights: Record<string, any>;
+  version: string;
+  showCoversInRecords: boolean;
+  recordsViewMode: 'list' | 'card';
+  embyLibrary: Record<string, any>;
   [key: string]: any;
 }
 

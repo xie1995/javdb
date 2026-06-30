@@ -15,7 +15,6 @@ export function createRecordsStateRefreshController(
   options: CreateRecordsStateRefreshControllerOptions,
 ): RecordsStateRefreshController {
   const resetAndRender = () => {
-    console.log('[DEBUG-FILTER] resetAndRender called');
     options.resetCurrentPage();
     options.updateFilteredRecords();
     options.render();

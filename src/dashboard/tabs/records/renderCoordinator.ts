@@ -26,7 +26,6 @@ export function createRecordsRenderCoordinator(
   const render = () => {
     const useIDB = options.shouldUseIDB();
     options.setServerModeActive(useIDB);
-    console.log('[DEBUG-FILTER] render called, useIDB:', useIDB);
 
     if (useIDB) {
       if (options.showLoading) options.showLoading();

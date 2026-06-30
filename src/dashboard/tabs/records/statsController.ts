@@ -247,7 +247,6 @@ export function createRecordsStatsController(options: CreateRecordsStatsControll
       options.onFilterApplied();
       return;
     } else if (filterType === 'inEmby') {
-      console.log('[DEBUG-FILTER] applyFilter inEmby branch');
       options.filterSelect.value = 'all';
       options.setAdvancedConditions([{
         id: `cond_emby_${Date.now()}`,
@@ -259,11 +258,9 @@ export function createRecordsStatsController(options: CreateRecordsStatsControll
       options.onFilterApplied();
       return;
     } else if (filterType === 'embyWatched') {
-      console.log('[DEBUG-FILTER] applyFilter embyWatched branch, calling refreshWatchedCodesFromStorage');
       options.filterSelect.value = 'all';
       highlightCard(card);
       refreshWatchedCodesFromStorage().then(() => {
-        console.log('[DEBUG-FILTER] embyWatched refresh complete, setting conditions');
         options.setAdvancedConditions([{
           id: `cond_emby_watched_${Date.now()}`,
           field: 'embyWatched',
@@ -271,7 +268,6 @@ export function createRecordsStatsController(options: CreateRecordsStatsControll
           value: 'true',
         } as RecordsAdvancedCondition]);
         options.onFilterApplied();
-        console.log('[DEBUG-FILTER] embyWatched onFilterApplied called');
       });
       return;
     } else if (filterType === 'thisWeek') {
@@ -328,17 +324,13 @@ export function createRecordsStatsController(options: CreateRecordsStatsControll
     }
 
     renderStatsCards(container, stats, activeFilter);
-    console.log('[DEBUG-FILTER] updateStats rendered, activeFilter:', activeFilter, 'embyWatched:', stats.embyWatched, 'inEmby:', stats.inEmby, 'pushed:', stats.pushed, 'total:', stats.total);
     bindCards();
   };
 
   const applyFilterByType = (filterType: string): void => {
-    console.log('[DEBUG-FILTER] applyFilterByType called, filterType:', filterType, 'container exists:', !!options.container);
     if (!options.container) return;
     const card = options.container.querySelector(`.stat-card[data-filter="${filterType}"]`);
-    console.log('[DEBUG-FILTER] card found in DOM:', !!card);
     if (card) {
-      console.log('[DEBUG-FILTER] calling applyFilter with card');
       applyFilter(filterType, card);
     } else {
       activeFilter = filterType;

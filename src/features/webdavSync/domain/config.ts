@@ -1,0 +1,20 @@
+export const DEFAULT_WEBDAV_SETTINGS = {
+  enabled: true,
+  url: '',
+  username: '',
+  password: '',
+  clientId: '',
+  deviceLabel: '',
+  browserName: '',
+  clientInstalledAt: '',
+  clientLastSeenAt: '',
+  clientLastSyncAt: '',
+  clientLastSyncStatus: '',
+  clientLastUploadId: '',
+  uploadIndexLimit: 50,
+  autoSync: false,
+  syncInterval: 1440, // 24 hours in minutes
+  retentionDays: 10,
+  warningDays: 7,
+  lastSync: '',
+} as const;

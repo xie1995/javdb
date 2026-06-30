@@ -126,7 +126,15 @@ export function deduplicateMagnetResults(results: MagnetResult[]): MagnetResult[
   return uniqueResults;
 }
 
-export function sortMagnetResults(results: MagnetResult[]): MagnetResult[] {
+import { scoreAndSortResults, scoreMagnetResult } from './qualityScore';
+
+export function sortMagnetResults(results: MagnetResult[], useQualityScore = true): MagnetResult[] {
+  // 使用质量评分系统排序（优先），有做种数据的外部源结果按质量评分排序
+  if (useQualityScore) {
+    return scoreAndSortResults(results) as MagnetResult[];
+  }
+
+  // Fallback: 传统排序逻辑（字幕优先、破解优先、大小、日期、做种数）
   return results.sort((a, b) => {
     if (a.hasSubtitle && !b.hasSubtitle) return -1;
     if (!a.hasSubtitle && b.hasSubtitle) return 1;

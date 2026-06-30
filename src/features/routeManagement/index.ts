@@ -507,7 +507,7 @@ export class RouteManager {
     private async getSettings(): Promise<ExtensionSettings> {
         return new Promise((resolve) => {
             chrome.storage.local.get('settings', (result) => {
-                resolve(result.settings || DEFAULT_SETTINGS);
+                resolve((result.settings as ExtensionSettings) || DEFAULT_SETTINGS);
             });
         });
     }
