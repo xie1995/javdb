@@ -98,19 +98,19 @@
                 </label>
                 <div class="form-group-inline">
                     <label style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;">
-                        <input type="radio" name="embySyncMode" value="manual" checked data-settings-search-target data-settings-search-keywords="同步 模式 手动">
-                        手动同步
-                    </label>
-                    <label style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;">
-                        <input type="radio" name="embySyncMode" value="scheduled" data-settings-search-target data-settings-search-keywords="同步 模式 定时 自动">
-                        定时同步
+                        <input type="checkbox" id="embyRealtimeOnJavdb" data-settings-search-target data-settings-search-keywords="同步 模式 实时 查询 javdb 网页">
+                        JavDB网页端实时查询
                     </label>
                     <label style="display:inline-flex;align-items:center;gap:6px;">
-                        <input type="radio" name="embySyncMode" value="realtime" data-settings-search-target data-settings-search-keywords="同步 模式 实时 查询">
-                        实时查询
+                        <input type="checkbox" id="embyAutoScheduledSync" data-settings-search-target data-settings-search-keywords="同步 模式 定时 自动 番号库">
+                        定时自动同步番号库
+                    </label>
+                    <label style="display:inline-flex;align-items:center;gap:6px;">
+                        <input type="checkbox" id="embyEnrichJavdbMetadata" data-settings-search-target data-settings-search-keywords="javdb 元数据 封面 抓取 自动">
+                        自动抓取JavDB封面
                     </label>
                 </div>
-                <p class="input-description">手动同步需手动点击按钮更新；定时同步按设定间隔自动更新；实时查询每次浏览时在线查询。</p>
+                <p class="input-description">实时查询：浏览JavDB列表/详情时在线查询Emby；定时同步：后台定时拉取Emby数据到本地缓存供番号库使用；自动抓取封面：同步后从JavDB抓取影片标题和封面图。</p>
             </div>
 
             <div class="form-group" id="embySyncIntervalField" style="display:none;">
@@ -133,6 +133,24 @@
             </div>
 
             <div id="embySyncStatus" class="connection-status" style="display:none;"></div>
+            <div id="embyEnrichProgress" class="connection-status" style="display:none;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span id="embyEnrichProgressText" style="flex:1;">正在从JavDB抓取元数据...</span>
+                    <button type="button" id="embyEnrichPauseBtn" class="btn btn-info btn-sm" style="display:none;padding:2px 8px;font-size:12px;">
+                        <i class="fas fa-pause"></i> 暂停
+                    </button>
+                    <button type="button" id="embyEnrichResumeBtn" class="btn btn-info btn-sm" style="display:none;padding:2px 8px;font-size:12px;">
+                        <i class="fas fa-play"></i> 恢复
+                    </button>
+                    <button type="button" id="embyEnrichStopBtn" class="btn btn-warning btn-sm" style="display:none;padding:2px 8px;font-size:12px;">
+                        <i class="fas fa-stop"></i> 停止
+                    </button>
+                </div>
+                <div style="margin-top:6px;background:var(--border-color);border-radius:4px;height:6px;overflow:hidden;">
+                    <div id="embyEnrichProgressBar" style="background:var(--primary-color,#007bff);height:100%;width:0%;transition:width 0.3s;"></div>
+                </div>
+            </div>
             <p class="input-description" id="embyLastSyncText" style="margin-top:8px;font-style:italic;color:var(--text-secondary);"></p>
 
             <div class="form-group" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-color);">

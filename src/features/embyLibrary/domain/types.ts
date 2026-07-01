@@ -14,6 +14,12 @@ export interface EmbySyncConfig {
     mode: SyncMode;
     scheduledIntervalMinutes: number;
     lastSyncTime?: number;
+    /** JavDB 网页端实时查询（浏览列表/详情时实时查 Emby） */
+    realtimeOnJavdb?: boolean;
+    /** 定时自动同步番号库（后台定时拉取 Emby 数据到本地缓存） */
+    autoScheduledSync?: boolean;
+    /** 同步后自动从 JavDB 抓取封面和标题等元数据 */
+    enrichJavdbMetadata?: boolean;
 }
 
 export interface LibraryIndexEntry {

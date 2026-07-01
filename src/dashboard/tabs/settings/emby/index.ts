@@ -1,9 +1,4 @@
-let _initialized = false;
-
 export async function initEmbySettings(): Promise<void> {
-    if (_initialized) return;
-    _initialized = true;
-
     const { initEmbySettings: initFn } = await import('./EmbySettings');
     await initFn();
 }

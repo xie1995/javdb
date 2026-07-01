@@ -40,7 +40,7 @@ async function saveConfig(config: EmbyLibraryConfig): Promise<void> {
         }, () => resolve());
     });
 
-    if (config.sync.mode === 'scheduled' && config.sync.scheduledIntervalMinutes) {
+    if (config.sync.autoScheduledSync && config.sync.scheduledIntervalMinutes) {
         scheduleLibrarySync(config.sync.scheduledIntervalMinutes);
     } else {
         cancelLibrarySync();
@@ -53,7 +53,7 @@ export function handleEmbySyncRequest(sendResponse: (response: any) => void): bo
             sendResponse({ success: false, error: '服务器未配置或未启用' });
             return;
         }
-        syncLibrary(config.server)
+        syncLibrary(config.server, config.sync.enrichJavdbMetadata)
             .then(({ index, totalFetched, matchedLibraryName, watchedCount }) => sendResponse({ success: true, index, totalFetched, count: index.totalCount, matchedLibraryName, watchedCount }))
             .catch((error: Error) => sendResponse({ success: false, error: error.message }));
     }).catch((error: Error) => {
@@ -77,7 +77,7 @@ export function handleEmbyCheckCode(message: any, sendResponse: (response: any) 
     }
 
     getConfig().then(async (config) => {
-        if (config.sync.mode === 'realtime' && config.server.enabled && config.server.url && config.server.apiKey) {
+        if (config.sync.realtimeOnJavdb && config.server.enabled && config.server.url && config.server.apiKey) {
             try {
                 const { entries } = await fetchLibraryFromServer(config.server);
                 const tempIndex: LibraryIndex = {
@@ -209,6 +209,27 @@ export function handleEmbySyncWatched(sendResponse: (response: any) => void): bo
     return true;
 }
 
+async function handleEmbyPlaybackStart(
+    message: { type: string; codes: string[]; name?: string },
+    sendResponse: (response: any) => void
+): Promise<boolean> {
+    const { codes, name } = message;
+    if (!codes || !Array.isArray(codes) || codes.length === 0) {
+        sendResponse({ success: true, addedCount: 0, skipped: true });
+        return false;
+    }
+
+    try {
+        const addedCount = await mergeWatchedCodes(codes);
+        console.log(`[EmbyLibrary] PlaybackStart: "${name}" → ${codes.join(', ')} → added ${addedCount} new codes`);
+        sendResponse({ success: true, addedCount });
+    } catch (e) {
+        console.error('[EmbyLibrary] PlaybackStart handler error:', e);
+        sendResponse({ success: false, error: String(e) });
+    }
+    return false;
+}
+
 const ALARM_NAME = 'emby_library_sync';
 
 let _lastWatchedSyncTime = 0;
@@ -239,7 +260,7 @@ export async function handleScheduledSync(): Promise<void> {
     try {
         const config = await getConfig();
         if (!config.server.enabled || !config.server.url || !config.server.apiKey) return;
-        const { totalFetched } = await syncLibrary(config.server);
+        const { totalFetched } = await syncLibrary(config.server, config.sync.enrichJavdbMetadata);
         console.log(`[EmbyLibrary] Scheduled sync completed (${totalFetched} items)`);
     } catch (e) {
         console.error('[EmbyLibrary] Scheduled sync failed:', e);
@@ -275,13 +296,16 @@ export function registerEmbyBackgroundHandlers(): void {
                     return handleEmbyClearWatched(sendResponse);
                 case 'EMBY_LIBRARY_SYNC_WATCHED':
                     return handleEmbySyncWatched(sendResponse);
+                case 'EMBY_PLAYBACK_START':
+                    handleEmbyPlaybackStart(message, sendResponse);
+                    return true;
                 default:
                     return false;
             }
         });
 
         getConfig().then((config) => {
-            if (config.sync.mode === 'scheduled' && config.sync.scheduledIntervalMinutes) {
+            if (config.sync.autoScheduledSync && config.sync.scheduledIntervalMinutes) {
                 scheduleLibrarySync(config.sync.scheduledIntervalMinutes);
             }
         }).catch((e) => {

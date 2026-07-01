@@ -60,6 +60,8 @@ export const STORAGE_KEYS = {
     EMBY_LIBRARY_INDEX: 'emby_library_index',
     // Emby 联动：已观看番号永久记录（即使 Emby 中文件已删除也保留）
     EMBY_WATCHED_PERMANENT: 'emby_watched_permanent',
+    // Emby 联动：JavDB 元数据抓取进度
+    EMBY_ENRICH_PROGRESS: 'emby_enrich_progress',
 
 } as const;
 

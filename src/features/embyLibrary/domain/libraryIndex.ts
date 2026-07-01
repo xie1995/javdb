@@ -2,6 +2,8 @@ import { STORAGE_KEYS } from '../../../utils/config';
 import type { EmbyServerConfig, LibraryIndex, LibraryIndexEntry, EmbyWatchedData } from './types';
 import { EMPTY_LIBRARY_INDEX, EMPTY_WATCHED_DATA } from './types';
 import { normalizeCode } from './matcher';
+import { viewedGetAll as idbViewedGetAll, viewedBulkPut as idbViewedBulkPut, viewedPut as idbViewedPut } from '../../../platform/storage/indexedDb';
+import type { VideoRecord } from '../../../types';
 
 /**
  * 从文本中提取可能的 Jav 番号
@@ -233,7 +235,7 @@ function findLibraryIdByName(folders: Array<{ id: string; name: string; path?: s
     return null;
 }
 
-export async function fetchLibraryFromServer(config: EmbyServerConfig, libraryName?: string): Promise<{ entries: LibraryIndexEntry[]; totalFetched: number; matchedLibraryName: string | null; serverId: string | null }> {
+export async function fetchLibraryFromServer(config: EmbyServerConfig, libraryName?: string): Promise<{ entries: LibraryIndexEntry[]; totalFetched: number; matchedLibraryName: string | null; serverId: string | null; playedCodes: string[] }> {
     if (!config.url || !config.apiKey) {
         throw new Error('服务器配置不完整');
     }
@@ -242,6 +244,7 @@ export async function fetchLibraryFromServer(config: EmbyServerConfig, libraryNa
     const entries: LibraryIndexEntry[] = [];
     let totalFetched = 0;
     let serverId: string | null = null;
+    const playedCodes: string[] = [];
 
     // 0. 从 System/Info 获取服务器 ID（用于构建跳转 URL 的 serverId 参数）
     try {
@@ -291,7 +294,7 @@ export async function fetchLibraryFromServer(config: EmbyServerConfig, libraryNa
     while (hasMore) {
         // 如果指定了库的 ParentId，用 ParentId 限定范围；否则递归扫描全部
         const parentFilter = parentId ? `ParentId=${encodeURIComponent(parentId)}&` : '';
-        const url = `${baseUrl}/Items?api_key=${encodeURIComponent(config.apiKey)}&${parentFilter}Fields=ProviderIds,Genres,Tags,OriginalTitle,Path,Overview,Studios&Filters=IsNotFolder&Recursive=true&StartIndex=${startIndex}&Limit=${pageSize}`;
+        const url = `${baseUrl}/Items?api_key=${encodeURIComponent(config.apiKey)}&${parentFilter}Fields=ProviderIds,UserData,Genres,Tags,OriginalTitle,Path,Overview,Studios&Filters=IsNotFolder&Recursive=true&StartIndex=${startIndex}&Limit=${pageSize}`;
 
         const response = await fetch(url, {
             method: 'GET',
@@ -322,6 +325,7 @@ export async function fetchLibraryFromServer(config: EmbyServerConfig, libraryNa
                     console.log(`[EmbyLibrary] Sample[0] ProviderIds: ${JSON.stringify(sample.ProviderIds || {})}`);
                     console.log(`[EmbyLibrary] Sample[0] Genres: ${JSON.stringify(sample.Genres || [])}`);
                     console.log(`[EmbyLibrary] Sample[0] Tags: ${JSON.stringify(sample.Tags || [])}`);
+                    console.log(`[EmbyLibrary] Sample[0] UserData: ${JSON.stringify(sample.UserData || {})}`);
                 }
             }
         }
@@ -337,14 +341,23 @@ export async function fetchLibraryFromServer(config: EmbyServerConfig, libraryNa
                     _matchedSource: (source as any),
                 });
             }
+            if (item.UserData?.Played) {
+                const played = extractCodesFromItem(item);
+                for (const code of played.codes) {
+                    const normalized = normalizeCode(code);
+                    if (normalized && !playedCodes.includes(normalized)) {
+                        playedCodes.push(normalized);
+                    }
+                }
+            }
         }
 
         startIndex += items.length;
         hasMore = items.length === pageSize;
     }
 
-    console.log(`[EmbyLibrary] Done. Fetched ${totalFetched} items total, indexed ${entries.length} items with valid jav codes.`);
-    return { entries, totalFetched, matchedLibraryName: matchedLibraryName || null, serverId };
+    console.log(`[EmbyLibrary] Done. Fetched ${totalFetched} items total, indexed ${entries.length} items with valid jav codes, found ${playedCodes.length} played codes.`);
+    return { entries, totalFetched, matchedLibraryName: matchedLibraryName || null, serverId, playedCodes };
 }
 
 export async function fetchWatchedCodesFromServer(config: EmbyServerConfig): Promise<string[]> {
@@ -422,8 +435,8 @@ export async function fetchWatchedCodesFromServer(config: EmbyServerConfig): Pro
     return watchedCodes;
 }
 
-export async function syncLibrary(config: EmbyServerConfig): Promise<{ index: LibraryIndex; totalFetched: number; matchedLibraryName: string | null; watchedCount: number }> {
-    const { entries, totalFetched, matchedLibraryName, serverId } = await fetchLibraryFromServer(config);
+export async function syncLibrary(config: EmbyServerConfig, enrichJavdbMetadata?: boolean): Promise<{ index: LibraryIndex; totalFetched: number; matchedLibraryName: string | null; watchedCount: number }> {
+    const { entries, totalFetched, matchedLibraryName, serverId, playedCodes } = await fetchLibraryFromServer(config);
     // 给每个 entry 注入服务器信息，用于构建详情页跳转链接
     const serverUrl = config.url.replace(/\/$/, '');
     for (const entry of entries) {
@@ -438,9 +451,66 @@ export async function syncLibrary(config: EmbyServerConfig): Promise<{ index: Li
     };
     await saveLibraryIndex(index);
 
-    // 从用户上下文中获取已观看番号（需要用户ID）
-    const watchedCodes = await fetchWatchedCodesFromServer(config);
-    const watchedCount = await mergeWatchedCodes(watchedCodes);
+    // 自动将 Emby 库中的番号导入番号库（状态为 untracked，不覆盖已有记录）
+    try {
+        const allExistingRecords = await idbViewedGetAll();
+        const existingIds = new Set(allExistingRecords.map(r => r.id));
+        const now = Date.now();
+        const newRecords: VideoRecord[] = [];
+
+        for (const entry of entries) {
+            for (const code of entry.normalizedCodes) {
+                if (!existingIds.has(code) && code.length >= 3) {
+                    // 只导入在 JavDB 标准格式（字母+数字）或纯数字格式的番号
+                    if (/^[a-z]+\d+$/.test(code) || /^\d{5,12}$/.test(code)) {
+                        newRecords.push({
+                            id: code,
+                            title: entry.name || code,
+                            status: 'untracked' as any,
+                            createdAt: now,
+                            updatedAt: now,
+                        });
+                        existingIds.add(code);
+                    }
+                }
+            }
+        }
+
+        if (newRecords.length > 0) {
+            await idbViewedBulkPut(newRecords);
+            console.log(`[EmbyLibrary] Auto-imported ${newRecords.length} codes into viewed records`);
+        }
+
+        if (enrichJavdbMetadata) {
+            const recordsMap = new Map(allExistingRecords.map(r => [r.id, r]));
+            const codesToEnrich: string[] = [];
+            for (const entry of entries) {
+                for (const code of entry.normalizedCodes) {
+                    if (code.length >= 3 && (/^[a-z]+\d+$/.test(code) || /^\d{5,12}$/.test(code))) {
+                        const existing = recordsMap.get(code);
+                        if (!existing || !existing.javdbImage) {
+                            if (!codesToEnrich.includes(code)) codesToEnrich.push(code);
+                        }
+                    }
+                }
+            }
+            if (codesToEnrich.length > 0) {
+                await enrichImportedRecordsWithJavdbMetadata(codesToEnrich).catch(e => {
+                    console.warn('[EmbyLibrary] Background enrichment failed:', e);
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('[EmbyLibrary] Failed to auto-import codes into viewed records:', e);
+    }
+
+    // 合并库扫描中发现的已播放番号（从 UserData.Played 提取）
+    let watchedCount = await mergeWatchedCodes(playedCodes);
+
+    // 再从已播放 API 补充
+    const watchedCodesFromApi = await fetchWatchedCodesFromServer(config);
+    const apiCount = await mergeWatchedCodes(watchedCodesFromApi);
+    watchedCount += apiCount;
 
     return { index, totalFetched, matchedLibraryName, watchedCount };
 }
@@ -491,6 +561,179 @@ export async function clearWatchedData(): Promise<void> {
     await new Promise<void>((resolve) => {
         chrome.storage.local.remove(STORAGE_KEYS.EMBY_WATCHED_PERMANENT, () => resolve());
     });
+}
+
+/**
+ * 从 JavDB 搜索页面解析第一条结果的链接和标题
+ */
+async function searchJavdb(code: string): Promise<{ url: string; title: string } | null> {
+    try {
+        const searchUrl = `https://javdb.com/search?q=${encodeURIComponent(code)}&f=all`;
+        const response = await fetch(searchUrl);
+        if (!response.ok) return null;
+        const html = await response.text();
+
+        // 匹配第一个 .item 中的链接
+        const itemMatch = html.match(/<div[^>]*class="[^"]*item[^"]*"[^>]*>/);
+        if (!itemMatch) return null;
+        const itemStart = html.indexOf(itemMatch[0]);
+        const itemHtml = html.substring(itemStart, itemStart + 2000);
+
+        const hrefMatch = itemHtml.match(/href="(\/v\/[^"]+)"/);
+        if (!hrefMatch) return null;
+        const url = `https://javdb.com${hrefMatch[1]}`;
+
+        const titleMatch = itemHtml.match(/title="([^"]+)"/);
+        const title = titleMatch ? titleMatch[1] : code;
+
+        return { url, title };
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * 从 JavDB 详情页解析封面图
+ */
+async function fetchJavdbCoverImage(detailUrl: string): Promise<string | undefined> {
+    try {
+        const response = await fetch(detailUrl);
+        if (!response.ok) return undefined;
+        const html = await response.text();
+
+        // 匹配 jdbstatic 封面图
+        const coverMatch = html.match(/(?:data-fancybox="gallery"\s+href|<img[^>]*src)="(https:\/\/[^"]*\.jdbstatic\.com\/covers\/[^"]+)"/);
+        if (coverMatch) return coverMatch[1];
+
+        // 备用：匹配 video-cover 类图片
+        const altMatch = html.match(/<img[^>]*class="[^"]*video-cover[^"]*"[^>]*src="([^"]+)"/);
+        if (altMatch) return altMatch[1];
+
+        return undefined;
+    } catch {
+        return undefined;
+    }
+}
+
+/**
+ * 后台异步从 JavDB 抓取封面和标题，丰富新导入的记录
+ * fire-and-forget 模式，不阻塞同步流程
+ */
+async function enrichImportedRecordsWithJavdbMetadata(codes: string[]): Promise<void> {
+    const total = codes.length;
+    console.log(`[EmbyLibrary] Starting background enrichment for ${total} codes...`);
+    let enriched = 0;
+
+    // Write initial progress to storage so UI can detect and show progress bar
+    const writeProgress = async (current: number, currentCode?: string, isDone?: boolean) => {
+        try {
+            await new Promise<void>((resolve) => {
+                chrome.storage.local.set({
+                    [STORAGE_KEYS.EMBY_ENRICH_PROGRESS]: {
+                        total,
+                        current,
+                        currentCode: currentCode || '',
+                        done: !!isDone,
+                        lastUpdate: Date.now(),
+                    },
+                }, () => resolve());
+            });
+        } catch {}
+    };
+    await writeProgress(0);
+
+    for (let i = 0; i < total; i++) {
+        const code = codes[i];
+
+        // 检查是否被用户中止
+        try {
+            const ctrl = await new Promise<Record<string, any>>(rs =>
+                chrome.storage.local.get([STORAGE_KEYS.EMBY_ENRICH_PROGRESS], d => rs(d))
+            );
+            const p = ctrl[STORAGE_KEYS.EMBY_ENRICH_PROGRESS] as any;
+            if (p?.aborted) {
+                console.log(`[EmbyLibrary] Enrichment aborted by user at ${i}/${total}`);
+                await writeProgress(i, code, true);
+                return;
+            }
+            if (p?.paused) {
+                console.log(`[EmbyLibrary] Enrichment paused at ${i}/${total}, waiting for resume...`);
+                await writeProgress(i, code); // keep showing paused state
+                // 轮询等待恢复
+                while (true) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    const check = await new Promise<Record<string, any>>(rs =>
+                        chrome.storage.local.get([STORAGE_KEYS.EMBY_ENRICH_PROGRESS], d => rs(d))
+                    );
+                    const cp = check[STORAGE_KEYS.EMBY_ENRICH_PROGRESS] as any;
+                    if (cp?.aborted) {
+                        console.log(`[EmbyLibrary] Aborted while paused at ${i}`);
+                        await writeProgress(i, code, true);
+                        return;
+                    }
+                    if (!cp?.paused) {
+                        console.log(`[EmbyLibrary] Resumed enrichment at ${i}`);
+                        break;
+                    }
+                }
+            }
+        } catch {}
+
+        try {
+            // 限速：每3个请求暂停4秒，避免触发JavDB风控
+            if (i > 0 && i % 3 === 0) {
+                await new Promise(r => setTimeout(r, 4000));
+            }
+            // 每个请求之间额外延迟2秒
+            if (i > 0) {
+                await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000));
+            }
+
+            await writeProgress(i + 1, code);
+
+            // 搜索 JavDB
+            const searchResult = await searchJavdb(code);
+            if (!searchResult) {
+                console.log(`[EmbyLibrary] Enrich: ${code} not found on JavDB`);
+                continue;
+            }
+
+            // 抓取封面图
+            const coverImage = await fetchJavdbCoverImage(searchResult.url);
+
+            // 更新记录
+            const record: VideoRecord = {
+                id: code,
+                title: searchResult.title,
+                status: 'untracked' as any,
+                javdbUrl: searchResult.url,
+                javdbImage: coverImage,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+            };
+            await idbViewedPut(record);
+            enriched++;
+            console.log(`[EmbyLibrary] Enrich: ${code} → ${searchResult.title} (cover: ${!!coverImage})`);
+        } catch (e) {
+            console.warn(`[EmbyLibrary] Enrich failed for ${code}:`, e);
+        }
+    }
+
+    // Mark enrichment as complete
+    try {
+        await new Promise<void>((resolve) => {
+            chrome.storage.local.set({
+                [STORAGE_KEYS.EMBY_ENRICH_PROGRESS]: {
+                    total,
+                    current: total,
+                    currentCode: '',
+                    done: true,
+                    lastUpdate: Date.now(),
+                },
+            }, () => resolve());
+        });
+    } catch {}
+    console.log(`[EmbyLibrary] Background enrichment done: ${enriched}/${total} enriched`);
 }
 
 export async function testConnection(config: EmbyServerConfig): Promise<{ success: boolean; message: string; serverName?: string }> {

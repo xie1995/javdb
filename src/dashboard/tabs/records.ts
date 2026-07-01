@@ -36,15 +36,15 @@ import { createRecordsViewRuntime, type RecordsViewRuntime } from './records/vie
 import { createRecordsLifecycleRuntime } from './records/lifecycleRuntime';
 import { type RecordsAdvancedCondition as AdvCondition } from './records/advancedConditionModel';
 
-// 防重复初始化（避免多次绑定事件导致重复行为）
-let RECORDS_TAB_INITIALIZED = false;
-
 export function initRecordsTab(): void {
-    if (RECORDS_TAB_INITIALIZED) {
-        console.warn('[RecordsTab] initRecordsTab() called more than once, skipping re-init');
+    // 防重复初始化：基于 DOM 而非模块级变量，导航返回时 DOM 重建会重新初始化
+    const recordsPage = document.querySelector('.records-page');
+    if (!recordsPage) return;
+    if (recordsPage.hasAttribute('data-records-initialized')) {
+        console.warn('[RecordsTab] initRecordsTab() called more than once on same DOM, skipping re-init');
         return;
     }
-    RECORDS_TAB_INITIALIZED = true;
+    recordsPage.setAttribute('data-records-initialized', '');
 
     // 每次进入 Records Tab 时重新从 storage 加载 Emby 已观看数据
     const watchedRefreshStarted = refreshWatchedCodesFromStorage();
