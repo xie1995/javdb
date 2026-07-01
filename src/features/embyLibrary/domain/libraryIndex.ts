@@ -294,7 +294,7 @@ export async function fetchLibraryFromServer(config: EmbyServerConfig, libraryNa
     while (hasMore) {
         // 如果指定了库的 ParentId，用 ParentId 限定范围；否则递归扫描全部
         const parentFilter = parentId ? `ParentId=${encodeURIComponent(parentId)}&` : '';
-        const url = `${baseUrl}/Items?api_key=${encodeURIComponent(config.apiKey)}&${parentFilter}Fields=ProviderIds,UserData,Genres,Tags,OriginalTitle,Path,Overview,Studios&Filters=IsNotFolder&Recursive=true&StartIndex=${startIndex}&Limit=${pageSize}`;
+        const url = `${baseUrl}/Items?api_key=${encodeURIComponent(config.apiKey)}&${parentFilter}Fields=ProviderIds,UserData,Genres,Tags,OriginalTitle,Path,Overview,Studios,ImageTags&Filters=IsNotFolder&Recursive=true&StartIndex=${startIndex}&Limit=${pageSize}`;
 
         const response = await fetch(url, {
             method: 'GET',
@@ -333,11 +333,17 @@ export async function fetchLibraryFromServer(config: EmbyServerConfig, libraryNa
         for (const item of items) {
             const { codes, source } = extractCodesFromItem(item);
             if (codes.length > 0) {
+                // 构建 Emby 封面图 URL（格式: {baseUrl}/Items/{itemId}/Images/Primary?api_key={apiKey}）
+                let coverImageUrl: string | undefined;
+                if (item.ImageTags && item.ImageTags.Primary) {
+                    coverImageUrl = `${baseUrl}/Items/${encodeURIComponent(item.Id)}/Images/Primary?api_key=${encodeURIComponent(config.apiKey)}`;
+                }
                 entries.push({
                     id: item.Id,
                     name: item.Name || '',
                     providerIds: { extracted: codes[0] },
                     normalizedCodes: codes.map(c => normalizeCode(c)),
+                    coverImageUrl,
                     _matchedSource: (source as any),
                 });
             }
@@ -467,6 +473,7 @@ export async function syncLibrary(config: EmbyServerConfig, enrichJavdbMetadata?
                             id: code,
                             title: entry.name || code,
                             status: 'untracked' as any,
+                            javdbImage: entry.coverImageUrl || undefined,
                             createdAt: now,
                             updatedAt: now,
                         });
@@ -474,6 +481,24 @@ export async function syncLibrary(config: EmbyServerConfig, enrichJavdbMetadata?
                     }
                 }
             }
+        }
+
+        // 同时给已有的但缺少封面的记录补充 Emby 封面（fire-and-forget）
+        const recordsNeedingEmbyCover: VideoRecord[] = [];
+        for (const entry of entries) {
+            for (const code of entry.normalizedCodes) {
+                if (code.length >= 3 && (/^[a-z]+\d+$/.test(code) || /^\d{5,12}$/.test(code))) {
+                    const existing = allExistingRecords.find(r => r.id === code);
+                    if (existing && !existing.javdbImage && entry.coverImageUrl) {
+                        existing.javdbImage = entry.coverImageUrl;
+                        recordsNeedingEmbyCover.push(existing);
+                    }
+                }
+            }
+        }
+        if (recordsNeedingEmbyCover.length > 0) {
+            try { await idbViewedBulkPut(recordsNeedingEmbyCover); } catch {}
+            console.log(`[EmbyLibrary] Updated ${recordsNeedingEmbyCover.length} existing records with Emby covers`);
         }
 
         if (newRecords.length > 0) {
@@ -565,6 +590,7 @@ export async function clearWatchedData(): Promise<void> {
 
 /**
  * 从 JavDB 搜索页面解析第一条结果的链接和标题
+ * 支持 GANA-3210、gana3210、fc2-ppv-123 等多种格式
  */
 async function searchJavdb(code: string): Promise<{ url: string; title: string } | null> {
     try {
@@ -573,20 +599,45 @@ async function searchJavdb(code: string): Promise<{ url: string; title: string }
         if (!response.ok) return null;
         const html = await response.text();
 
-        // 匹配第一个 .item 中的链接
-        const itemMatch = html.match(/<div[^>]*class="[^"]*item[^"]*"[^>]*>/);
-        if (!itemMatch) return null;
-        const itemStart = html.indexOf(itemMatch[0]);
-        const itemHtml = html.substring(itemStart, itemStart + 2000);
+        // 策略1: 查找 strong 标签中包含原始查找关键词
+        const escapedCode = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const strongRegex = new RegExp(`<strong[^>]*>\\s*${escapedCode}\\s*</strong>`, 'gi');
+        const strongMatches = html.matchAll(strongRegex);
 
-        const hrefMatch = itemHtml.match(/href="(\/v\/[^"]+)"/);
-        if (!hrefMatch) return null;
-        const url = `https://javdb.com${hrefMatch[1]}`;
+        for (const match of strongMatches) {
+            const matchIdx = match.index!;
+            // 向前查找最近的 .item div
+            const before = html.substring(0, matchIdx);
+            const itemStart = before.lastIndexOf('item');
+            if (itemStart < 0) continue;
+            const itemHtml = html.substring(itemStart, matchIdx + 300);
 
-        const titleMatch = itemHtml.match(/title="([^"]+)"/);
-        const title = titleMatch ? titleMatch[1] : code;
+            const hrefMatch = itemHtml.match(/href="(\/v\/[^"]+)"/);
+            if (!hrefMatch) continue;
+            const url = `https://javdb.com${hrefMatch[1]}`;
 
-        return { url, title };
+            const titleMatch = itemHtml.match(/title="([^"]+)"/);
+            const title = titleMatch ? titleMatch[1] : code;
+
+            return { url, title };
+        }
+
+        // 策略2: 回退到简单 .item 匹配
+        const itemRegex = /<div[^>]*class="[^"]*item[^"]*"[^>]*>/g;
+        let itemMatch: RegExpExecArray | null;
+        while ((itemMatch = itemRegex.exec(html)) !== null) {
+            const itemHtml = html.substring(itemMatch.index, itemMatch.index + 2000);
+            const hrefMatch = itemHtml.match(/href="(\/v\/[^"]+)"/);
+            if (!hrefMatch) continue;
+            const url = `https://javdb.com${hrefMatch[1]}`;
+
+            const titleMatch = itemHtml.match(/title="([^"]+)"/);
+            const title = titleMatch ? titleMatch[1] : code;
+
+            return { url, title };
+        }
+
+        return null;
     } catch {
         return null;
     }

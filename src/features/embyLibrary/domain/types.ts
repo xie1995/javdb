@@ -37,6 +37,8 @@ export interface LibraryIndexEntry {
     serverType?: ServerType;
     /** 服务器 ID（用于构建 Emby 的 item 详情 URL，如 caabb0f42b534a81a93cabae238dd69b） */
     serverId?: string;
+    /** Emby/Jellyfin 服务器上的封面图 URL（优先使用，无需访问JavDB） */
+    coverImageUrl?: string;
     /** @deprecated internal debug field */
     _matchedSource?: 'ProviderIds' | 'Genres' | 'Title' | 'Overview';
 }
