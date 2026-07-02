@@ -144,16 +144,93 @@ export async function initEmbySettings(): Promise<void> {
     }
 
     if (syncLibraryBtn) {
+        // 进度条元素
+        const enrichProgress = document.getElementById('embyEnrichProgress') as HTMLElement | null;
+        const enrichFill = document.getElementById('embyEnrichFill') as HTMLElement | null;
+        const enrichPercent = document.getElementById('embyEnrichPercent') as HTMLElement | null;
+        const enrichText = document.getElementById('embyEnrichText') as HTMLElement | null;
+
+        // 控制按钮
+        const pauseBtn = document.getElementById('embyEnrichPause') as HTMLButtonElement | null;
+        const resumeBtn = document.getElementById('embyEnrichResume') as HTMLButtonElement | null;
+        const stopBtn = document.getElementById('embyEnrichStop') as HTMLButtonElement | null;
+
+        let enrichListener: ((msg: any) => void) | null = null;
+        let enrichRunning = false;
+
+        function showControlButtons(show: boolean) {
+            if (pauseBtn) pauseBtn.style.display = show ? 'inline-flex' : 'none';
+            if (resumeBtn) resumeBtn.style.display = 'none'; // start hidden
+            if (stopBtn) stopBtn.style.display = show ? 'inline-flex' : 'none';
+            syncLibraryBtn.style.display = show ? 'none' : 'inline-flex';
+        }
+
+        function updateProgressUI(p: any) {
+            const pct = p.total > 0 ? Math.round((p.current / p.total) * 100) : 0;
+            if (enrichFill) enrichFill.style.width = pct + '%';
+            if (enrichPercent) enrichPercent.textContent = pct + '%';
+            if (enrichText) {
+                const stageText = p.stage === 'searching' ? '🔍 搜索中' : p.stage === 'browsing' ? '👀 浏览中' : '✅';
+                const extra = p.title === '已停止' ? ' ⏹ 已停止' : '';
+                enrichText.textContent = `${stageText} ${p.current}/${p.total} ${p.code || ''}${extra}`;
+            }
+        }
+
+        // 暂停
+        pauseBtn?.addEventListener('click', async () => {
+            await sendMessage({ type: 'EMBY_ENRICH_PAUSE' });
+            if (pauseBtn) pauseBtn.style.display = 'none';
+            if (resumeBtn) resumeBtn.style.display = 'inline-flex';
+            if (enrichText) enrichText.textContent += ' ⏸ 已暂停';
+        });
+
+        // 恢复
+        resumeBtn?.addEventListener('click', async () => {
+            await sendMessage({ type: 'EMBY_ENRICH_RESUME' });
+            if (pauseBtn) pauseBtn.style.display = 'inline-flex';
+            if (resumeBtn) resumeBtn.style.display = 'none';
+        });
+
+        // 停止
+        stopBtn?.addEventListener('click', async () => {
+            await sendMessage({ type: 'EMBY_ENRICH_STOP' });
+            showControlButtons(false);
+            enrichRunning = false;
+        });
+
         syncLibraryBtn.addEventListener('click', async () => {
             if (!syncStatus) return;
             if (!enabledCheckbox.checked) { setStatus(syncStatus, '请先启用Emby联动', 'error'); return; }
             if (!serverUrlInput.value.trim() || !apiKeyInput.value.trim()) { setStatus(syncStatus, '请先填写服务器信息', 'error'); return; }
-            setStatus(syncStatus, '正在同步...', 'loading');
+            setStatus(syncStatus, '正在同步番号索引...', 'loading');
+
+            // 显示进度条和控制按钮
+            if (enrichProgress) enrichProgress.style.display = 'block';
+            if (enrichFill) enrichFill.style.width = '0%';
+            if (enrichPercent) enrichPercent.textContent = '0%';
+            if (enrichText) enrichText.textContent = '准备中...';
+            showControlButtons(true);
+            enrichRunning = true;
+
+            // 监听抓取进度
+            enrichListener = (msg: any) => {
+                if (msg?.type !== 'EMBY_LIBRARY_ENRICH_PROGRESS') return;
+                const p = msg?.progress;
+                if (!p) return;
+                updateProgressUI(p);
+                if (!enrichRunning) {
+                    // 停止时更新 UI
+                    updateProgressUI(p);
+                }
+            };
+            chrome.runtime.onMessage.addListener(enrichListener);
+
             try {
                 const cur = config.sync;
-                // Update config right before sync to pass current enrich setting
                 await sendMessage({ type: 'EMBY_LIBRARY_UPDATE_CONFIG', config: { ...config, sync: { ...cur, enrichJavdbMetadata: enrichJavdbMetadataCheckbox?.checked ?? false } } });
                 const result = await sendMessage({ type: 'EMBY_LIBRARY_SYNC' });
+                // 完成
+                if (enrichText) enrichText.textContent = '完成！';
                 if (result?.success) {
                     const count = result.index?.totalCount ?? result.count ?? 0;
                     const fetched = result.totalFetched ?? 0;
@@ -161,6 +238,18 @@ export async function initEmbySettings(): Promise<void> {
                     if (lastSyncText) lastSyncText.textContent = '上次同步: ' + new Date().toLocaleString();
                 } else setStatus(syncStatus, '✗ ' + (result?.error || '失败'), 'error');
             } catch (e) { setStatus(syncStatus, '✗ ' + (e as Error).message, 'error'); }
+            finally {
+                enrichRunning = false;
+                // 延迟隐藏进度条和按钮
+                setTimeout(() => {
+                    if (enrichProgress) enrichProgress.style.display = 'none';
+                    showControlButtons(false);
+                }, 3000);
+                if (enrichListener) {
+                    chrome.runtime.onMessage.removeListener(enrichListener);
+                    enrichListener = null;
+                }
+            }
         });
     }
 

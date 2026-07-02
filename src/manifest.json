@@ -39,7 +39,7 @@
     "http://*/*"
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https: http:;"
+    "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: https: http:; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https: http:;"
   },
   "background": {
     "service_worker": "apps/background/bootstrap.ts",

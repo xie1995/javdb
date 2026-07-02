@@ -53,7 +53,15 @@ export function handleEmbySyncRequest(sendResponse: (response: any) => void): bo
             sendResponse({ success: false, error: '服务器未配置或未启用' });
             return;
         }
-        syncLibrary(config.server, config.sync.enrichJavdbMetadata)
+        syncLibrary(config.server, config.sync.enrichJavdbMetadata, (progress) => {
+            // 广播抓取进度给 Dashboard UI
+            try {
+                chrome.runtime.sendMessage({
+                    type: 'EMBY_LIBRARY_ENRICH_PROGRESS',
+                    progress,
+                }).catch(() => {});
+            } catch {}
+        })
             .then(({ index, totalFetched, matchedLibraryName, watchedCount }) => sendResponse({ success: true, index, totalFetched, count: index.totalCount, matchedLibraryName, watchedCount }))
             .catch((error: Error) => sendResponse({ success: false, error: error.message }));
     }).catch((error: Error) => {
@@ -267,6 +275,25 @@ export async function handleScheduledSync(): Promise<void> {
     }
 }
 
+async function handleEnrichControl(
+    message: { type: string },
+    sendResponse: (response: any) => void
+): Promise<void> {
+    const ENRICH_CONTROL_KEY = 'emby_enrich_control';
+    const typeMap: Record<string, string> = {
+        'EMBY_ENRICH_PAUSE': 'paused',
+        'EMBY_ENRICH_RESUME': 'running',
+        'EMBY_ENRICH_STOP': 'stopped',
+    };
+    const value = typeMap[message.type];
+    if (value) {
+        await chrome.storage.local.set({ [ENRICH_CONTROL_KEY]: value });
+        sendResponse({ success: true, control: value });
+    } else {
+        sendResponse({ success: false, error: 'unknown control' });
+    }
+}
+
 export function registerEmbyBackgroundHandlers(): void {
     try {
         chrome.runtime.onMessage.addListener((message: any, _sender, sendResponse): boolean | void => {
@@ -299,6 +326,11 @@ export function registerEmbyBackgroundHandlers(): void {
                 case 'EMBY_PLAYBACK_START':
                     handleEmbyPlaybackStart(message, sendResponse);
                     return true;
+                case 'EMBY_ENRICH_PAUSE':
+                case 'EMBY_ENRICH_RESUME':
+                case 'EMBY_ENRICH_STOP':
+                    handleEnrichControl(message, sendResponse);
+                    return false;
                 default:
                     return false;
             }

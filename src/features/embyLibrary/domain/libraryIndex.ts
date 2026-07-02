@@ -244,7 +244,7 @@ async function fetchJavdbCoverImage(detailUrl: string): Promise<string | undefin
 
 // ========== Exports ==========
 
-export async function syncLibrary(config: EmbyServerConfig, enrichJavdbMetadata?: boolean): Promise<{ index: LibraryIndex; totalFetched: number; matchedLibraryName: string | null; watchedCount: number }> {
+export async function syncLibrary(config: EmbyServerConfig, enrichJavdbMetadata?: boolean, onEnrichProgress?: (p: EnrichProgress) => void): Promise<{ index: LibraryIndex; totalFetched: number; matchedLibraryName: string | null; watchedCount: number }> {
     const { entries, totalFetched, matchedLibraryName, serverId, playedCodes } = await fetchLibraryFromServer(config);
     const serverUrl = config.url.replace(/\/$/, '');
     for (const entry of entries) {
@@ -287,7 +287,7 @@ export async function syncLibrary(config: EmbyServerConfig, enrichJavdbMetadata?
                 }
             }
             if (codesToEnrich.length > 0) {
-                await enrichImportedRecordsWithJavdbMetadata(codesToEnrich).catch(e => {
+                await enrichImportedRecordsWithJavdbMetadata(codesToEnrich, onEnrichProgress).catch(e => {
                     console.warn('[EmbyLibrary] Enrichment failed:', e);
                 });
             }
@@ -352,28 +352,149 @@ export async function clearWatchedData(): Promise<void> {
     await new Promise<void>((resolve) => { chrome.storage.local.remove(STORAGE_KEYS.EMBY_WATCHED_PERMANENT, () => resolve()); });
 }
 
-async function enrichImportedRecordsWithJavdbMetadata(codes: string[]): Promise<void> {
+/**
+ * 拟人化延迟：模拟真实用户浏览行为
+ * - 搜索番号后"看"搜索结果页（3~6s）
+ * - 点开详情页"浏览"封面和基本信息（5~12s）
+ * - 偶尔"仔细看"（15~30s，概率约 15%）
+ * - 每 4~6 个番号后"休息"一会（30~90s）
+ * - 每约 20 个番号后长时间"休息"（2~5分钟），避免持续请求
+ */
+function humanDelay(sessionIndex: number): Promise<void> {
+    // 每 4~6 个番号取一次额外休息
+    const breakEvery = 4 + Math.floor(Math.random() * 3); // 4-6
+    if (sessionIndex > 0 && sessionIndex % breakEvery === 0) {
+        const breakSec = 30 + Math.random() * 60; // 30-90s
+        console.log(`[EmbyLibrary] 🫖 Taking a break for ${breakSec.toFixed(0)}s...`);
+        return new Promise(r => setTimeout(r, breakSec * 1000));
+    }
+    return Promise.resolve();
+}
+
+function humanLongBreak(batchIndex: number): Promise<void> {
+    const longBreakEvery = 18 + Math.floor(Math.random() * 5); // 18-22
+    if (batchIndex > 0 && batchIndex % longBreakEvery === 0) {
+        const breakMin = 2 + Math.floor(Math.random() * 3); // 2-5 minutes
+        console.log(`[EmbyLibrary] 😴 Long break for ${breakMin} min...`);
+        return new Promise(r => setTimeout(r, breakMin * 60 * 1000));
+    }
+    return Promise.resolve();
+}
+
+/** 模拟一次番号抓取：搜索 → 浏览 → 详情 */
+async function enrichOneCode(code: string, index: number): Promise<boolean> {
+    // 1. 搜索 JavDB —— 模拟"输入番号、看搜索结果"
+    await new Promise(r => setTimeout(r, 1000 + Math.random() * 2000)); // 1-3s 输入+加载
+    const searchResult = await searchJavdb(code);
+    if (!searchResult) {
+        console.log(`[EmbyLibrary] Not found: ${code}`);
+        return false;
+    }
+
+    // 2. 浏览搜索结果页 —— 模拟"扫一眼结果"
+    const browseTime = 3 + Math.random() * 6; // 3-9s
+    await new Promise(r => setTimeout(r, browseTime * 1000));
+
+    // 3. 打开详情页 —— 模拟"点进去看"
+    const isDeepBrowse = Math.random() < 0.15; // 15% 概率"仔细看"
+    const detailTime = isDeepBrowse
+        ? 15 + Math.random() * 15  // 仔细看：15-30s
+        : 5 + Math.random() * 7;   // 普通看：5-12s
+    await new Promise(r => setTimeout(r, detailTime * 1000));
+
+    // 4. 抓取封面
+    const coverImage = await fetchJavdbCoverImage(searchResult.url);
+
+    console.log(`[EmbyLibrary] Enriched #${index}: ${code} → ${searchResult.title}${isDeepBrowse ? ' (deep)' : ''}`);
+    const record: VideoRecord = {
+        id: code, title: searchResult.title, status: 'untracked' as any,
+        javdbUrl: searchResult.url, javdbImage: coverImage,
+        createdAt: Date.now(), updatedAt: Date.now(),
+    };
+    await idbViewedPut(record);
+    return true;
+}
+
+export type EnrichProgress = { current: number; total: number; code: string; title?: string; stage: 'searching' | 'browsing' | 'detail' | 'done' };
+
+const ENRICH_CONTROL_KEY = 'emby_enrich_control';
+type EnrichControl = 'running' | 'paused' | 'stopped';
+
+async function getEnrichControl(): Promise<EnrichControl> {
+    try {
+        const result = await chrome.storage.local.get(ENRICH_CONTROL_KEY);
+        const val = result[ENRICH_CONTROL_KEY];
+        if (val === 'paused' || val === 'stopped') return val;
+    } catch {}
+    return 'running';
+}
+
+async function setEnrichControl(control: EnrichControl): Promise<void> {
+    await chrome.storage.local.set({ [ENRICH_CONTROL_KEY]: control });
+}
+
+/** 等待直到控制状态变为 running，或变为 stopped */
+async function waitIfPaused(): Promise<boolean> {
+    while (true) {
+        const control = await getEnrichControl();
+        if (control === 'stopped') return false; // 停止
+        if (control === 'running') return true;   // 继续
+        // paused: 每秒检查一次
+        await new Promise(r => setTimeout(r, 1000));
+    }
+}
+
+async function enrichImportedRecordsWithJavdbMetadata(
+    codes: string[],
+    onProgress?: (p: EnrichProgress) => void,
+): Promise<void> {
     const total = codes.length;
-    console.log(`[EmbyLibrary] Starting JavDB enrichment for ${total} codes...`);
+    console.log(`[EmbyLibrary] Starting JavDB enrichment for ${total} codes (~${(total * 20 / 60).toFixed(0)}min estimated)...`);
     let enriched = 0;
+    let stopped = false;
+
+    await setEnrichControl('running');
+    onProgress?.({ current: 0, total, code: codes[0] || '', stage: 'searching' });
 
     for (let i = 0; i < total; i++) {
         const code = codes[i];
         try {
-            if (i > 0 && i % 3 === 0) await new Promise(r => setTimeout(r, 4000));
-            if (i > 0) await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000));
+            // 检查暂停/停止
+            const shouldContinue = await waitIfPaused();
+            if (!shouldContinue) { stopped = true; break; }
 
-            const searchResult = await searchJavdb(code);
-            if (!searchResult) { console.log(`[EmbyLibrary] Not found: ${code}`); continue; }
+            onProgress?.({ current: i, total, code, stage: 'searching' });
 
-            const coverImage = await fetchJavdbCoverImage(searchResult.url);
-            const record: VideoRecord = { id: code, title: searchResult.title, status: 'untracked' as any, javdbUrl: searchResult.url, javdbImage: coverImage, createdAt: Date.now(), updatedAt: Date.now() };
-            await idbViewedPut(record);
-            enriched++;
-            console.log(`[EmbyLibrary] Enriched: ${code} → ${searchResult.title}`);
-        } catch (e) { console.warn(`[EmbyLibrary] Failed ${code}:`, e); }
+            // 长时间休息（每约20个）
+            await humanLongBreak(i);
+
+            // 休息期间也检查
+            const afterBreak = await waitIfPaused();
+            if (!afterBreak) { stopped = true; break; }
+
+            // 小休息（每4-6个）
+            await humanDelay(i);
+
+            onProgress?.({ current: i, total, code, stage: 'browsing' });
+            const ok = await enrichOneCode(code, i + 1);
+            if (ok) enriched++;
+
+            onProgress?.({ current: i + 1, total, code, title: code, stage: 'done' });
+        } catch (e) {
+            console.warn(`[EmbyLibrary] Failed ${code}:`, e);
+            onProgress?.({ current: i + 1, total, code, stage: 'done' });
+            await new Promise(r => setTimeout(r, 5000 + Math.random() * 5000));
+        }
     }
-    console.log(`[EmbyLibrary] JavDB enrichment done: ${enriched}/${total}`);
+
+    await setEnrichControl('stopped'); // 清理状态
+    if (stopped) {
+        onProgress?.({ current: enriched, total, code: '', title: '已停止', stage: 'done' });
+        console.log(`[EmbyLibrary] Enrichment stopped by user: ${enriched}/${total}`);
+    } else {
+        onProgress?.({ current: total, total, code: '', stage: 'done' });
+        console.log(`[EmbyLibrary] JavDB enrichment done: ${enriched}/${total}`);
+    }
 }
 
 export async function testConnection(config: EmbyServerConfig): Promise<{ success: boolean; message: string; serverName?: string }> {

@@ -209,6 +209,8 @@ export class PerformanceOptimizer {
   // P1 FIX: 清理前将队列中的任务 flush 到 chrome.storage，防止工作丢失
   private async flushQueuesToStorage(): Promise<void> {
     if (this.requestQueue.length === 0 && this.domOperationQueue.length === 0) return;
+    // Guard: chrome.storage may be unavailable when extension context is invalidated
+    if (typeof chrome === 'undefined' || !chrome.storage) return;
     try {
       const snapshot = {
         flushedAt: Date.now(),

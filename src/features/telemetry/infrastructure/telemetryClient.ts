@@ -31,6 +31,9 @@ export async function sendTelemetry(input: SendTelemetryInput): Promise<{ ok: bo
       ok: !!response.ok,
       status: response.status,
     };
+  } catch {
+    // Silently ignore fetch errors (network unreachable, CORS, etc.)
+    return { ok: false };
   } finally {
     if (timer) clearTimeout(timer);
   }
